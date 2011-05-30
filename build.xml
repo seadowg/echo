@@ -1,1 +1,23 @@
-<!--Need to set up scalac task in here-->
+<project name="echo" basedir="." default="build">
+  <property name="scala-compiler.jar"
+    value="/usr/local/Cellar/scala/2.8.1/libexec/lib/scala-compiler.jar"/>
+  <property name="scala-library.jar" 
+    value="/usr/local/Cellar/scala/2.8.1/libexec/lib/scala-library.jar"/>
+  <path id="scala.classpath">
+    <pathelement location="${scala-compiler.jar}"/>
+    <pathelement location="${scala-library.jar}"/>
+  </path>
+  <taskdef resource="scala/tools/ant/antlib.xml">
+    <classpath refid="scala.classpath"/>
+  </taskdef>
+  <target name="build">
+    <mkdir dir="build/classes"   />
+      <scalac srcdir="src"
+        destdir="build/classes"
+        classpathref="scala.classpath">
+      </scalac>
+  </target>
+  <target name="clean">
+    <delete dir="build/classes"/>
+  </target>  
+</project>
