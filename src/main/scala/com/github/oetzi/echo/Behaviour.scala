@@ -5,5 +5,13 @@ package com.github.oetzi.echo {
 		def now() : T = {
 			rule(new Date().getTime)
 		}
+		
+		def +(behaviour : Behaviour[T])(implicit numeric : Numeric[T]) : Behaviour[T] = {
+			val new_rule : Double => T = {
+				time => numeric.plus(this.now, behaviour.now)
+			}
+			
+			new Behaviour(new_rule)
+		}
 	}
 }
