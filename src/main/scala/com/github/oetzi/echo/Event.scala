@@ -1,5 +1,5 @@
 package com.github.oetzi.echo {
-	class Event {
+	class Event[T] {
 		
 	}
 }
