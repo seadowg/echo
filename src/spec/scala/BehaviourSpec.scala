@@ -1,5 +1,6 @@
 import org.specs._
 import com.github.oetzi.echo.Behaviour
+import com.github.oetzi.echo.Event
 
 object BehaviourSpec extends Specification {
 	"Behaviour" should {
@@ -97,6 +98,32 @@ object BehaviourSpec extends Specification {
 			val second_val = beh.now
 
 			first_val must_!= second_val
+		}
+	}
+	
+	"'Behaviour.until' function" should {
+		"create a new Behaviour of type T" in {
+			val beh = new Behaviour(time => time)
+			val event = new Event[Boolean]
+			
+			beh.until(event, time => 5.0).isInstanceOf[Behaviour[Double]] mustBe true
+		}
+		
+		"create a Behaviour that is unchanged before the Event occurs" in {
+			val beh = new Behaviour(time => 5)
+			val event = new Event[Boolean]
+			
+			beh.until(event, time => 10).now mustBe 5
+		}
+		
+		"create a Behaviour that is changed when the Event DOES occurs" in {
+			val beh = new Behaviour(time => 5)
+			val event = new Event[Boolean]
+			
+			val until_beh = beh.until(event, time => 10)
+			event.occur(true)
+			
+			until_beh.now mustBe 10
 		}
 	} 
 }

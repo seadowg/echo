@@ -29,5 +29,9 @@ package com.github.oetzi.echo {
 			
 			new Behaviour[T](new_rule)
 		}
+		
+		def until[A](event : Event[A], rule : Double => T) : Behaviour[T] = {
+			new Behaviour[T](this.rule)
+		}
 	}
 }
