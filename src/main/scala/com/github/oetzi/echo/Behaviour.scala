@@ -11,7 +11,7 @@ package com.github.oetzi.echo {
 				time => numeric.plus(this.now, behaviour.now)
 			}
 			
-			new Behaviour(new_rule)
+			new Behaviour[T](new_rule)
 		}
 	}
 }
