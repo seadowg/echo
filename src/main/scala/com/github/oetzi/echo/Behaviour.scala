@@ -13,5 +13,13 @@ package com.github.oetzi.echo {
 			
 			new Behaviour[T](new_rule)
 		}
+		
+		def -(behaviour : Behaviour[T])(implicit numeric : Numeric[T]) : Behaviour[T] = {
+			val new_rule : Double => T = {
+				time => numeric.minus(this.now, behaviour.now)
+			}
+			
+			new Behaviour[T](new_rule)
+		}
 	}
 }
