@@ -101,6 +101,21 @@ object BehaviourSpec extends Specification {
 		}
 	}
 	
+	"'Behaviour.change' function" should {
+		"return the calling object" in {
+			val beh = new Behaviour(time => time)
+			
+			beh.change(time => time) mustBe beh
+		}
+		
+		"change the Behaviour's rule" in {
+			val beh = new Behaviour(time => 0)
+			beh.change(time => 1)
+			
+			beh.now mustBe 1
+		}
+	}
+	
 	"'Behaviour.until' function" should {
 		"create a new Behaviour of type T" in {
 			val beh = new Behaviour(time => time)

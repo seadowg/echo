@@ -1,7 +1,7 @@
 import java.util.Date
 
 package com.github.oetzi.echo {
-	class Behaviour[T](rule : Double => T) {
+	class Behaviour[T](var rule : Double => T) {
 		def now() : T = {
 			rule(new Date().getTime)
 		}
@@ -30,8 +30,15 @@ package com.github.oetzi.echo {
 			new Behaviour[T](new_rule)
 		}
 		
+		def change(rule : Double => T) = {
+			this.rule = rule
+			this
+		}
+		
 		def until[A](event : Event[A], rule : Double => T) : Behaviour[T] = {
-			new Behaviour[T](this.rule)
+			val beh = new Behaviour(this.rule)
+			event.each(occur => beh.change(rule))
+			beh
 		}
 	}
 }
