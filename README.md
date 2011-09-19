@@ -6,7 +6,18 @@
 chosen as the implementation because: its nice, it allows for FP and it will hopefully make this framework available to
 Java also. How is this going work? What are you asking me for?
 
-## So FRP? What can I do?
+### The Basic Spec
+
+Im wanting echo to work a bit like this (requires knowledge of FRP to understand):
+
+* Pure Behaviours - time varying continuous values that are essentially a function with respect to time. By this I mean that a Behaviours value is lazily calculated and is done so recursively (not updated at an interval).
+* Pureish Events that work in the way that Haskellers define them but also work as collections (ie have each, map, filter functions)
+* Graph like model where as much of the control flow is modelled in one stream as possible (less threading)
+* Alternative 'Signal'-esque based system that is implemented using Behaviours and Events. Signals are used by some FRP frameworks to combine the two types into one - it has a continuous value and discrete changes. I would like to experiment with this principal.
+* A focus on actual practical industrial usage. This means implementing Behaviours and Events to abstract networking, IO components etc. The graphical stuff is already done to death so it doesn't interest me as much.
+* An additional focus on the framework being as DSLie as possible. I want to put a lot of thought into how naturally and intuitively echo can be used.
+
+## So... what can it do?
 
 At the moment? Not a lot. This is about the coolest thing you can do so far:
 
