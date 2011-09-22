@@ -23,9 +23,8 @@ define "echo" do
   test.using :specs
   
   task :typeset do
-    system 'xelatex src/report/*.tex'
-    rm 'echo.aux'
-    rm 'echo.log'
+    FileUtils.makedirs('target/pdfs') unless File.exists?('target/pdfs')
+    system 'xelatex -output-directory=target/pdfs src/report/*.tex'
   end
   
   task :wipe => :clean do
