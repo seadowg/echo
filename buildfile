@@ -10,7 +10,9 @@ COPYRIGHT = "Callum Stott 2011"
 # Specify Maven 2.0 remote repositories here, like this:
 repositories.remote << "http://www.ibiblio.org/maven2/"
 
-desc "The Echo project"
+Project.local_task :typeset
+Project.local_task :wipe
+
 define "echo" do
 
   project.version = VERSION_NUMBER
@@ -19,4 +21,14 @@ define "echo" do
 
   package :jar
   test.using :specs
+  
+  task :typeset do
+    system 'xelatex src/report/echo.tex'
+    rm 'echo.aux'
+    rm 'echo.log'
+  end
+  
+  task :wipe => :clean do
+    system 'rm echo.*'
+  end
 end
