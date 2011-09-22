@@ -23,7 +23,7 @@ define "echo" do
   test.using :specs
   
   task :typeset do
-    system 'xelatex src/report/echo.tex'
+    system 'xelatex src/report/*.tex'
     rm 'echo.aux'
     rm 'echo.log'
   end
