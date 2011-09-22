@@ -23,6 +23,9 @@ At the moment? Not a lot. This is about the coolest thing you can do so far:
 
     val event = new Event[Boolean]
     val behaviour = new Behaviour(time => "Hello!") until (event, time => "DIE!")
+    println behaviour.now // => Hello!
+    event.occur
+    println behaviour.now // => DIE!
     
 This will create a Behaviour thats value will be "Hello!" until the Event 'event' occurs (its 'occur' function is called).
 The Event and Behaviour implementations are also kind of weak - no division, no Event operations and Behaviour operations must
