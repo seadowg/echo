@@ -9,5 +9,12 @@ package com.github.oetzi.echo {
 		def each(edge : T => Any) {
 			edges = edges ++ List[T => Any](edge)
 		}
+		
+		def ++(event : Event[T]) : Event[T] = {
+			val new_event = new Event[T]
+			this.each(e => new_event.occur(e))
+			event.each(e => new_event.occur(e))
+			return new_event
+		}
 	}
 }
