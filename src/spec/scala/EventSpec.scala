@@ -43,4 +43,38 @@ object EventSpec extends Specification {
 			first < second mustBe true
 		}
 	}
+	
+	"Event.++ function" should {
+		"return a new event with the same type" in {
+			val event1 = new Event[Int]
+			val event2 = new Event[Int]
+			val comp_event = event1 ++ event2
+			
+			comp_event.isInstanceOf[Event[Int]] mustBe true
+		}
+		
+		"create an event that will fire when the caller fires" in {
+			val event1 = new Event[Int]
+			val event2 = new Event[Int]
+			val comp_event = event1 ++ event2
+			var fired = 0
+			
+			comp_event.each(event => fired = event)
+			event1.occur(5)
+			
+			fired mustBe 5
+		}
+		
+		"create an event that will fire when the paramater fires" in {
+			val event1 = new Event[Int]
+			val event2 = new Event[Int]
+			val comp_event = event1 ++ event2
+			var fired = 0
+			
+			comp_event.each(event => fired = event)
+			event2.occur(6)
+			
+			fired mustBe 6
+		}
+	}
 }
