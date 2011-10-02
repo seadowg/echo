@@ -40,5 +40,9 @@ package com.github.oetzi.echo {
 			event.each(occur => beh.change(rule))
 			beh
 		}
+		
+		override def toString() : String = {
+			this.now.toString
+		}
 	}
 }
