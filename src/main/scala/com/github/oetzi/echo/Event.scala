@@ -1,5 +1,5 @@
 package com.github.oetzi.echo {
-	class Event[T] {
+	trait EventSource[T] {
 		var edges : List[T => Any] = List[T => Any]()
 		
 		def occur(event : T) {
@@ -17,4 +17,6 @@ package com.github.oetzi.echo {
 			return new_event
 		}
 	}
+	
+	class Event[T] extends EventSource[T] {	}
 }
