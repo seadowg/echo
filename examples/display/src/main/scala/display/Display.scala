@@ -6,6 +6,10 @@ package display {
 			val button = new Button("Click Me!")
 			button.press.each(press => println("OH YEAH YOU CLICKED!"))
 			
+			addButtonToFrame(button)
+		}
+		
+		def addButtonToFrame(button : Button) {
 			val panel = new JPanel()
 			val frame = new JFrame()
 			panel.add(button)
