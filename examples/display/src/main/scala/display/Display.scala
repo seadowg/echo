@@ -4,7 +4,7 @@ package display {
 	object Display {
 		def main(args : Array[String]) {
 			val button = new Button("Click Me!")
-			button.press.each(press => println("OH YEAH YOU CLICKED!"))
+			button.each(press => println("OH YEAH YOU CLICKED!"))
 			
 			addButtonToFrame(button)
 		}
