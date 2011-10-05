@@ -1,0 +1,24 @@
+require 'buildr/scala'
+
+# Version number for this release
+VERSION_NUMBER = "0.0.1"
+# Group identifier for your projects
+GROUP = "color"
+COPYRIGHT = "Callum Stott 2011"
+
+# Specify Maven 2.0 remote repositories here, like this:
+repositories.remote << "http://www.ibiblio.org/maven2/"
+
+Project.local_task :start
+
+define "color" do
+  project.version = VERSION_NUMBER
+  project.group = GROUP
+  manifest["Implementation-Vendor"] = COPYRIGHT
+  
+  compile.with('lib/*')
+  
+  task :start do
+    system 'scala -classpath lib/echo-0.2.0.jar:target/classes display.Display'
+  end
+end

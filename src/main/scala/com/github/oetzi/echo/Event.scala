@@ -10,7 +10,7 @@ package com.github.oetzi.echo {
 			edges = edges ++ List[T => Any](edge)
 		}
 		
-		def ++(event : Event[T]) : Event[T] = {
+		def ++(event : EventSource[T]) : EventSource[T] = {
 			val new_event = new Event[T]
 			this.each(e => new_event.occur(e))
 			event.each(e => new_event.occur(e))
