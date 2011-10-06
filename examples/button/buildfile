@@ -16,7 +16,7 @@ define "button" do
   project.group = GROUP
   manifest["Implementation-Vendor"] = COPYRIGHT
   
-  compile.with('lib/*')
+  compile.with('../example_lib/*')
   
   task :start do
     system 'scala -classpath lib/echo-0.2.0.jar:target/classes display.Display'
