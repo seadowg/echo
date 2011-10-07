@@ -12,6 +12,7 @@ repositories.remote << "http://www.ibiblio.org/maven2/"
 
 Project.local_task :typeset
 Project.local_task :wipe
+Project.local_task :examples
 
 define "echo" do
 
@@ -27,7 +28,15 @@ define "echo" do
     system 'xelatex -output-directory=target/pdfs src/report/*.tex'
   end
   
+  task :examples => :package do
+    system 'rm examples/example_lib/*.jar' 
+    system "cp target/echo-#{VERSION_NUMBER}.jar examples/example_lib/echo-#{VERSION_NUMBER}.jar"
+    system 'cd examples/button && buildr'
+    system 'cd examples/color && buildr'
+  end
+  
   task :wipe => :clean do
-    system 'rm echo.*'
+    system 'cd examples/button && buildr clean'
+    system 'cd examples/color && buildr clean'  
   end
 end
