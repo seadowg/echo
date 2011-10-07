@@ -42,6 +42,15 @@ object EventSpec extends Specification {
 			
 			first < second mustBe true
 		}
+		
+		"passes the correct value for the event" in {
+			val event = new Event[Int]
+			var x = 5
+			
+			event.each(event => x = event)
+			event.occur(10)
+			x mustBe 10
+		}
 	}
 	
 	"Event.++ function" should {
@@ -53,7 +62,7 @@ object EventSpec extends Specification {
 			comp_event.isInstanceOf[Event[Int]] mustBe true
 		}
 		
-		"create an event that will fire when the caller fires" in {
+		"create an event that will fire when the caller fires (with the correct value)" in {
 			val event1 = new Event[Int]
 			val event2 = new Event[Int]
 			val comp_event = event1 ++ event2
@@ -65,7 +74,7 @@ object EventSpec extends Specification {
 			fired mustBe 5
 		}
 		
-		"create an event that will fire when the paramater fires" in {
+		"create an event that will fire when the paramater fires (with the correct value)" in {
 			val event1 = new Event[Int]
 			val event2 = new Event[Int]
 			val comp_event = event1 ++ event2
@@ -73,6 +82,40 @@ object EventSpec extends Specification {
 			
 			comp_event.each(event => fired = event)
 			event2.occur(6)
+			
+			fired mustBe 6
+		}
+	}
+	
+	"Event.filter function" should {
+		"return a new event with the same type" in {
+			val event = new Event[Int]
+			event.filter(_ == 0).isInstanceOf[Event[Int]] mustBe true
+		}
+		
+		"create an event that fires if predicate is true for the creating instance" in {
+			val event = new Event[Int]
+			var fired = false
+			event.filter(_ == 0).each(event => fired = true)
+			event.occur(0)
+			
+			fired mustBe true
+		}
+		
+		"create an event that doesn't fire if the predicate is false for the creating instance" in {
+			val event = new Event[Int]
+			var fired = false
+			event.filter(_ == 0).each(event => fired = true)
+			event.occur(1)
+			
+			fired mustBe false
+		}
+		
+		"create an event that recieves the same value as the original" in {
+			val event = new Event[Int]
+			var fired = 0
+			event.filter(_ == 6).each(event => fired = event)
+			event.occur(6)
 			
 			fired mustBe 6
 		}
