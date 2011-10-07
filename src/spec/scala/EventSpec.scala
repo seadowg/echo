@@ -120,4 +120,37 @@ object EventSpec extends Specification {
 			fired mustBe 6
 		}
 	}
+	
+	"Event.apply" should {
+		"return a new event with the same type" in {
+			val event = new Event[Int]
+			event(5).isInstanceOf[Event[Int]] mustBe true
+		}
+		
+		"create an event that fires when Event.filter(matcher == _) also fires" in {
+			val event = new Event[Int]
+			val matcher = 1
+			var fired = 0
+			
+			event(matcher).each(event => fired = fired + event)
+			event.filter(_ == matcher).each(event => fired = fired + event)
+			
+			event.occur(1)
+			
+			fired mustBe 2
+		}
+		
+		"create an event that doesn't fire if Event.filter(matcher == _) doesn't fire" in {
+			val event = new Event[Int]
+			val matcher = 1
+			var fired = 0
+			
+			event(matcher).each(event => fired = fired + event)
+			event.filter(_ == matcher).each(event => fired = fired + event)
+			
+			event.occur(2)
+			
+			fired mustBe 0
+		}
+	}
 }

@@ -2,6 +2,10 @@ package com.github.oetzi.echo {
 	trait EventSource[T] {
 		var edges : List[T => Any] = List[T => Any]()
 		
+		def apply(matcher : T) : EventSource[T]= {
+			this.filter(_ == matcher)
+		}
+		
 		def occur(event : T) {
 			edges.foreach(edge => edge(event))
 		}
@@ -10,7 +14,7 @@ package com.github.oetzi.echo {
 			edges = edges ++ List[T => Any](edge)
 		}
 		
-		def filter(predicate : T => Boolean) : Event[T] = {
+		def filter(predicate : T => Boolean) : EventSource[T] = {
 			val new_event = new Event[T]
 			this.each(event => if (predicate(event)) new_event.occur(event))
 			return new_event
