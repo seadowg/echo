@@ -29,10 +29,12 @@ define "echo" do
   end
   
   task :examples => :package do
+    FileUtils.makedirs('examples/example_lib') unless File.exists?('examples/example_lib')
     system 'rm examples/example_lib/*.jar' 
     system "cp target/echo-#{VERSION_NUMBER}.jar examples/example_lib/echo-#{VERSION_NUMBER}.jar"
     system 'cd examples/button && buildr'
     system 'cd examples/color && buildr'
+    system 'buildr clean'
   end
   
   task :wipe => :clean do
