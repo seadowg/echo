@@ -13,6 +13,7 @@ repositories.remote << "http://www.ibiblio.org/maven2/"
 Project.local_task :typeset
 Project.local_task :wipe
 Project.local_task :examples
+Project.local_task :console
 
 define "echo" do
 
@@ -40,5 +41,9 @@ define "echo" do
   task :wipe => :clean do
     system 'cd examples/button && buildr clean'
     system 'cd examples/color && buildr clean'  
+  end
+  
+  task :console => :package do
+    system 'scala -classpath target:target/classes'
   end
 end
