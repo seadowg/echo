@@ -19,7 +19,7 @@ Im wanting echo to work a bit like this (requires knowledge of FRP to understand
 
 ## So... what can it do?
 
-At the moment? Not a lot. This is about the coolest thing you can do so far:
+At the moment? Not a lot. These are about the coolest thing you can do so far:
 
     val event = new Event[Boolean]
     val behaviour = new Behaviour(time => "Hello!") until (event, time => "DIE!")
