@@ -8,6 +8,11 @@ object BehaviourSpec extends Specification {
 			val beh = new Behaviour(time => time)
 			beh must_!= null
 		}
+		
+		"return Behaviour.now.toString() when toString() is called" in {
+			val beh = new Behaviour(time => 5)
+			beh.toString mustEqual "5"
+		}
 	}
 	
 	"'Behaviour.now' function" should {
@@ -140,5 +145,5 @@ object BehaviourSpec extends Specification {
 			
 			until_beh.now mustBe 10
 		}
-	} 
+	}
 }

@@ -35,10 +35,14 @@ package com.github.oetzi.echo {
 			this
 		}
 		
-		def until[A](event : Event[A], rule : Double => T) : Behaviour[T] = {
+		def until[A](event : EventSource[A], rule : Double => T) : Behaviour[T] = {
 			val beh = new Behaviour(this.rule)
 			event.each(occur => beh.change(rule))
 			beh
+		}
+		
+		override def toString() : String = {
+			this.now.toString
 		}
 	}
 }

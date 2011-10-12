@@ -2,7 +2,7 @@
 require 'buildr/scala'
 
 # Version number for this release
-VERSION_NUMBER = "0.0.1"
+VERSION_NUMBER = "0.2.0"
 # Group identifier for your projects
 GROUP = "echo"
 COPYRIGHT = "Callum Stott 2011"
@@ -12,6 +12,8 @@ repositories.remote << "http://www.ibiblio.org/maven2/"
 
 Project.local_task :typeset
 Project.local_task :wipe
+Project.local_task :examples
+Project.local_task :console
 
 define "echo" do
 
@@ -27,7 +29,21 @@ define "echo" do
     system 'xelatex -output-directory=target/pdfs src/report/*.tex'
   end
   
+  task :examples => :package do
+    FileUtils.makedirs('examples/example_lib') unless File.exists?('examples/example_lib')
+    system 'rm examples/example_lib/*.jar' 
+    system "cp target/echo-#{VERSION_NUMBER}.jar examples/example_lib/echo-#{VERSION_NUMBER}.jar"
+    system 'cd examples/button && buildr'
+    system 'cd examples/color && buildr'
+    system 'buildr clean'
+  end
+  
   task :wipe => :clean do
-    system 'rm echo.*'
+    system 'cd examples/button && buildr clean'
+    system 'cd examples/color && buildr clean'  
+  end
+  
+  task :console => :package do
+    system 'scala -classpath target:target/classes'
   end
 end
