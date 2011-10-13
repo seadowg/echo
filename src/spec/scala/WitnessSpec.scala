@@ -30,7 +30,7 @@ object WitnessSpec extends Specification {
 			behaviour.change(time => true)
 			Thread.sleep(1)
 			
-			fired mustBe 2
+			fired mustBe 1
 		}
 		
 		"not crash if each is called more than once" in {
