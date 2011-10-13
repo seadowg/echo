@@ -32,6 +32,23 @@ object WitnessSpec extends Specification {
 			
 			fired mustBe 2
 		}
+		
+		"not crash if each is called more than once" in {
+			val behaviour = new Behaviour(time => false)
+			val witness = new Witness(behaviour)
+			var failed = false
+			
+			try {
+				witness.each(event => 5)
+				witness.each(event => 5)
+			}
+			
+			catch {
+				case e : Exception => failed = true
+			}
+			
+			failed mustBe false
+		}
 	}
 	
 	"Witness.dispose" should {
