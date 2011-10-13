@@ -19,6 +19,6 @@ define "color" do
   compile.with('../example_lib/*')
   
   task :start do
-    system 'scala -classpath ../example_lib/echo-0.2.0.jar:target/classes display.Display'
+    system 'scala -classpath ../example_lib/echo-0.3.0.jar:target/classes display.Display'
   end
 end
