@@ -6,6 +6,7 @@ import com.github.oetzi.echo.Witness
 package display {
 	class ColorPanel extends JPanel {
 		def setBackground(color : Behaviour[Color]) {
+			super.setBackground(color.now)
 			new Witness(color).each(event => super.setBackground(event))	
 		}
 	}
