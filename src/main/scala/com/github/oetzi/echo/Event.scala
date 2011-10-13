@@ -46,10 +46,6 @@ package com.github.oetzi.echo {
 		})
 		thread.start
 		
-		override def each(edge : T => Any) {
-			super.each(edge)
-		}
-		
 		def dispose() {
 			shouldRun = false
 			thread = null
