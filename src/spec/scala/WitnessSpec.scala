@@ -16,7 +16,11 @@ object WitnessSpec extends Specification {
 			
 			witness.each(event => fired = event)
 			behaviour.change(time => true)
-			Thread.sleep(1)
+			
+			val then = new Behaviour(time => time).now
+			val now = new Behaviour(time => time)
+			
+			while (!fired && now.now < then + 1000) {}
 			
 			fired mustBe true
 		}
@@ -28,9 +32,13 @@ object WitnessSpec extends Specification {
 			
 			witness.each(event => fired = fired + 1)
 			behaviour.change(time => true)
-			Thread.sleep(1)
 			
-			fired mustBe 2
+			val then = new Behaviour(time => time).now
+			val now = new Behaviour(time => time)
+			
+			while (fired < 1 && now.now < then + 1000) {}
+			
+			fired mustBe 1
 		}
 		
 		"not crash if each is called more than once" in {

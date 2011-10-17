@@ -2,6 +2,8 @@ import java.util.Date
 
 package com.github.oetzi.echo {
 	class Behaviour[T](var rule : Double => T) {
+		var witness : Witness[T] = null;
+		
 		def now() : T = {
 			rule(new Date().getTime)
 		}
@@ -39,6 +41,11 @@ package com.github.oetzi.echo {
 			val beh = new Behaviour(this.rule)
 			event.each(occur => beh.change(rule))
 			beh
+		}
+		
+		def changes() : Witness[T] = {
+			if (witness == null) this.witness = new Witness(this)
+			this.witness
 		}
 		
 		override def toString() : String = {

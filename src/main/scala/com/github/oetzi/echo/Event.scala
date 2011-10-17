@@ -31,11 +31,10 @@ package com.github.oetzi.echo {
 	class Event[T] extends EventSource[T] {	}
 	
 	class Witness[T](val behaviour : Behaviour[T]) extends EventSource[T] {
-		var started = false
 		var shouldRun = true
 		var thread = new Thread(new Runnable() {
 			def run() {
-				var last : Any = null
+				var last : T = behaviour.now
 				while (shouldRun) {
 					val now = behaviour.now
 					if (last != now) {
@@ -45,14 +44,7 @@ package com.github.oetzi.echo {
 				}
 			}
 		})
-		
-		override def each(edge : T => Any) {
-			super.each(edge)
-			if (!started) { 
-				started = true
-				thread.start
-			}
-		}
+		thread.start
 		
 		def dispose() {
 			shouldRun = false
