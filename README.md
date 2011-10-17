@@ -72,10 +72,10 @@ Events are slightly trickier to understand but just as useful as Behaviours (pos
 occurring or not occurring and we see an event 'occurring' as a discrete event in time. Here is a quick example of using the 
 concrete `Event` type:
 
-  val event = new Event[Int]
-  event.each(event => println("OH YEAH I OCCURRED! " + event))
-  event.occur(5)
-  => "OH YEAH I OCCURRED! 5"
+    val event = new Event[Int]
+    event.each(event => println("OH YEAH I OCCURRED! " + event))
+    event.occur(5)
+    => "OH YEAH I OCCURRED! 5"
 
 Here we use the handy `each` function on the Event. Events can also be thought of as a stream of occur-rations that are yet to   
 happen. By this logic, the function passed to `each` should be executed each time the Event 'occurs'. Cool eh? What's nicer is 
