@@ -5,7 +5,7 @@ package com.github.oetzi.echo {
 		var witness : Witness[T] = null;
 		
 		def now() : T = {
-			rule(new Date().getTime)
+			rule(System.currentTimeMillis)
 		}
 		
 		def +(behaviour : Behaviour[T])(implicit numeric : Numeric[T]) : Behaviour[T] = {
