@@ -39,7 +39,7 @@ package com.github.oetzi.echo {
 		
 		def until[A](event : EventSource[A], rule : Double => T) : Behaviour[T] = {
 			val beh = new Behaviour(this.rule)
-			event.each(occur => beh.change(rule))
+			event.foreach(occur => beh.change(rule))
 			beh
 		}
 		

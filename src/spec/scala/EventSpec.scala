@@ -10,10 +10,10 @@ object EventSpec extends Specification {
 		}
 	}
 	
-	"Event.each function" should {
+	"Event.foreach function" should {
 		"work" in {
 			val event = new Event[Int]
-			event.each(event => event)
+			event.foreach(event => event)
 			true mustBe true
 		}
 	}
@@ -23,7 +23,7 @@ object EventSpec extends Specification {
 			val event = new Event[Int]
 			var x = 5
 			
-			event.each(event => x = event)
+			event.foreach(event => x = event)
 			event.occur(10)
 			x mustBe 10
 		}
@@ -33,11 +33,11 @@ object EventSpec extends Specification {
 			var first : Double = 0
 			var second : Double = 0
 			
-			event.each({
+			event.foreach({
 				event => first = new Date().getTime;
 				Thread.sleep(1);
 			})
-			event.each(event => second = new Date().getTime)
+			event.foreach(event => second = new Date().getTime)
 			event.occur(5)
 			
 			first < second mustBe true
@@ -47,7 +47,7 @@ object EventSpec extends Specification {
 			val event = new Event[Int]
 			var x = 5
 			
-			event.each(event => x = event)
+			event.foreach(event => x = event)
 			event.occur(10)
 			x mustBe 10
 		}
@@ -68,7 +68,7 @@ object EventSpec extends Specification {
 			val comp_event = event1 ++ event2
 			var fired = 0
 			
-			comp_event.each(event => fired = event)
+			comp_event.foreach(event => fired = event)
 			event1.occur(5)
 			
 			fired mustBe 5
@@ -80,7 +80,7 @@ object EventSpec extends Specification {
 			val comp_event = event1 ++ event2
 			var fired = 0
 			
-			comp_event.each(event => fired = event)
+			comp_event.foreach(event => fired = event)
 			event2.occur(6)
 			
 			fired mustBe 6
@@ -96,7 +96,7 @@ object EventSpec extends Specification {
 		"create an event that fires if predicate is true for the creating instance" in {
 			val event = new Event[Int]
 			var fired = false
-			event.filter(_ == 0).each(event => fired = true)
+			event.filter(_ == 0).foreach(event => fired = true)
 			event.occur(0)
 			
 			fired mustBe true
@@ -105,7 +105,7 @@ object EventSpec extends Specification {
 		"create an event that doesn't fire if the predicate is false for the creating instance" in {
 			val event = new Event[Int]
 			var fired = false
-			event.filter(_ == 0).each(event => fired = true)
+			event.filter(_ == 0).foreach(event => fired = true)
 			event.occur(1)
 			
 			fired mustBe false
@@ -114,7 +114,7 @@ object EventSpec extends Specification {
 		"create an event that recieves the same value as the original" in {
 			val event = new Event[Int]
 			var fired = 0
-			event.filter(_ == 6).each(event => fired = event)
+			event.filter(_ == 6).foreach(event => fired = event)
 			event.occur(6)
 			
 			fired mustBe 6
@@ -132,8 +132,8 @@ object EventSpec extends Specification {
 			val matcher = 1
 			var fired = 0
 			
-			event(matcher).each(event => fired = fired + event)
-			event.filter(_ == matcher).each(event => fired = fired + event)
+			event(matcher).foreach(event => fired = fired + event)
+			event.filter(_ == matcher).foreach(event => fired = fired + event)
 			
 			event.occur(1)
 			
@@ -145,8 +145,8 @@ object EventSpec extends Specification {
 			val matcher = 1
 			var fired = 0
 			
-			event(matcher).each(event => fired = fired + event)
-			event.filter(_ == matcher).each(event => fired = fired + event)
+			event(matcher).foreach(event => fired = fired + event)
+			event.filter(_ == matcher).foreach(event => fired = fired + event)
 			
 			event.occur(2)
 			

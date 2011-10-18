@@ -10,20 +10,20 @@ package com.github.oetzi.echo {
 			edges.foreach(edge => edge(event))
 		}
 		
-		def each(edge : T => Any) {
+		def foreach(edge : T => Any) {
 			edges = edges ++ List[T => Any](edge)
 		}
 		
 		def filter(predicate : T => Boolean) : EventSource[T] = {
 			val new_event = new Event[T]
-			this.each(event => if (predicate(event)) new_event.occur(event))
+			this.foreach(event => if (predicate(event)) new_event.occur(event))
 			return new_event
 		}
 		
 		def ++(event : EventSource[T]) : EventSource[T] = {
 			val new_event = new Event[T]
-			this.each(e => new_event.occur(e))
-			event.each(e => new_event.occur(e))
+			this.foreach(e => new_event.occur(e))
+			event.foreach(e => new_event.occur(e))
 			return new_event
 		}
 	}

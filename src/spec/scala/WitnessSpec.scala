@@ -14,7 +14,7 @@ object WitnessSpec extends Specification {
 			val witness = new Witness(behaviour)
 			var fired = false
 			
-			witness.each(event => fired = event)
+			witness.foreach(event => fired = event)
 			behaviour.change(time => true)
 			
 			val then = new Behaviour(time => time).now
@@ -30,7 +30,7 @@ object WitnessSpec extends Specification {
 			val witness = new Witness(behaviour)
 			var fired = 0
 			
-			witness.each(event => fired = fired + 1)
+			witness.foreach(event => fired = fired + 1)
 			behaviour.change(time => true)
 			
 			val then = new Behaviour(time => time).now
@@ -41,14 +41,14 @@ object WitnessSpec extends Specification {
 			fired mustBe 1
 		}
 		
-		"not crash if each is called more than once" in {
+		"not crash if foreach is called more than once" in {
 			val behaviour = new Behaviour(time => false)
 			val witness = new Witness(behaviour)
 			var failed = false
 			
 			try {
-				witness.each(event => 5)
-				witness.each(event => 5)
+				witness.foreach(event => 5)
+				witness.foreach(event => 5)
 			}
 			
 			catch {
@@ -65,7 +65,7 @@ object WitnessSpec extends Specification {
 			val witness = new Witness(behaviour)
 			var fired = false
 			
-			witness.each(event => fired = event)
+			witness.foreach(event => fired = event)
 			witness.dispose
 			behaviour.change(time => true)
 			
