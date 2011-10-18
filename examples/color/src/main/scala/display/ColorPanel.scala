@@ -7,7 +7,7 @@ package display {
 	class ColorPanel extends JPanel {
 		def setBackground(color : Behaviour[Color]) {
 			super.setBackground(color.now)
-			color.changes.each(change => super.setBackground(change))	
+			color.sample.foreach(change => super.setBackground(change))	
 		}
 	}
 }
