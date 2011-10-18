@@ -147,12 +147,12 @@ object BehaviourSpec extends Specification {
 		}
 	}
 	
-	"'Behaviour.changes' function" should {
+	"'Behaviour.sample' function" should {
 		"return a Witness for the Behaviour" in {
 			val beh = new Behaviour(time => 5)
 			var fired = false
 			
-			beh.changes.each(event => fired = true)
+			beh.sample.each(event => fired = true)
 			beh.change(time => 1)
 			
 			val then = new Behaviour(time => time).now
@@ -166,7 +166,7 @@ object BehaviourSpec extends Specification {
 		"return the same Witness instance for each call" in {
 			val beh = new Behaviour(time => 5)
 			
-			beh.changes mustBe beh.changes
+			beh.sample mustBe beh.sample
 		}
 	}
 }

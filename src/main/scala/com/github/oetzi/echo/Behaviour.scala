@@ -43,7 +43,7 @@ package com.github.oetzi.echo {
 			beh
 		}
 		
-		def changes() : Witness[T] = {
+		def sample() : Witness[T] = {
 			if (witness == null) this.witness = new Witness(this)
 			this.witness
 		}
