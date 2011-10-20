@@ -25,7 +25,7 @@ intuitively echo can be used.
 
 ## Building
 
-The project uses [buildr](http://buildr.apache.org/]) for building. If you haven't used this before it is a ruby tool for 
+The project uses [buildr](http://buildr.apache.org/) for building. If you haven't used this before it is a ruby tool for 
 building JVM languages. To build the project simply do:
 
     buildr
