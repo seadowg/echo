@@ -43,9 +43,10 @@ package com.github.oetzi.echo {
 			beh
 		}
 		
-		def sample() : Witness[T] = {
-			if (witness == null) this.witness = new Witness(this)
-			this.witness
+		def sample[A](event : EventSource[A]) : EventSource[T] = {
+			val newEvent = new Event[T]
+			event.foreach(event => newEvent.occur(this.now))
+			return newEvent
 		}
 		
 		override def toString() : String = {

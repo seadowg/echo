@@ -148,25 +148,33 @@ object BehaviourSpec extends Specification {
 	}
 	
 	"'Behaviour.sample' function" should {
-		"return a Witness for the Behaviour" in {
+		"return a new Event when passed an Event of any type" in {
 			val beh = new Behaviour(time => 5)
+			val event = new Event[Unit]
+			
+			beh.sample(event).isInstanceOf[Event[Int]] mustBe true
+		}
+		
+		"return an Event that fires when the passed in event fires" in {
+			val beh = new Behaviour(time => 5)
+			val event = new Event[Unit]
 			var fired = false
 			
-			beh.sample.foreach(event => fired = true)
-			beh.change(time => 1)
-			
-			val then = new Behaviour(time => time).now
-			val now = new Behaviour(time => time)
-			
-			while (!fired && now.now < then + 1000) {}
+			beh.sample(event).foreach(event => fired = true)
+			event.occur()
 			
 			fired mustBe true
 		}
 		
-		"return the same Witness instance for foreach call" in {
+		"return an Event that occurs with the current value of the Behaviour" in {
 			val beh = new Behaviour(time => 5)
+			val event = new Event[Unit]
+			var firedVal = 0
 			
-			beh.sample mustBe beh.sample
+			beh.sample(event).foreach(event => firedVal = event)
+			event.occur()
+			
+			firedVal mustBe 5
 		}
 	}
 }
