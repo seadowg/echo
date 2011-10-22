@@ -29,26 +29,4 @@ package com.github.oetzi.echo {
 	}
 	
 	class Event[T] extends EventSource[T] {	}
-	
-	class Witness[T](val behaviour : Behaviour[T]) extends EventSource[T] {
-		var shouldRun = true
-		var thread = new Thread(new Runnable() {
-			def run() {
-				var last : T = behaviour.now
-				while (shouldRun) {
-					val now = behaviour.now
-					if (last != now) {
-						Witness.this.occur(now)
-						last = now
-					}
-				}
-			}
-		})
-		thread.start
-		
-		def dispose() {
-			shouldRun = false
-			thread = null
-		}
-	}
 }

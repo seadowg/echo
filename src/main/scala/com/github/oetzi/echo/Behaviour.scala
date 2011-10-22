@@ -2,8 +2,6 @@ import java.util.Date
 
 package com.github.oetzi.echo {
 	class Behaviour[T](var rule : Double => T) {
-		var witness : Witness[T] = null;
-		
 		def now() : T = {
 			rule(System.currentTimeMillis)
 		}
