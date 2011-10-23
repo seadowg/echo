@@ -1,7 +1,7 @@
 import java.awt.Color
 import javax.swing.JPanel
-import com.github.oetzi.echo.Behaviour
-import com.github.oetzi.echo.Event
+import com.github.oetzi.echo.core.Behaviour
+import com.github.oetzi.echo.core.Event
 
 package display {
 	class ColorPanel extends JPanel {
