@@ -1,4 +1,4 @@
-package com.github.oetzi.echo {
+package com.github.oetzi.echo.core {
 	trait EventSource[T] {
 		var edges : List[T => Any] = List[T => Any]()
 		

@@ -1,6 +1,6 @@
 import java.util.Date
 
-package com.github.oetzi.echo {
+package com.github.oetzi.echo.core {
 	class Behaviour[T](var rule : Double => T) {
 		def now() : T = {
 			rule(System.currentTimeMillis)

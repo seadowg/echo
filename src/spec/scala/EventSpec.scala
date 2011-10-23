@@ -1,5 +1,5 @@
 import org.specs._
-import com.github.oetzi.echo.Event
+import com.github.oetzi.echo.core.Event
 import java.util.Date
 
 object EventSpec extends Specification {

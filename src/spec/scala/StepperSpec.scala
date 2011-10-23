@@ -1,6 +1,6 @@
 import org.specs._
-import com.github.oetzi.echo.Stepper
-import com.github.oetzi.echo.Event
+import com.github.oetzi.echo.core.Stepper
+import com.github.oetzi.echo.core.Event
 
 object StepperSpec extends Specification {
 	"Stepper" should {

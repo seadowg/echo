@@ -1,6 +1,6 @@
 import org.specs._
 import com.github.oetzi.echo.Echo._
-import com.github.oetzi.echo.Behaviour
+import com.github.oetzi.echo.core.Behaviour
 
 object EchoSpec extends Specification {
 	"Echo" should {
