@@ -6,30 +6,6 @@ package com.github.oetzi.echo.core {
 			rule(System.currentTimeMillis)
 		}
 		
-		def +(behaviour : Behaviour[T])(implicit numeric : Numeric[T]) : Behaviour[T] = {
-			val new_rule : Double => T = {
-				time => numeric.plus(this.now, behaviour.now)
-			}
-			
-			new Behaviour[T](new_rule)
-		}
-		
-		def -(behaviour : Behaviour[T])(implicit numeric : Numeric[T]) : Behaviour[T] = {
-			val new_rule : Double => T = {
-				time => numeric.minus(this.now, behaviour.now)
-			}
-			
-			new Behaviour[T](new_rule)
-		}
-		
-		def *(behaviour : Behaviour[T])(implicit numeric : Numeric[T]) : Behaviour[T] = {
-			val new_rule : Double => T = {
-				time => numeric.times(this.now, behaviour.now)
-			}
-			
-			new Behaviour[T](new_rule)
-		}
-		
 		def change(rule : Double => T) = {
 			this.rule = rule
 			this
@@ -56,7 +32,5 @@ package com.github.oetzi.echo.core {
 		event.foreach(newValue => this.change(time => newValue))
 	}
 	
-	class EmbdBehaviour[T](behaviour : Behaviour[T]) extends Behaviour[T](time => behaviour.now) {
-		
-	}
+	class EmbdBehaviour[T](behaviour : Behaviour[T]) extends Behaviour[T](time => behaviour.now) { }
 }

@@ -15,5 +15,13 @@ object EchoSpec extends Specification {
 			val comp_beh = beh + 5
 			comp_beh.now mustBe 10
 		}
+		
+		"allow numerically typed Behaviors to be composed" in {
+			val beh = new Behaviour(time => time)
+			val beh2 = new Behaviour(time => time)
+			
+			val comp_beh = beh + beh2
+			comp_beh must_!= null
+		}
 	}
 }
