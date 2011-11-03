@@ -45,7 +45,7 @@ There are a few other tasks added to buildfile:
 To include echo in a project make sure the .jar is in the classpath for your project and import it like so:
 
     import com.github.oetzi.echo.Echo._
-    import com.github.oetzi.echo._
+    import com.github.oetzi.echo.core._
     
 You need to include `Echo._` as it contains the implicit functions etc needed for echo's DSL elements (such as combining 
 Behaviours with values).  
