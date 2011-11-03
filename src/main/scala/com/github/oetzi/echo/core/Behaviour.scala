@@ -28,7 +28,7 @@ package com.github.oetzi.echo.core {
 		}
 	}
 	
-	class ChaosBehaviour[T](var chaosRule : Unit => T) extends Behaviour[T](time => chaosRule()) {
+	class ChaosBehaviour[T](var chaosRule : () => T) extends Behaviour[T](time => chaosRule()) {
 		override def now() : T = {
 			chaosRule()
 		}
