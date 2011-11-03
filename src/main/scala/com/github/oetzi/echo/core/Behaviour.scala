@@ -28,6 +28,12 @@ package com.github.oetzi.echo.core {
 		}
 	}
 	
+	class ChaosBehaviour[T](var chaosRule : Unit => T) extends Behaviour[T](time => chaosRule()) {
+		override def now() : T = {
+			chaosRule()
+		}
+	}
+	
 	class Stepper[T](val init : T, val event : Event[T]) extends Behaviour[T](time => init) {
 		event.foreach(newValue => this.change(time => newValue))
 	}

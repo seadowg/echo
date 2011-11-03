@@ -19,6 +19,6 @@ define "button" do
   compile.with('../example_lib/*')
   
   task :start do
-    system 'scala -classpath ../example_lib/echo-0.4.0.jar:target/classes display.Display'
+    system 'scala -classpath ../example_lib/echo-0.5.0.jar:target/classes display.Display'
   end
 end
