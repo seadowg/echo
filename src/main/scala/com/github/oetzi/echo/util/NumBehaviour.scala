@@ -1,13 +1,8 @@
-import java.util.Date
+import com.github.oetzi.echo.core.Behaviour
+import com.github.oetzi.echo.core.EmbdBehaviour
 
-package com.github.oetzi.echo {
-	class Behaviour[T](var rule : Double => T) {
-		var witness : Witness[T] = null;
-		
-		def now() : T = {
-			rule(new Date().getTime)
-		}
-		
+package com.github.oetzi.echo.util {
+	class NumBehaviour[T](behaviour : Behaviour[T]) extends EmbdBehaviour[T](behaviour) {
 		def +(behaviour : Behaviour[T])(implicit numeric : Numeric[T]) : Behaviour[T] = {
 			val new_rule : Double => T = {
 				time => numeric.plus(this.now, behaviour.now)
@@ -30,26 +25,6 @@ package com.github.oetzi.echo {
 			}
 			
 			new Behaviour[T](new_rule)
-		}
-		
-		def change(rule : Double => T) = {
-			this.rule = rule
-			this
-		}
-		
-		def until[A](event : EventSource[A], rule : Double => T) : Behaviour[T] = {
-			val beh = new Behaviour(this.rule)
-			event.each(occur => beh.change(rule))
-			beh
-		}
-		
-		def changes() : Witness[T] = {
-			if (witness == null) this.witness = new Witness(this)
-			this.witness
-		}
-		
-		override def toString() : String = {
-			this.now.toString
 		}
 	}
 }

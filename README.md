@@ -25,7 +25,7 @@ intuitively echo can be used.
 
 ## Building
 
-The project uses [buildr](http://buildr.apache.org/]) for building. If you haven't used this before it is a ruby tool for 
+The project uses [buildr](http://buildr.apache.org/) for building. If you haven't used this before it is a ruby tool for 
 building JVM languages. To build the project simply do:
 
     buildr
@@ -52,9 +52,12 @@ Behaviours with values).
 
 ## Using
 
-The framework adds a couple of new types to Scala that should hopefully make you life easier. Some brief documentation follows.
+### Just give me the basics!
 
-### Behaviours
+The framework adds two new types to Scala. These are central to the concept of FRP and provide you with your new favourite way
+of programming.
+
+#### Behaviours
 
 Behaviour allow programmers to represent values that vary over time (we can also say they are 'continuous'). It is easier to 
 see how they work via a simple example:
@@ -66,14 +69,14 @@ Here, we create a new `Behaviour[Double]` that represents time. To create a new 
 type `Double => Any`. We can then compute the value of this function at any given time (ie 'observe' the Behaviour) by calling    
 the Behaviour's `now` function. 
 
-### Events
+#### Events
 
 Events are slightly trickier to understand but just as useful as Behaviours (possibly more so). An Event can either be 
 occurring or not occurring and we see an event 'occurring' as a discrete event in time. Here is a quick example of using the 
 concrete `Event` type:
 
     val event = new Event[Int]
-    event.each(event => println("OH YEAH I OCCURRED! " + event))
+    event.foreach(event => println("OH YEAH I OCCURRED! " + event))
     event.occur(5)
     => "OH YEAH I OCCURRED! 5"
 

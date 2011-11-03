@@ -1,7 +1,7 @@
 import java.awt.Color
 import javax.swing.JFrame
 import javax.swing.JPanel
-import com.github.oetzi.echo.Behaviour
+import com.github.oetzi.echo.core.Behaviour
 
 package display {
 	object Display {
