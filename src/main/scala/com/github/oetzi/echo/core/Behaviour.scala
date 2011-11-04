@@ -38,5 +38,5 @@ package com.github.oetzi.echo.core {
 		event.foreach(newValue => this.change(time => newValue))
 	}
 	
-	class EmbdBehaviour[T](behaviour : Behaviour[T]) extends Behaviour[T](time => behaviour.now) { }
+	class EmbdBehaviour[T](val self : Behaviour[T]) { }
 }

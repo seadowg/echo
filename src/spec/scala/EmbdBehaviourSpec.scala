@@ -10,12 +10,5 @@ object EmbdBehaviourSpec extends Specification {
 			
 			embd.isInstanceOf[EmbdBehaviour[Int]] mustBe true
 		}
-		
-		"have a rule that matches that of the passed in Behaviour" in {
-			val beh = new Behaviour(time => 5)
-			val embd = new EmbdBehaviour(beh)
-			
-			beh.now mustBe embd.now
-		}
 	}
 }
