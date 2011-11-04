@@ -32,7 +32,7 @@ package com.github.oetzi.echo.core {
 		}
 	}
 	
-	class Reactive[T](val init : T, val event : Event[T]) extends Behaviour[T](time => init) {
+	class Stepper[T](val init : T, val event : Event[T]) extends Behaviour[T](time => init) {
 		event.foreach(newValue => this.change(time => newValue))
 		
 		override def at(time : Double) : T = {
