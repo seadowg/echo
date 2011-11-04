@@ -5,7 +5,7 @@ package com.github.oetzi.echo.util {
 	class NumBehaviour[T](behaviour : Behaviour[T]) extends EmbdBehaviour[T](behaviour) {
 		def +(behaviour : Behaviour[T])(implicit numeric : Numeric[T]) : Behaviour[T] = {
 			val new_rule : Double => T = {
-				time => numeric.plus(self.now, behaviour.now)
+				time => numeric.plus(self.at(time), behaviour.at(time))
 			}
 			
 			new Behaviour[T](new_rule)
@@ -13,7 +13,7 @@ package com.github.oetzi.echo.util {
 		
 		def -(behaviour : Behaviour[T])(implicit numeric : Numeric[T]) : Behaviour[T] = {
 			val new_rule : Double => T = {
-				time => numeric.minus(self.now, behaviour.now)
+				time => numeric.minus(self.at(time), behaviour.at(time))
 			}
 			
 			new Behaviour[T](new_rule)
@@ -21,7 +21,7 @@ package com.github.oetzi.echo.util {
 		
 		def *(behaviour : Behaviour[T])(implicit numeric : Numeric[T]) : Behaviour[T] = {
 			val new_rule : Double => T = {
-				time => numeric.times(self.now, behaviour.now)
+				time => numeric.times(self.at(time), behaviour.at(time))
 			}
 			
 			new Behaviour[T](new_rule)
