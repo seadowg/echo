@@ -6,6 +6,10 @@ package com.github.oetzi.echo.core {
 			rule(System.currentTimeMillis)
 		}
 		
+		def at(time : Double) : T = {
+			rule(time)
+		}
+		
 		def change(rule : Double => T) = {
 			this.rule = rule
 			this
@@ -28,15 +32,15 @@ package com.github.oetzi.echo.core {
 		}
 	}
 	
-	class ChaosBehaviour[T](var chaosRule : () => T) extends Behaviour[T](time => chaosRule()) {
-		override def now() : T = {
-			chaosRule()
+	class Stepper[T](val init : T, val event : Event[T]) extends Behaviour[T](time => init) {
+		event.foreach(newValue => this.change(time => newValue))
+		
+		override def at(time : Double) : T = {
+			throw new NonDeterminismException()
 		}
 	}
 	
-	class Stepper[T](val init : T, val event : Event[T]) extends Behaviour[T](time => init) {
-		event.foreach(newValue => this.change(time => newValue))
-	}
-	
 	class EmbdBehaviour[T](val self : Behaviour[T]) { }
+	
+	case class NonDeterminismException() extends Exception { }
 }
