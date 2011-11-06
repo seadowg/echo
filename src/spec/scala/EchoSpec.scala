@@ -1,6 +1,6 @@
 import org.specs._
 import com.github.oetzi.echo.Echo._
-import com.github.oetzi.echo.core.Behaviour
+import com.github.oetzi.echo.core._
 
 object EchoSpec extends Specification {
 	"Echo" should {
@@ -22,6 +22,14 @@ object EchoSpec extends Specification {
 			
 			val comp_beh = beh + beh2
 			comp_beh must_!= null
+		}
+		
+		"allow numerically typed Reactives to be composed" in {
+			val react = new Reactive(() => 5)
+			val react1 = new Reactive(() => 5)
+			
+			val comp_react = react + react1
+			comp_react.now mustBe 10
 		}
 	}
 }
