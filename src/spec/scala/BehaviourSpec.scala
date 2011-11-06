@@ -22,7 +22,12 @@ object BehaviourSpec extends Specification {
 		}
 	}
 	
-	
+	"'Behaviour.at' function" should {
+		"should return the result of the rule with the passed value" in {
+			val beh = new Behaviour(time => time * 5)
+			beh.at(5).asInstanceOf[Int] mustBe 25
+		}
+	}
 	
 	"'Behaviour.change' function" should {
 		"return the calling object" in {
