@@ -7,5 +7,6 @@ package com.github.oetzi.echo {
 		implicit def lift[T](value : T) : Behaviour[T] = new Behaviour(time => value)
 		implicit def beh2Num[T](behaviour : Behaviour[T]) : NumBehaviour[T] = new NumBehaviour[T](behaviour)
 		implicit def react2Num[T](reactive : Reactive[T]) : NumReactive[T] = new NumReactive[T](reactive)
+		type Time = Double
 	}
 }

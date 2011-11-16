@@ -29,47 +29,6 @@ object BehaviourSpec extends Specification {
 		}
 	}
 	
-	"'Behaviour.change' function" should {
-		"return the calling object" in {
-			val beh = new Behaviour(time => time)
-			
-			beh.change(time => time) mustBe beh
-		}
-		
-		"change the Behaviour's rule" in {
-			val beh = new Behaviour(time => 0)
-			beh.change(time => 1)
-			
-			beh.now mustBe 1
-		}
-	}
-	
-	"'Behaviour.until' function" should {
-		"create a new Behaviour of type T" in {
-			val beh = new Behaviour(time => time)
-			val event = new Event[Boolean]
-			
-			beh.until(event, time => 5.0).isInstanceOf[Behaviour[Double]] mustBe true
-		}
-		
-		"create a Behaviour that is unchanged before the Event occurs" in {
-			val beh = new Behaviour(time => 5)
-			val event = new Event[Boolean]
-			
-			beh.until(event, time => 10).now mustBe 5
-		}
-		
-		"create a Behaviour that is changed when the Event DOES occurs" in {
-			val beh = new Behaviour(time => 5)
-			val event = new Event[Boolean]
-			
-			val until_beh = beh.until(event, time => 10)
-			event.occur(true)
-			
-			until_beh.now mustBe 10
-		}
-	}
-	
 	"'Behaviour.sample' function" should {
 		"return a new Event when passed an Event of any type" in {
 			val beh = new Behaviour(time => 5)
@@ -98,6 +57,15 @@ object BehaviourSpec extends Specification {
 			event.occur()
 			
 			firedVal mustBe 5
+		}
+	}
+	
+	"'Behaviour.map' function" should {
+		"return a new Behaviour of type B (for map(func : T => B))" in {
+			val beh = new Behaviour(time => 5)
+			val func : Int => String = { int => int.toString }
+			
+			beh.map(func).isInstanceOf[Behaviour[String]] mustBe true
 		}
 	}
 }
