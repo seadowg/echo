@@ -18,7 +18,7 @@ package com.github.oetzi.echo.core {
 			new Behaviour(time => func(this.at(time)))
 		}
 		
-		def at(time : Double) : T = {
+		def at(time : Time) : T = {
 			rule(time)
 		}
 	}
