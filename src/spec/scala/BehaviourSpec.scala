@@ -29,7 +29,7 @@ object BehaviourSpec extends Specification {
 		}
 	}
 	
-	"'Behaviour.sample' function" should {
+	/*"'Behaviour.sample' function" should {
 		"return a new Event when passed an Event of any type" in {
 			val beh = new Behaviour(time => 5)
 			val event = new Event[Unit]
@@ -58,7 +58,7 @@ object BehaviourSpec extends Specification {
 			
 			firedVal mustBe 5
 		}
-	}
+	}*/
 	
 	"'Behaviour.map' function" should {
 		"return a new Behaviour of type B (for map(func : T => B))" in {
