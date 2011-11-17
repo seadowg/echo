@@ -43,6 +43,14 @@ object EventSpec extends Specification {
 			
 			event.occs.length mustBe length + 1
 		}
+		
+		"maintains order on added occurences" in {
+			val event = new Event[Int]
+			event.occur(new Occurence(15, 5))
+			event.occur(new Occurence(10, 5))
+			
+			event.occs.last.time mustBe 15L
+		}
 	}
 	
 	"Event.merge" should {
@@ -62,6 +70,41 @@ object EventSpec extends Specification {
 			}
 			
 			matcher.isEmpty mustBe true
+		}
+		
+		"return an Event with ordered occurences of each" in {
+			val eventOne = new Event[Int]
+			val eventTwo = new Event[Int]
+			val occurOne = new Occurence(10, 5)
+			val occurTwo = new Occurence(15, 5)
+			eventOne.occur(occurOne)
+			eventTwo.occur(occurTwo)
+			var last : Occurence[Int] = new Occurence(0, 0)
+			
+			eventTwo.merge(eventOne).occs.foreach { occurence => 
+				last.time must be_<=(occurence.time)
+				last = occurence	
+			}
+		}
+		
+		"return an Event that updates when the original updates" in {
+			val eventOne = new Event[Int]
+			val eventTwo = new Event[Int]
+			
+			val combEvent = eventOne.merge(eventTwo)
+			eventOne.occur(new Occurence(now, 5))
+			
+			combEvent.occs.length mustBe 1
+		}
+		
+		"return an Event that updates when the paramater updates" in {
+			val eventOne = new Event[Int]
+			val eventTwo = new Event[Int]
+			
+			val combEvent = eventOne.merge(eventTwo)
+			eventTwo.occur(new Occurence(now, 5))
+			
+			combEvent.occs.length mustBe 1
 		}
 	}
 }

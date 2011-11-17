@@ -5,24 +5,82 @@ package com.github.oetzi.echo.core {
 	
 	trait EventSource[T] {
 		var list : List[Occurence[T]] = List[Occurence[T]]()
+		var edges : Set[EventSource[T]] = Set[EventSource[T]]()
 		
 		def occs() : List[Occurence[T]] = {
 			list
 		}
 		
 		def occur(occurence : Occurence[T]) {
-			list = list ++ List(occurence)
+			synchronized {
+				if (!list.isEmpty && occurence.time < list.last.time) {
+					for (i <- 0 until list.length) {
+						if (occurence.time >= list(i).time) {
+							list = list.slice(0, i + 1) ++ List(occurence) ++ list.slice(i + 1, list.length)
+						}
+					}
+				}
+				
+				else {
+					list = list ++ List(occurence)
+				}
+				
+				echo(occurence)
+			}
 		}
 		
 		def merge(event : EventSource[T]) : EventSource[T] = {
-			val newEvent = new Event[T]
-			newEvent.mergeList(this.occs)
-			newEvent.mergeList(event.occs)
-			newEvent
+			synchronized {
+				val newEvent = new Event[T]
+				newEvent.mergeList(this.occs)
+				newEvent.mergeList(event.occs)
+				this.addEdge(newEvent)
+				event.addEdge(newEvent)
+				newEvent
+			}
+		}
+		
+		private def echo(occurence : Occurence[T])
+		{
+			edges.foreach { event => 
+				event.occur(occurence)
+			}
+		}
+		
+		private def addEdge(event : EventSource[T]) {
+			edges = edges + event
 		}
 		
 		private def mergeList(toMerge : List[Occurence[T]]) {
-			list = list ++ toMerge
+			var newList = List[Occurence[T]]()
+			var left = list
+			var right = toMerge
+			
+			while (!left.isEmpty || !right.isEmpty) {
+				if (!left.isEmpty && !right.isEmpty) {
+					if (left.first.time <= right.first.time) {
+						newList = newList ++ List(left.first)
+						left = left.drop(1)
+					}
+					
+					else {
+						newList = newList ++ List(right.first)
+						right = right.drop(1)
+					}
+				}
+				
+				else if (!left.isEmpty) {
+					newList = newList ++ List(left.first)
+					left = left.drop(1)
+				}
+				
+				else if (!right.isEmpty) {
+					newList = newList ++ List(right.first)
+					right = right.drop(1)
+				}
+			}
+			
+			list = newList
 		}
 	}
 	
