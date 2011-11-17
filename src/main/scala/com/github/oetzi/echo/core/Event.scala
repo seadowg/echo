@@ -8,7 +8,9 @@ package com.github.oetzi.echo.core {
 		var edges : Set[EventSource[T]] = Set[EventSource[T]]()
 		
 		def occs() : List[Occurence[T]] = {
-			list
+			synchronized {
+				list
+			}
 		}
 		
 		def occur(occurence : Occurence[T]) {
