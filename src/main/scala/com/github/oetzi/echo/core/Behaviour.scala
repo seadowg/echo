@@ -25,9 +25,8 @@ package com.github.oetzi.echo.core {
 		}
 		
 		def until[A](event : EventSource[A], newRule : Time => T) : Behaviour[T] = {
-			val timeStamp = System.currentTimeMillis
 			val rule : Time => T = { time =>
-				if (!event.occs.isEmpty && event.occs.last.time >= timeStamp) {
+				if (!event.occs.isEmpty && event.occs.first.time <= time) {
 					newRule(time)
 				}
 				else {

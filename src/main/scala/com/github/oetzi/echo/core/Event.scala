@@ -15,9 +15,11 @@ package com.github.oetzi.echo.core {
 		}
 		
 		def foreach(func : Occurence[T] => Any) {
-			ops = ops ++ List(func)
-			list.foreach { occ =>
-				func(occ)
+			synchronized {
+				ops = ops ++ List(func)
+				list.foreach { occ =>
+					func(occ)
+				}
 			}
 		}
 		

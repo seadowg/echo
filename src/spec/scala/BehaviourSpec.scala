@@ -51,6 +51,14 @@ object BehaviourSpec extends Specification {
 			
 			beh.now mustBe 10
 		}
+		
+		"return a Behaviour thats rule only 'changes' if the time is after the event" in {
+			val event = new Event[Int]
+			val beh = new Behaviour(time => 5).until(event, time => 10)
+			event.occur(new Occurence(System.currentTimeMillis, 5))
+			
+			beh.at(1) mustBe 5
+		}
 	}
 	
 	"'Behaviour.sample' function" should {
