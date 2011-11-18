@@ -53,6 +53,33 @@ object EventSpec extends Specification {
 		}
 	}
 	
+	"Event.foreach" should {
+		"should create a function that is executed on each future occurence" in {
+			val event = new Event[Int]
+			var fired = false
+			
+			event.foreach { occurence =>
+				fired = true
+			}
+			
+			event.occur(new Occurence(0, 10))
+			
+			fired mustBe true
+		}
+		
+		"should create a function that is executed on each past occurence" in {
+			val event = new Event[Int]
+			var fired = false
+			event.occur(new Occurence(0, 10))
+			
+			event.foreach { occurence =>
+				fired = true
+			}
+			
+			fired mustBe true
+		}
+	}
+	
 	"Event.merge" should {
 		"return an Event that contains all the occurences of each" in {
 			val eventOne = new Event[Int]

@@ -14,6 +14,30 @@ package com.github.oetzi.echo.core {
 			this.at(System.currentTimeMillis)
 		}
 		
+		def sample[A](event : EventSource[A]) : Event[T] = {
+			val newEvent = new Event[T]
+			
+			event.foreach { occurence =>
+				newEvent.occur(new Occurence(occurence.time, this.at(occurence.time)))
+			}
+			
+			newEvent
+		}
+		
+		def until[A](event : EventSource[A], newRule : Time => T) : Behaviour[T] = {
+			val timeStamp = System.currentTimeMillis
+			val rule : Time => T = { time =>
+				if (!event.occs.isEmpty && event.occs.last.time >= timeStamp) {
+					newRule(time)
+				}
+				else {
+					this.rule(time)	
+				}
+			}
+			
+			new Behaviour(rule)
+		}
+		
 		def map[B](func : T => B) : Behaviour[B] = {
 			new Behaviour(time => func(this.at(time)))
 		}

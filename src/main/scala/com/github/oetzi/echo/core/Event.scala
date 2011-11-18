@@ -6,10 +6,18 @@ package com.github.oetzi.echo.core {
 	trait EventSource[T] {
 		var list : List[Occurence[T]] = List[Occurence[T]]()
 		var edges : Set[EventSource[T]] = Set[EventSource[T]]()
+		var ops : List[Occurence[T] => Any] = List[Occurence[T] => Any]()
 		
 		def occs() : List[Occurence[T]] = {
 			synchronized {
 				list
+			}
+		}
+		
+		def foreach(func : Occurence[T] => Any) {
+			ops = ops ++ List(func)
+			list.foreach { occ =>
+				func(occ)
 			}
 		}
 		
@@ -28,6 +36,9 @@ package com.github.oetzi.echo.core {
 				}
 				
 				echo(occurence)
+				ops.foreach { op =>
+					op(occurence)
+				}
 			}
 		}
 		
