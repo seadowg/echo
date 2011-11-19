@@ -61,13 +61,6 @@ object BehaviourSpec extends Specification {
 		}
 
 		"provide a sample function" >> {
-			"returning a new Event when passed an Event of any type" in {
-				val beh = new Behaviour(time => 5)
-				val event = new Event[Unit]
-
-				beh.sample(event).isInstanceOf[Event[Int]] mustBe true
-			}
-
 			"returning an Event that fires when the passed in event fires" in {
 				val beh = new Behaviour(time => 5)
 				val event = new Event[Int]
@@ -93,11 +86,11 @@ object BehaviourSpec extends Specification {
 		}
 
 		"provide a map function" >> {
-			"returning a new Behaviour of type B (for map(func : T => B))" in {
+			"returning a new Behaviour thats rule is func(this.now)" in {
 				val beh = new Behaviour(time => 5)
 				val func : Int => String = { int => int.toString }
-
-				beh.map(func).isInstanceOf[Behaviour[String]] mustBe true
+				
+				beh.map(func).now mustEqual "5"
 			}
 		}
 	}
