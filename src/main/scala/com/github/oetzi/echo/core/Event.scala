@@ -1,8 +1,6 @@
 import com.github.oetzi.echo.Echo._
 
 package com.github.oetzi.echo.core {
-	class Occurence[T](val time : Time, val value : T) { }
-	
 	trait EventSource[T] {
 		var list : List[Occurence[T]] = List[Occurence[T]]()
 		var edges : Set[EventSource[T]] = Set[EventSource[T]]()
@@ -98,6 +96,8 @@ package com.github.oetzi.echo.core {
 			list = newList
 		}
 	}
+	
+	class Occurence[T](val time : Time, val value : T) { }
 	
 	class Event[T] extends EventSource[T] {	}
 }
