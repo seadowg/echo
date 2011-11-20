@@ -21,11 +21,11 @@ package com.github.oetzi.echo.core {
 				val filtered = this.occs.filter(occ => occ.time == time)
 				
 				if (filtered.isEmpty) {
-					return None
+					None
 				}
 				
 				else {
-					return Some(filtered.last)
+					Some(filtered.last)
 				}
 			}
 		}
