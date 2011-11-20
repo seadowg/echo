@@ -33,6 +33,86 @@ object EventSpec extends Specification {
 				event.occs()(0) mustBe occurence
 			}
 		}
+		
+		"provide an occAt function (with paramater)" in {
+			"returning a None for empty events" in {
+				val event = new Event[Int]
+				
+				event.occAt(0) mustBe None
+			}
+			
+			"returning an Occurence if the time has a match" in {
+				val event = new Event[Int]
+				val occ = new Occurence(5, 10)
+				event.occur(occ)
+				
+				event.occAt(5).getOrElse(()) mustBe occ
+			}
+			
+			"returning the rightmost Occurence if time has muliple matches" in {
+				val event = new Event[Int]
+				val occ = new Occurence(5, 9)
+				val occ1 = new Occurence(5, 10)
+				event.occur(occ)
+				event.occur(occ1)
+				
+				event.occAt(5).getOrElse(()) mustBe occ1
+			}
+			
+			"returning None if the time is before the first event" in {
+				val event = new Event[Int]
+				val occ = new Occurence(5, 9)
+				event.occur(occ)
+				
+				event.occAt(4) mustBe None
+			}
+			
+			"returning None if the time is after the last event" in {
+				val event = new Event[Int]
+				val occ = new Occurence(5, 9)
+				event.occur(occ)
+				
+				event.occAt(6) mustBe None
+			}
+		}
+		
+		"provide a occsBefore function" in {
+			"returning an empty list for a new Event" in {
+				val event = new Event[Int]
+				
+				event.occsBefore(now).isEmpty mustBe true
+			}
+			
+			"returning an empty list if the time is before the first occurence" in {
+				val event = new Event[Int]
+				event.occur(new Occurence(5, 10))
+				
+				event.occsBefore(4).isEmpty mustBe true
+			}
+			
+			"returning an empty list if the time is equal to the first occurence" in {
+				val event = new Event[Int]
+				event.occur(new Occurence(5, 10))
+				
+				event.occsBefore(5).isEmpty mustBe true
+			}
+			
+			"returning all the occurences if the time is after the last event" in {
+				val event = new Event[Int]
+				event.occur(new Occurence(5, 10))
+				
+				event.occsBefore(6).length mustBe 1
+			}
+			
+			"returning the occurences before a certain event if first < time >= last" in {
+				val event = new Event[Int]
+				val matcher = new Occurence(5, 10)
+				event.occur(matcher)
+				event.occur(new Occurence(6, 10))
+				
+				event.occsBefore(6).last mustBe matcher
+			}
+		}
 
 		"provide an occur function" >> {
 			"that increase the length of occs" in {

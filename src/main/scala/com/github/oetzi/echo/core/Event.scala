@@ -12,6 +12,35 @@ package com.github.oetzi.echo.core {
 			}
 		}
 		
+		def occAt(time : Time) : Option[Occurence[T]] = {
+			synchronized {
+				if (occs.isEmpty) {
+						return None
+				}
+				
+				val filtered = this.occs.filter(occ => occ.time == time)
+				
+				if (filtered.isEmpty) {
+					return None
+				}
+				
+				else {
+					return Some(filtered.last)
+				}
+			}
+		}
+		
+		def occsBefore(time : Time) : List[Occurence[T]] = {
+			synchronized {
+				time match {
+					case empty if occs.isEmpty => List[Occurence[T]]()
+					case less if less <= this.occs.first.time => List[Occurence[T]]()
+					case all if all > this.occs.last.time => this.occs
+					case _ => this.occs.filter(occ => occ.time < time	)
+				}
+			}
+		}
+		
 		def foreach(func : Occurence[T] => Any) {
 			synchronized {
 				ops = ops ++ List(func)
