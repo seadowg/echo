@@ -6,8 +6,8 @@ package com.github.oetzi.echo.types {
 	
 	object Stepper {
 		private def construct[T](initial : T, event : EventSource[T]) : Time => T = {
-			val rule : Time => T = { time =>
-				val result : Occurence[T] = event.occAt(time).getOrElse {
+			{ time =>
+				val result = event.occAt(time).getOrElse {
 					val before = event.occsBefore(time)
 					
 					if (!before.isEmpty) {
@@ -21,8 +21,6 @@ package com.github.oetzi.echo.types {
 				
 				result.value
 			}
-			
-			rule
 		}
 	}
 }
