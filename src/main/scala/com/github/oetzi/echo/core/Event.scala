@@ -2,9 +2,9 @@ import com.github.oetzi.echo.Echo._
 
 package com.github.oetzi.echo.core {
 	trait EventSource[T] {
-		var list : List[Occurence[T]] = List[Occurence[T]]()
-		var edges : Set[EventSource[T]] = Set[EventSource[T]]()
-		var ops : List[Occurence[T] => Any] = List[Occurence[T] => Any]()
+		private var list : List[Occurence[T]] = List[Occurence[T]]()
+		private var edges : Set[EventSource[T]] = Set[EventSource[T]]()
+		private var ops : List[Occurence[T] => Any] = List[Occurence[T] => Any]()
 		
 		def occs() : List[Occurence[T]] = {
 			synchronized {

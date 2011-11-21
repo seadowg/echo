@@ -1,7 +1,7 @@
 import com.github.oetzi.echo.Echo._
 
 package com.github.oetzi.echo.core {
-	class Behaviour[T](val rule : Time => T) {
+	class Behaviour[T](private val rule : Time => T) {
 		def now() : T = {
 			this.at(System.currentTimeMillis)
 		}
