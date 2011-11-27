@@ -2,7 +2,7 @@ import com.github.oetzi.echo.core._
 import com.github.oetzi.echo.Echo._
 
 package com.github.oetzi.echo.types {
-	class Stepper[T](private val initial : T, private val event : EventSource[T]) extends Behaviour[T](
+	class Stepper[T](initial : T, event : EventSource[T]) extends Behaviour[T](
 		Stepper.construct(initial, event)) { }
 	
 	object Stepper {
