@@ -6,10 +6,6 @@ package com.github.oetzi.echo.core {
 		private var edges : List[Channel[T]] = List[Channel[T]]()
 		private var ops : List[Occurence[T] => Any] = List[Occurence[T] => Any]()
 		
-		def apply(matcher : T) = {
-			this.filter(occurence => occurence.value == matcher)
-		}
-		
 		def occs() : List[Occurence[T]] = {
 			synchronized {
 				occurences
