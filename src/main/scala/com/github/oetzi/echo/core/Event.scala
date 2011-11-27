@@ -2,13 +2,17 @@ import com.github.oetzi.echo.Echo._
 
 package com.github.oetzi.echo.core {
 	trait EventSource[T] {
-		private var list : List[Occurence[T]] = List[Occurence[T]]()
-		private var edges : Set[EventSource[T]] = Set[EventSource[T]]()
+		private var occurences : List[Occurence[T]] = List[Occurence[T]]()
+		private var edges : List[Channel[T]] = List[Channel[T]]()
 		private var ops : List[Occurence[T] => Any] = List[Occurence[T] => Any]()
+		
+		def apply(matcher : T) = {
+			this.filter(occurence => occurence.value == matcher)
+		}
 		
 		def occs() : List[Occurence[T]] = {
 			synchronized {
-				list
+				occurences
 			}
 		}
 		
@@ -44,24 +48,33 @@ package com.github.oetzi.echo.core {
 		def foreach(func : Occurence[T] => Any) {
 			synchronized {
 				ops = ops ++ List(func)
-				list.foreach { occ =>
+				occurences.foreach { occ =>
 					func(occ)
 				}
 			}
 		}
 		
+		def filter(func : Occurence[T] => Boolean) = {
+			synchronized {
+				val newEvent = new Event[T]
+				newEvent.occurences = this.occurences.filter(func)
+				this.addEdge(newEvent, func)
+				newEvent
+			}
+		}
+		
 		def occur(occurence : Occurence[T]) {
 			synchronized {
-				if (!list.isEmpty && occurence.time < list.last.time) {
-					for (i <- 0 until list.length) {
-						if (occurence.time >= list(i).time) {
-							list = list.slice(0, i + 1) ++ List(occurence) ++ list.slice(i + 1, list.length)
+				if (!occurences.isEmpty && occurence.time < occurences.last.time) {
+					for (i <- 0 until occurences.length) {
+						if (occurence.time >= occurences(i).time) {
+							occurences = occurences.slice(0, i + 1) ++ List(occurence) ++ occurences.slice(i + 1, occurences.length)
 						}
 					}
 				}
 				
 				else {
-					list = list ++ List(occurence)
+					occurences = occurences ++ List(occurence)
 				}
 				
 				echo(occurence)
@@ -84,18 +97,22 @@ package com.github.oetzi.echo.core {
 		
 		private def echo(occurence : Occurence[T])
 		{
-			edges.foreach { event => 
-				event.occur(occurence)
+			edges.foreach { channel => 
+				channel.send(occurence)
 			}
 		}
 		
 		private def addEdge(event : EventSource[T]) {
-			edges = edges + event
+			edges = edges ++ List(new Channel(event))
+		}
+		
+		private def addEdge(event : EventSource[T], filter : Occurence[T] => Boolean) {
+			edges = edges ++ List(new Channel(event, filter))
 		}
 		
 		private def mergeList(toMerge : List[Occurence[T]]) {
 			var newList = List[Occurence[T]]()
-			var left = list
+			var left = occurences
 			var right = toMerge
 			
 			while (!left.isEmpty || !right.isEmpty) {
@@ -122,11 +139,23 @@ package com.github.oetzi.echo.core {
 				}
 			}
 			
-			list = newList
+			occurences = newList
 		}
 	}
 	
 	class Occurence[T](val time : Time, val value : T) { }
+	
+	class Channel[T](val endPoint : EventSource[T], val filter : Occurence[T] => Boolean) {
+		def this(endPoint : EventSource[T]) {
+			this(endPoint, occur => true)
+		}
+		
+		def send(occurence : Occurence[T]) {
+			if (filter(occurence)) {
+				endPoint.occur(occurence)
+			}
+		}
+	}
 	
 	class Event[T] extends EventSource[T] {	}
 }

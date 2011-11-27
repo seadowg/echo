@@ -158,6 +158,34 @@ object EventSpec extends Specification {
 				fired mustBe true
 			}
 		}
+		
+		"provide a filter function" >> {
+			"returning an event that contains the matching occurences of the original" in {
+				val event = new Event[Int]
+				event.occur(new Occurence(now, 4))
+				event.occur(new Occurence(now, 5))
+				event.occur(new Occurence(now, 6))
+				
+				event.filter(occ => occ.value > 5).occs.length mustBe 1
+			}
+			
+			"returning an event that contains new events from the original" in {
+				val event = new Event[Int]
+				val newEvent = event.filter(occ => occ.value > 5)
+				event.occur(new Occurence(now, 6))
+				
+				newEvent.occs.length mustBe 1
+			}
+			
+			"returning an event that only matching contains new events from the original" in {
+				val event = new Event[Int]
+				val newEvent = event.filter(occ => occ.value > 5)
+				event.occur(new Occurence(now, 6))
+				event.occur(new Occurence(now, 5))
+				
+				newEvent.occs.length mustBe 1
+			}
+		}
 
 		"provide a merge function" >> {
 			"returning an Event that contains all the occurences of each" in {
