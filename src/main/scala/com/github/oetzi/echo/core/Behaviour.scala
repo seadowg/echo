@@ -1,56 +1,44 @@
-import java.util.Date
+import com.github.oetzi.echo.Echo._
 
 package com.github.oetzi.echo.core {
-	abstract class Continuous[T] {
-		def now : T
+	class Behaviour[T](private val rule : Time => T) {
+		def now() : T = {
+			this.at(System.currentTimeMillis)
+		}
 		
-		def sample[A](event : EventSource[A]) : EventSource[T] = {
+		def at(time : Time) : T = {
+			rule(time)
+		}
+		
+		def sample[A](event : EventSource[A]) : Event[T] = {
 			val newEvent = new Event[T]
-			event.foreach(event => newEvent.occur(this.now))
-			return newEvent
+			
+			event.foreach { occurence =>
+				newEvent.occur(new Occurence(occurence.time, this.at(occurence.time)))
+			}
+			
+			newEvent
+		}
+		
+		def until[A](event : EventSource[A], newRule : Time => T) : Behaviour[T] = {
+			val rule : Time => T = { time =>
+				if (!event.occs.isEmpty && event.occs.first.time <= time) {
+					newRule(time)
+				}
+				else {
+					this.rule(time)	
+				}
+			}
+			
+			new Behaviour(rule)
+		}
+		
+		def map[B](func : T => B) : Behaviour[B] = {
+			new Behaviour(time => func(this.at(time)))
 		}
 		
 		override def toString() : String = {
 			this.now.toString
 		}
 	}
-	
-	class Behaviour[T](var rule : Double => T) extends Continuous[T]() {
-		def now() : T = {
-			rule(System.currentTimeMillis)
-		}
-		
-		def at(time : Double) : T = {
-			rule(time)
-		}
-		
-		def change(rule : Double => T) : Behaviour[T] = {
-			this.rule = rule
-			this
-		}
-		
-		def until[A](event : EventSource[A], rule : Double => T) : Behaviour[T] = {
-			val beh = new Behaviour(this.rule)
-			event.foreach(occur => beh.change(rule))
-			beh
-		}
-	}
-	
-	class Reactive[T](var rule : () => T) extends Continuous[T]() {
-		def now() : T = {
-			rule()
-		}
-	}
-	
-	class Stepper[T](val init : T, val event : Event[T]) extends Behaviour[T](time => init) {
-		event.foreach(newValue => this.change(time => newValue))
-		
-		override def at(time : Double) : T = {
-			throw new NonDeterminismException()
-		}
-	}
-	
-	class EmbdContinuous[T](val self : Continuous[T]) { }
-	
-	case class NonDeterminismException() extends Exception { }
 }

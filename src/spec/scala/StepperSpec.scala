@@ -1,31 +1,52 @@
 import org.specs._
-import com.github.oetzi.echo.core.Stepper
-import com.github.oetzi.echo.core.Event
-import com.github.oetzi.echo.core.NonDeterminismException
+import com.github.oetzi.echo.Echo._
+import com.github.oetzi.echo.core._
+import com.github.oetzi.echo.types.Stepper
+
 
 object StepperSpec extends Specification {
 	"Stepper" should {
-		"be created when passed an Event and an initial value" in {
-			val step = new Stepper(0, new Event[Int])
-			step.isInstanceOf[Stepper[Int]] mustBe true
-		}
-		
-		"return the initial value for when 'now' is called" in {
-			val step = new Stepper(0, new Event[Int])
-			step.now mustBe 0
-		}
-		
-		"change the current rule to the Event value when it occurs" in {
-			val event = new Event[Int]
-			val step = new Stepper(0, event)
+		"have an at" >> {
+			"returning 'initial' if event hasn't occured" in {
+				val stepper = new Stepper(0, new Event[Int])
+				
+				stepper.at(now) mustBe 0
+			}
 			
-			event.occur(5)
-			step.now mustBe 5
-		}
-		
-		"throw an exception when `at` is called" in {
-			val beh = new Stepper(5, new Event[Int]())
-			beh.at(10) must throwA[NonDeterminismException]
+			"returning the newest event if time is >= last event occurence" in {
+				val event = new Event[Int]
+				event.occur(new Occurence(now, 5))
+				val stepper = new Stepper(0, event)
+				
+				stepper.at(now + 1) mustBe 5
+			}
+			
+			"returning the initial value if the time is < the first event" in {
+				val event = new Event[Int]
+				event.occur(new Occurence(now, 5))
+				val stepper = new Stepper(0, event)
+				
+				stepper.at(0) mustBe 0
+			}
+			
+			"returning an event's value if the time is equal to it" in {
+				val event = new Event[Int]
+				event.occur(new Occurence(5, 10))
+				event.occur(new Occurence(7, 11))
+				val stepper = new Stepper(0, event)
+				
+				stepper.at(5) mustBe 10
+			}
+			
+			"returning an events value if it has the max before time" in {
+					val event = new Event[Int]
+					event.occur(new Occurence(5, 10))
+					event.occur(new Occurence(4, 9))
+					event.occur(new Occurence(6, 11))
+					val stepper = new Stepper(0, event)
+
+					stepper.at(5) mustBe 10
+			}
 		}
 	}
 }
