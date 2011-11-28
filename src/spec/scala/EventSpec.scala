@@ -5,9 +5,29 @@ import com.github.oetzi.echo.Echo._
 
 object EventSpec extends Specification {
 	"Event" should {
-		"be created without paramaters" in {
+		"be created without paramaters from the constructor" in {
 			val event = new Event[Int]
 			event.isInstanceOf[Event[Int]] mustBe true
+		}
+		
+		"be created from Event.apply" in {
+			val event = Event[Int]
+			event.isInstanceOf[Event[Int]] mustBe true
+		}
+		
+		"create a constant event when passed a time and value to Event.apply" >> {
+			"that has one occurence" in {
+				val event = Event(0, 5)
+				
+				event.occs.length mustBe 1
+			}
+			
+			"that's occurence has the same paramaters as those passed" in {
+				val event = Event(0, 5)
+				
+				event.occs.first.value mustBe 5
+				event.occs.first.time mustBe 0.asInstanceOf[Time]
+			}
 		}
 		
 		"provide an occs function" >> {
