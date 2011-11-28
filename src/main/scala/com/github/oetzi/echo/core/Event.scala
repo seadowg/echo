@@ -153,5 +153,17 @@ package com.github.oetzi.echo.core {
 		}
 	}
 	
-	class Event[T] extends EventSource[T] {	}
+	class Event[T] extends EventSource[T] { }
+	
+	object Event {
+		def apply[T]() = {
+			new Event[T]
+		}
+		
+		def apply[T](time : Time, value : T) = {
+			val event = new Event[T]
+			event.occur(new Occurence(time, value))
+			event
+		}
+	}
 }
