@@ -10,14 +10,10 @@ package com.github.oetzi.echo.core {
 			rule(time)
 		}
 		
-		def sample[A](event : EventSource[A]) : Event[T] = {
-			val newEvent = new Event[T]
-			
-			event.foreach { occurence =>
-				newEvent.occur(new Occurrence(occurence.time, this.at(occurence.time)))
+		def sample[A](event : EventSource[A]) : EventSource[T] = {
+			event.map { occurence =>
+				new Occurrence(occurence.time, this.at(occurence.time))
 			}
-			
-			newEvent
 		}
 		
 		def until[A](event : EventSource[A], newRule : Time => T) : Behaviour[T] = {
