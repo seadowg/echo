@@ -16,7 +16,7 @@ package com.github.oetzi.echo.types {
 					}
 				
 					else {
-						new Occurence(0, behaviour)
+						new Occurrence(0, behaviour)
 					}
 				}
 				

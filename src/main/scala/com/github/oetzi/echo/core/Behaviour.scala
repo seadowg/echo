@@ -14,7 +14,7 @@ package com.github.oetzi.echo.core {
 			val newEvent = new Event[T]
 			
 			event.foreach { occurence =>
-				newEvent.occur(new Occurence(occurence.time, this.at(occurence.time)))
+				newEvent.occur(new Occurrence(occurence.time, this.at(occurence.time)))
 			}
 			
 			newEvent

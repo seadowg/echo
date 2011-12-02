@@ -1,7 +1,7 @@
 import org.specs._
 import com.github.oetzi.echo.core.Behaviour
 import com.github.oetzi.echo.core.Event
-import com.github.oetzi.echo.core.Occurence
+import com.github.oetzi.echo.core.Occurrence
 
 object BehaviourSpec extends Specification {
 	"Behaviour" should {
@@ -46,7 +46,7 @@ object BehaviourSpec extends Specification {
 				var beh = new Behaviour(time => 5)
 				val event = new Event[Int]
 				beh = beh.until(event, time => 10)
-				event.occur(new Occurence(System.currentTimeMillis, 5))
+				event.occur(new Occurrence(System.currentTimeMillis, 5))
 
 				beh.now mustBe 10
 			}
@@ -54,7 +54,7 @@ object BehaviourSpec extends Specification {
 			"returning a Behaviour thats rule only 'changes' if the time is after the event" in {
 				val event = new Event[Int]
 				val beh = new Behaviour(time => 5).until(event, time => 10)
-				event.occur(new Occurence(System.currentTimeMillis, 5))
+				event.occur(new Occurrence(System.currentTimeMillis, 5))
 
 				beh.at(1) mustBe 5
 			}
@@ -66,7 +66,7 @@ object BehaviourSpec extends Specification {
 				val event = new Event[Int]
 
 				val sampler = beh.sample(event)
-				event.occur(new Occurence(10, 5))
+				event.occur(new Occurrence(10, 5))
 
 				sampler.occs.isEmpty mustBe false
 			}
@@ -77,7 +77,7 @@ object BehaviourSpec extends Specification {
 				var firedVal = 0
 
 				val sampler = beh.sample(event)
-				val occ = new Occurence(10, 5)
+				val occ = new Occurrence(10, 5)
 				event.occur(occ)
 
 				sampler.occs.last.time mustBe occ.time
