@@ -151,33 +151,6 @@ object EventSpec extends Specification {
 				event.occs.last.time mustBe 15L
 			}
 		}
-
-		"provide a foreach function" >> {
-			"that creates a function that is executed on each future occurence" in {
-				val event = new Event[Int]
-				var fired = false
-
-				event.foreach { occurence =>
-					fired = true
-				}
-
-				event.occur(new Occurrence(0, 10))
-
-				fired mustBe true
-			}
-
-			"that creates a function that is executed on each past occurence" in {
-				val event = new Event[Int]
-				var fired = false
-				event.occur(new Occurrence(0, 10))
-
-				event.foreach { occurence =>
-					fired = true
-				}
-
-				fired mustBe true
-			}
-		}
 		
 		"provide a map function" >> {
 			"returning an event that returns the the same number of occurences" in {

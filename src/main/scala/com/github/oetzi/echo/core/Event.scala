@@ -2,9 +2,9 @@ import com.github.oetzi.echo.Echo._
 
 package com.github.oetzi.echo.core {
 	trait EventSource[T] {
-		private var occurences : List[Occurrence[T]] = List[Occurrence[T]]()
+		private var occurences : List[Occurrence[T]] = Nil
 		private var edges : List[Channel[T, _]] = Nil
-		private var ops : List[Occurrence[T] => Any] = List[Occurrence[T] => Any]()
+		private var ops : List[Occurrence[T] => Any] = Nil
 		
 		def occs() : List[Occurrence[T]] = {
 			synchronized {
@@ -58,15 +58,6 @@ package com.github.oetzi.echo.core {
 				echo(occurence)
 				ops.foreach { op =>
 					op(occurence)
-				}
-			}
-		}
-		
-		def foreach(func : Occurrence[T] => Any) {
-			synchronized {
-				ops = ops ++ List(func)
-				occurences.foreach { occ =>
-					func(occ)
 				}
 			}
 		}
