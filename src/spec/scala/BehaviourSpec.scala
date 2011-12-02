@@ -2,24 +2,13 @@ import org.specs._
 import com.github.oetzi.echo.core.Behaviour
 import com.github.oetzi.echo.core.Event
 import com.github.oetzi.echo.core.Occurrence
+import com.github.oetzi.echo.Echo._
 
 object BehaviourSpec extends Specification {
 	"Behaviour" should {
 		"create a new instance given a valid block" in {
 			val beh = new Behaviour(time => time)
 			beh must_!= null
-		}
-		
-		"return Behaviour.now.toString() when toString() is called" in {
-			val beh = new Behaviour(time => 5)
-			beh.toString mustEqual "5"
-		}
-		
-		"provide a now function" >> {
-			"returning the result of rule()" in {
-				val beh = new Behaviour(time => (5 + 6))
-				beh.now mustBe 11
-			}
 		}
 
 		"provide an at function" >> {
@@ -39,7 +28,7 @@ object BehaviourSpec extends Specification {
 			"returning a new Behaviour with the current rule when the Event hasn't occured" in {
 				val beh = new Behaviour(time => 5)
 
-				beh.until(new Event[Int], time => 10).now mustBe 5
+				beh.until(new Event[Int], time => 10).at(now) mustBe 5
 			}
 
 			"returning a new Behaviour with the new rule after the Event occurs" in {
@@ -48,7 +37,7 @@ object BehaviourSpec extends Specification {
 				beh = beh.until(event, time => 10)
 				event.occur(new Occurrence(System.currentTimeMillis, 5))
 
-				beh.now mustBe 10
+				beh.at(now) mustBe 10
 			}
 
 			"returning a Behaviour thats rule only 'changes' if the time is after the event" in {
@@ -86,11 +75,11 @@ object BehaviourSpec extends Specification {
 		}
 
 		"provide a map function" >> {
-			"returning a new Behaviour thats rule is func(this.now)" in {
+			"returning a new Behaviour thats rule is func(this.at(now))" in {
 				val beh = new Behaviour(time => 5)
 				val func : Int => String = { int => int.toString }
 				
-				beh.map(func).now mustEqual "5"
+				beh.map(func).at(now) mustEqual "5"
 			}
 		}
 	}
