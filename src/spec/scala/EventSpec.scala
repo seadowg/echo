@@ -48,7 +48,7 @@ object EventSpec extends Specification {
       "returning a list with the correct values" in {
         val event = new Event[Int]
         val occurrence = new Occurrence(now, 5)
-        event.occur(occurence)
+        event.occur(occurrence)
 
         event.occs()(0) mustBe occurrence
       }
@@ -235,7 +235,7 @@ object EventSpec extends Specification {
 
         eventTwo.merge(eventOne).occs().foreach {
           occurrence =>
-            last.time must be_<=(occurence.time)
+            last.time must be_<=(occurrence.time)
             last = occurrence
         }
       }
