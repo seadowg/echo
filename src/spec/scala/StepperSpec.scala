@@ -13,7 +13,7 @@ object StepperSpec extends Specification {
 				stepper.at(now) mustBe 0
 			}
 			
-			"returning the newest event if time is >= last event occurence" in {
+			"returning the newest event if time is >= last event occurrence" in {
 				val event = new Event[Int]
 				event.occur(new Occurrence(now, 5))
 				val stepper = new Stepper(0, event)

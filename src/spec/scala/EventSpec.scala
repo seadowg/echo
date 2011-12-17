@@ -16,13 +16,13 @@ object EventSpec extends Specification {
 		}
 		
 		"create a constant event when passed a time and value to Event.apply" >> {
-			"that has one occurence" in {
+			"that has one occurrence" in {
 				val event = Event(0, 5)
 				
 				event.occs.length mustBe 1
 			}
 			
-			"that's occurence has the same paramaters as those passed" in {
+			"that's occurrence has the same paramaters as those passed" in {
 				val event = Event(0, 5)
 				
 				event.occs.first.value mustBe 5
@@ -51,6 +51,17 @@ object EventSpec extends Specification {
 				event.occur(occurence)
 
 				event.occs()(0) mustBe occurence
+			}
+			
+			"returning a list that remains up to date with the Event" in {
+				val event = new Event[Int]
+				val occurence = new Occurrence(now, 5)
+				event.occur(occurence)
+				val occs = event.occs
+				
+				event.occur(occurence)
+				
+				occs.length mustBe 2
 			}
 		}
 		
@@ -103,14 +114,14 @@ object EventSpec extends Specification {
 				event.occsBefore(now).isEmpty mustBe true
 			}
 			
-			"returning an empty list if the time is before the first occurence" in {
+			"returning an empty list if the time is before the first occurrence" in {
 				val event = new Event[Int]
 				event.occur(new Occurrence(5, 10))
 				
 				event.occsBefore(4).isEmpty mustBe true
 			}
 			
-			"returning an empty list if the time is equal to the first occurence" in {
+			"returning an empty list if the time is equal to the first occurrence" in {
 				val event = new Event[Int]
 				event.occur(new Occurrence(5, 10))
 				
