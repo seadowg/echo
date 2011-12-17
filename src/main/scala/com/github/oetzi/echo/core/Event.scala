@@ -14,10 +14,6 @@ trait EventSource[T] {
 
   def occAt(time: Time): Option[Occurrence[T]] = {
     synchronized {
-      if (occs().isEmpty) {
-        return None
-      }
-
       val filtered = this.occs().filter(occ => occ.time == time)
 
       if (filtered.isEmpty) {
@@ -32,12 +28,7 @@ trait EventSource[T] {
 
   def occsBefore(time: Time): List[Occurrence[T]] = {
     synchronized {
-      time match {
-        case empty if occs().isEmpty => List[Occurrence[T]]()
-        case less if less <= this.occs().head.time => List[Occurrence[T]]()
-        case all if all > this.occs().last.time => this.occs()
-        case _ => this.occs().filter(occ => occ.time < time)
-      }
+      this.occs().filter(occ => occ.time < time)
     }
   }
 
