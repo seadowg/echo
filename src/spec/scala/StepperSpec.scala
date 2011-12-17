@@ -13,9 +13,9 @@ object StepperSpec extends Specification {
 				stepper.at(now) mustBe 0
 			}
 			
-			"returning the newest event if time is >= last event occurence" in {
+			"returning the newest event if time is >= last event occurrence" in {
 				val event = new Event[Int]
-				event.occur(new Occurence(now, 5))
+				event.occur(new Occurrence(now, 5))
 				val stepper = new Stepper(0, event)
 				
 				stepper.at(now + 1) mustBe 5
@@ -23,7 +23,7 @@ object StepperSpec extends Specification {
 			
 			"returning the initial value if the time is < the first event" in {
 				val event = new Event[Int]
-				event.occur(new Occurence(now, 5))
+				event.occur(new Occurrence(now, 5))
 				val stepper = new Stepper(0, event)
 				
 				stepper.at(0) mustBe 0
@@ -31,8 +31,8 @@ object StepperSpec extends Specification {
 			
 			"returning an event's value if the time is equal to it" in {
 				val event = new Event[Int]
-				event.occur(new Occurence(5, 10))
-				event.occur(new Occurence(7, 11))
+				event.occur(new Occurrence(5, 10))
+				event.occur(new Occurrence(7, 11))
 				val stepper = new Stepper(0, event)
 				
 				stepper.at(5) mustBe 10
@@ -40,9 +40,9 @@ object StepperSpec extends Specification {
 			
 			"returning an events value if it has the max before time" in {
 					val event = new Event[Int]
-					event.occur(new Occurence(5, 10))
-					event.occur(new Occurence(4, 9))
-					event.occur(new Occurence(6, 11))
+					event.occur(new Occurrence(5, 10))
+					event.occur(new Occurrence(4, 9))
+					event.occur(new Occurrence(6, 11))
 					val stepper = new Stepper(0, event)
 
 					stepper.at(5) mustBe 10

@@ -1,5 +1,7 @@
 reports/*
 target/*
-.rvmrc
 examples/*/target
 examples/example_lib/*
+echo.iml
+echo.ipr
+echo.iws

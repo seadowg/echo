@@ -73,7 +73,7 @@ the concrete `Event` type:
 
     val event = new Event[Int]
     event.foreach(event => println("OH YEAH I OCCURRED! " + event))
-    event.occur(new Occurence(now, 5))
+    event.occur(new Occurrence(now, 5))
     => "OH YEAH I OCCURRED! 5"
 
 Here we use the handy `foreach` function on the Event. Events can also be thought of as a stream of occur-rations that are 

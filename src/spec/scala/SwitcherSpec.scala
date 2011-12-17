@@ -14,11 +14,11 @@ object SwitcherSpec extends Specification {
 				switcher.at(now) mustBe 5
 			}
 			
-			"returning b.at for initial behaviour b if time is before first event occurence" in {
+			"returning b.at for initial behaviour b if time is before first event occurrence" in {
 				val behaviour = new Behaviour(time => 5)
 				val event = new Event[Behaviour[Int]]
 				val switcher = new Switcher(behaviour, event)
-				event.occur(new Occurence(5, new Behaviour(time => 6)))
+				event.occur(new Occurrence(5, new Behaviour(time => 6)))
 				
 				switcher.at(4) mustBe 5
 			}
@@ -27,27 +27,27 @@ object SwitcherSpec extends Specification {
 				val behaviour = new Behaviour(time => 5)
 				val event = new Event[Behaviour[Int]]
 				val switcher = new Switcher(behaviour, event)
-				event.occur(new Occurence(5, new Behaviour(time => 6)))
+				event.occur(new Occurrence(5, new Behaviour(time => 6)))
 				
 				switcher.at(6) mustBe 6
 			}
 			
-			"returning b.at for a behaviour thats occurence matches time" in {
+			"returning b.at for a behaviour thats occurrence matches time" in {
 				val behaviour = new Behaviour(time => 5)
 				val event = new Event[Behaviour[Int]]
 				val switcher = new Switcher(behaviour, event)
-				event.occur(new Occurence(5, new Behaviour(time => 6)))
-				event.occur(new Occurence(6, new Behaviour(time => 7)))
+				event.occur(new Occurrence(5, new Behaviour(time => 6)))
+				event.occur(new Occurrence(6, new Behaviour(time => 7)))
 				
 				switcher.at(5) mustBe 6
 			}
 			
-			"returning b.at for a the newest behaviour thats occurence is less than time" in {
+			"returning b.at for a the newest behaviour thats occurrence is less than time" in {
 				val behaviour = new Behaviour(time => 5)
 				val event = new Event[Behaviour[Int]]
 				val switcher = new Switcher(behaviour, event)
-				event.occur(new Occurence(5, new Behaviour(time => 6)))
-				event.occur(new Occurence(7, new Behaviour(time => 7)))
+				event.occur(new Occurrence(5, new Behaviour(time => 6)))
+				event.occur(new Occurrence(7, new Behaviour(time => 7)))
 				
 				switcher.at(6) mustBe 6
 			}
