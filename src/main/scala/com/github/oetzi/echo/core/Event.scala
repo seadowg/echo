@@ -144,10 +144,24 @@ object Event {
     new Event[T]
   }
 
-  def apply[T](time: Time, value: T) = {
+  def apply[T](time: Time, value: T): EventSource[T] = {
     val event = new Event[T]
     event.occur(new Occurrence(time, value))
     event
+  }
+
+  def join[T, U[T] <: EventSource[T]](event: EventSource[U[T]]): EventSource[T] = {
+    val newEvent: EventSource[T] = new Event[T]
+    event.map {
+      occEvent =>
+        occEvent.value.map {
+          occ =>
+            newEvent.occur(occ)
+            occ
+        }
+        occEvent
+    }
+    newEvent
   }
 }
 

@@ -17,6 +17,51 @@ object EventSpec extends Specification {
       event.isInstanceOf[Event[Int]] mustBe true
     }
 
+    "provide a join operation" >> {
+      "that returns a flattened empty event for an empty event" in {
+        val event = Event[Event[Int]]()
+
+        Event.join(event).isInstanceOf[Event[Int]] mustBe true
+      }
+
+      "that returns a flattened event with the occurences of each occurence" in {
+        val event = Event[Event[Int]]()
+        var list = List[Occurrence[Int]]()
+
+        for (i <- 0 until 3) {
+          val e = Event[Int]
+          val o = new Occurrence(i, 5)
+          e.occur(o)
+          list = list ++ List(o)
+          event.occur(new Occurrence(i, e))
+        }
+
+        Event.join(event).occs() mustEqual list
+      }
+
+      "that returns a flattened event that is kept up to date with the original's occurence event's occurences" in {
+        val event = Event[Event[Int]]()
+        val occEvent = new Event[Int]
+        event.occur(new Occurrence(5, occEvent))
+        val joined = Event.join(event)
+
+        occEvent.occur(new Occurrence(now, 5))
+
+        joined.occs().length mustBe 1
+      }
+
+      "that returns a flattened event that is kept up to date with any new occurence events in the original" in {
+        val event = Event[Event[Int]]()
+        val occEvent = new Event[Int]
+        val joined = Event.join(event)
+
+        event.occur(new Occurrence(5, occEvent))
+        occEvent.occur(new Occurrence(now, 5))
+
+        joined.occs().length mustBe 1
+      }
+    }
+
     "create a constant event when passed a time and value to Event.apply" >> {
       "that has one occurrence" in {
         val event = Event(0, 5)
