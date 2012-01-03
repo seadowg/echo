@@ -1,3 +1,5 @@
+package com.github.oetzi.echo.test
+
 import org.specs._
 import com.github.oetzi.echo.core.Behaviour
 import com.github.oetzi.echo.core.Event
