@@ -1,11 +1,10 @@
 package com.github.oetzi.echo.display
 
 import javax.swing.JButton
-import com.github.oetzi.echo.core.{Occurrence, Behaviour, EventSource, Event}
-import com.github.oetzi.echo.Echo._
+import com.github.oetzi.echo.core.{Occurrence, Behaviour, Event}
 import java.awt.event.{ActionEvent, ActionListener}
 
-class Button private() extends Canvas with EventSource[Unit] {
+class Button private() extends Canvas {
   val redraw: Event[Unit] = new Event[Unit]
   val click: Event[Unit] = new Event[Unit]
 
@@ -48,9 +47,16 @@ class Button private() extends Canvas with EventSource[Unit] {
 }
 
 object Button {
-  def apply(text: String): Button = {
+  def apply(text: Behaviour[String]): Button = {
     val button = new Button()
     button.textBeh = text
+
+    button
+  }
+
+  def apply(func: Button => Behaviour[String]) = {
+    val button = new Button()
+    button.textBeh = func(button)
 
     button
   }
