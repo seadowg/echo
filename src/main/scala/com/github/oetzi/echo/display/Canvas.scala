@@ -10,9 +10,16 @@ trait Canvas {
   val redraw: Event[Unit]
   val internal: Component
 
-  def width(): Behaviour[Int]
+  protected var widthBeh: Behaviour[Int] = new Behaviour(t => this.internal.getWidth())
+  protected var heightBeh: Behaviour[Int] = new Behaviour(t => this.internal.getHeight())
 
-  def height(): Behaviour[Int]
+  def width(): Behaviour[Int] = {
+    this.widthBeh
+  }
+
+  def height(): Behaviour[Int] = {
+    this.heightBeh
+  }
 
   def update(occurrence: Occurrence[Unit], draw: Boolean = false)
 

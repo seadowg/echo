@@ -2,6 +2,7 @@ package com.github.oetzi.echo.display
 
 import javax.swing.JButton
 import com.github.oetzi.echo.core.{Occurrence, Behaviour, Event}
+import com.github.oetzi.echo.Echo._
 import java.awt.event.{ActionEvent, ActionListener}
 
 class Button private() extends Canvas {
@@ -14,19 +15,14 @@ class Button private() extends Canvas {
         Button.this.click.occur(new Occurrence(event.getWhen(), ()))
       }
     })
+
+    override def repaint() {
+      Button.this.update(new Occurrence(now, ()))
+      super.repaint()
+    }
   }
 
-  private var widthBeh: Behaviour[Int] = new Behaviour(t => this.internal.getWidth())
-  private var heightBeh: Behaviour[Int] = new Behaviour(t => this.internal.getHeight())
   private var textBeh: Behaviour[String] = new Behaviour(t => this.internal.getText())
-
-  def width(): Behaviour[Int] = {
-    this.widthBeh
-  }
-
-  def height(): Behaviour[Int] = {
-    this.heightBeh
-  }
 
   def text(): Behaviour[String] = {
     this.textBeh

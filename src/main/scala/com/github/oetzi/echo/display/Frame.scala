@@ -16,9 +16,6 @@ class Frame private() extends Canvas {
   }
   private var components: List[Canvas] = List[Canvas]()
 
-  private var widthBeh: Behaviour[Int] = new Behaviour(t => this.internal.getWidth())
-  private var heightBeh: Behaviour[Int] = new Behaviour(t => this.internal.getHeight())
-
   startClock()
 
   def startClock() {
@@ -27,14 +24,6 @@ class Frame private() extends Canvas {
         Frame.this.update(new Occurrence(now, ()), true)
       }
     }, 0, 40)
-  }
-
-  def width(): Behaviour[Int] = {
-    this.widthBeh
-  }
-
-  def height(): Behaviour[Int] = {
-    this.heightBeh
   }
 
   def update(occurrence: Occurrence[Unit], draw: Boolean = false) {
@@ -68,6 +57,7 @@ object Frame {
     frame.heightBeh = height
     frame.internal.setVisible(true)
     frame.internal.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
+    frame.internal.setResizable(false)
 
     map.foreach {
       entry =>
