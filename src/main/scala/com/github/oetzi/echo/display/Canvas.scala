@@ -11,9 +11,9 @@ trait Canvas {
 
   def height(): Behaviour[Int]
 
-  def update(occurrence: Occurrence[Unit])
+  def update(occurrence: Occurrence[Unit], draw: Boolean)
 
-  protected def draw(occurrence: Occurrence[Unit])
+  def draw(occurrence: Occurrence[Unit])
 }
 
 }

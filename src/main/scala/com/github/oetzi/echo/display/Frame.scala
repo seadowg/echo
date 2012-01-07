@@ -5,9 +5,15 @@ import com.github.oetzi.echo.Echo._
 import com.github.oetzi.echo.core.{Occurrence, Behaviour, Event}
 import java.lang.Thread
 
-class Frame() extends Canvas {
-  val internal: JFrame = new JFrame()
+class Frame private() extends Canvas {
   val redraw: Event[Unit] = new Event[Unit]()
+
+  val internal: JFrame = new JFrame() {
+    override def repaint() {
+      Frame.this.update(new Occurrence(now, ()), false)
+      super.repaint()
+    }
+  }
   private val components: List[Canvas] = List[Canvas]()
 
   private var widthBeh: Behaviour[Int] = this.internal.getWidth()
@@ -19,7 +25,7 @@ class Frame() extends Canvas {
     val thread = new Thread(new Runnable() {
       def run() {
         while (true) {
-          Frame.this.update(new Occurrence(now, ()))
+          Frame.this.update(new Occurrence(now, ()), true)
           Thread.sleep(40)
         }
       }
@@ -35,17 +41,17 @@ class Frame() extends Canvas {
     this.heightBeh
   }
 
-  def update(occurrence: Occurrence[Unit]) {
+  def update(occurrence: Occurrence[Unit], draw: Boolean) {
     redraw.occur(occurrence)
-    this.draw(occurrence)
+    if (draw) this.draw(occurrence)
 
     this.components.foreach {
       canvas =>
-        canvas.update(occurrence)
+        canvas.update(occurrence, draw)
     }
   }
 
-  protected def draw(occurrence: Occurrence[Unit]) {
+  def draw(occurrence: Occurrence[Unit]) {
     this.internal.setSize(widthBeh.at(occurrence.time), heightBeh.at(occurrence.time))
 
     this.internal.repaint()

@@ -28,5 +28,12 @@ object FrameSpec extends Specification {
     "be 'visible'" in {
       frame.internal.isVisible() mustBe true
     }
+
+    "create a redraw event when Swing repaint occurs" in {
+      val before = frame.redraw.occs.length
+
+      frame.internal.setSize(200, 200)
+      frame.redraw.occs.length mustBe before + 1
+    }
   }
 }
