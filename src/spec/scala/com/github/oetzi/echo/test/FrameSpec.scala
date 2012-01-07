@@ -1,13 +1,13 @@
 package com.github.oetzi.echo.test
 
 import org.specs._
-import com.github.oetzi.echo.display.Frame
 import com.github.oetzi.echo.Echo._
+import com.github.oetzi.echo.display.{Button, Canvas, Frame}
 
 object FrameSpec extends Specification {
   "Frame" should {
 
-    val frame = Frame(100, 100)
+    val frame = Frame(100, 100, Map[String, Canvas]())
 
     "have an internal JFrame" in {
       frame.internal must_!= null
@@ -29,11 +29,11 @@ object FrameSpec extends Specification {
       frame.internal.isVisible() mustBe true
     }
 
-    "create a redraw event when Swing repaint occurs" in {
-      val before = frame.redraw.occs.length
+    "adds components to the JFrame's content" in {
+      val button = Button("Hello")
+      val frame = Frame(100, 100, Map("button" -> button))
 
-      frame.internal.setSize(200, 200)
-      frame.redraw.occs.length mustBe before + 1
+      frame.internal.getContentPane().getComponent(0) mustBe button.internal
     }
   }
 }

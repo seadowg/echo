@@ -3,34 +3,30 @@ package com.github.oetzi.echo.display {
 import javax.swing.JFrame
 import com.github.oetzi.echo.Echo._
 import com.github.oetzi.echo.core.{Occurrence, Behaviour, Event}
-import java.lang.Thread
+import java.util.{TimerTask, Timer}
 
 class Frame private() extends Canvas {
   val redraw: Event[Unit] = new Event[Unit]()
 
   val internal: JFrame = new JFrame() {
     override def repaint() {
-      Frame.this.update(new Occurrence(now, ()), false)
+      Frame.this.update(new Occurrence(now, ()))
       super.repaint()
     }
   }
-  private val components: List[Canvas] = List[Canvas]()
+  private var components: List[Canvas] = List[Canvas]()
 
-  private var widthBeh: Behaviour[Int] = this.internal.getWidth()
-  private var heightBeh: Behaviour[Int] = this.internal.getHeight()
+  private var widthBeh: Behaviour[Int] = new Behaviour(t => this.internal.getWidth())
+  private var heightBeh: Behaviour[Int] = new Behaviour(t => this.internal.getHeight())
 
   startClock()
 
   def startClock() {
-    val thread = new Thread(new Runnable() {
-      def run() {
-        while (true) {
-          Frame.this.update(new Occurrence(now, ()), true)
-          Thread.sleep(40)
-        }
+    new Timer().schedule(new TimerTask() {
+      override def run() {
+        Frame.this.update(new Occurrence(now, ()), true)
       }
-    })
-    thread.start()
+    }, 0, 40)
   }
 
   def width(): Behaviour[Int] = {
@@ -41,13 +37,20 @@ class Frame private() extends Canvas {
     this.heightBeh
   }
 
-  def update(occurrence: Occurrence[Unit], draw: Boolean) {
+  def update(occurrence: Occurrence[Unit], draw: Boolean = false) {
     redraw.occur(occurrence)
-    if (draw) this.draw(occurrence)
 
     this.components.foreach {
       canvas =>
-        canvas.update(occurrence, draw)
+        canvas.update(occurrence)
+    }
+
+    if (draw) {
+      this.draw(occurrence)
+      this.components.foreach {
+        canvas =>
+          canvas.draw(occurrence)
+      }
     }
   }
 
@@ -59,11 +62,18 @@ class Frame private() extends Canvas {
 }
 
 object Frame {
-  def apply(width: Behaviour[Int], height: Behaviour[Int]): Frame = {
+  def apply(width: Behaviour[Int], height: Behaviour[Int], map: Map[String, Canvas]): Frame = {
     val frame = new Frame()
     frame.widthBeh = width
     frame.heightBeh = height
     frame.internal.setVisible(true)
+    frame.internal.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
+
+    map.foreach {
+      entry =>
+        frame.internal.getContentPane().add(entry._2.internal)
+        frame.components = frame.components ++ List(entry._2)
+    }
 
     frame
   }
