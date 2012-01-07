@@ -11,14 +11,6 @@ trait Canvas {
 
   def height(): Behaviour[Int]
 
-  def visible(): Behaviour[Boolean]
-
-  def setHeight(height: Behaviour[Int])
-
-  def setWidth(width: Behaviour[Int])
-
-  def setVisible(visible: Behaviour[Boolean])
-
   def update(occurrence: Occurrence[Unit])
 
   protected def draw(occurrence: Occurrence[Unit])

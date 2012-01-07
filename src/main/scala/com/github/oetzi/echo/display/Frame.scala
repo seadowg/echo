@@ -2,17 +2,16 @@ package com.github.oetzi.echo.display {
 
 import javax.swing.JFrame
 import com.github.oetzi.echo.Echo._
-import com.github.oetzi.echo.types.Switcher
 import com.github.oetzi.echo.core.{Occurrence, Behaviour, Event}
 import java.lang.Thread
 
-class Frame extends Canvas {
+class Frame() extends Canvas {
   val internal: JFrame = new JFrame()
   val redraw: Event[Unit] = new Event[Unit]()
+  private val components: List[Canvas] = List[Canvas]()
 
-  private val widthBeh: Switcher[Int] = new Switcher(this.internal.getWidth(), new Event[Behaviour[Int]])
-  private val heightBeh: Switcher[Int] = new Switcher(this.internal.getHeight(), new Event[Behaviour[Int]])
-  private val visibleBeh: Switcher[Boolean] = new Switcher(this.internal.isVisible(), new Event[Behaviour[Boolean]])
+  private var widthBeh: Behaviour[Int] = this.internal.getWidth()
+  private var heightBeh: Behaviour[Int] = this.internal.getHeight()
 
   startClock()
 
@@ -28,10 +27,6 @@ class Frame extends Canvas {
     thread.start()
   }
 
-  def visible(): Behaviour[Boolean] = {
-    this.visibleBeh
-  }
-
   def width(): Behaviour[Int] = {
     this.widthBeh
   }
@@ -40,28 +35,31 @@ class Frame extends Canvas {
     this.heightBeh
   }
 
-  def setWidth(behaviour: Behaviour[Int]) {
-    this.widthBeh.event.occur(new Occurrence(now, behaviour))
-  }
-
-  def setHeight(behaviour: Behaviour[Int]) {
-    this.heightBeh.event.occur(new Occurrence(now, behaviour))
-  }
-
-  def setVisible(behaviour: Behaviour[Boolean]) {
-    this.visibleBeh.event.occur(new Occurrence(now, behaviour))
-  }
-
   def update(occurrence: Occurrence[Unit]) {
     redraw.occur(occurrence)
     this.draw(occurrence)
+
+    this.components.foreach {
+      canvas =>
+        canvas.update(occurrence)
+    }
   }
 
   protected def draw(occurrence: Occurrence[Unit]) {
-    this.internal.setVisible(visibleBeh.at(occurrence.time))
     this.internal.setSize(widthBeh.at(occurrence.time), heightBeh.at(occurrence.time))
 
     this.internal.repaint()
+  }
+}
+
+object Frame {
+  def apply(width: Behaviour[Int], height: Behaviour[Int]): Frame = {
+    val frame = new Frame()
+    frame.widthBeh = width
+    frame.heightBeh = height
+    frame.internal.setVisible(true)
+
+    frame
   }
 }
 
