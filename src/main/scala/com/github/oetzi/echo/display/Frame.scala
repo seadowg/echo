@@ -1,18 +1,19 @@
 package com.github.oetzi.echo.display {
 
-import javax.swing.JFrame
 import com.github.oetzi.echo.Echo._
 import com.github.oetzi.echo.core.{Occurrence, Behaviour}
 import java.util.{TimerTask, Timer}
+import javax.swing.{BoxLayout, JFrame}
 
 class Frame private() extends Canvas {
+  private var components: List[Canvas] = List[Canvas]()
+
   val internal: JFrame = new JFrame() {
     override def repaint() {
       Frame.this.update(new Occurrence(now, ()))
       super.repaint()
     }
   }
-  private var components: List[Canvas] = List[Canvas]()
 
   startClock()
 
@@ -48,13 +49,16 @@ class Frame private() extends Canvas {
 }
 
 object Frame {
-  def apply(width: Behaviour[Int], height: Behaviour[Int], map: Map[String, Canvas]): Frame = {
+  def apply(width: Behaviour[Int], height: Behaviour[Int], map: Map[String, Canvas] = Map()): Frame = {
     val frame = new Frame()
-    frame.widthBeh = width
-    frame.heightBeh = height
+
+    def insets = frame.internal.getInsets()
+    frame.widthBeh = width.map(width => width + insets.left + insets.right)
+    frame.heightBeh = height.map(height => height + insets.top + insets.bottom)
     frame.internal.setVisible(true)
     frame.internal.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
     frame.internal.setResizable(false)
+    frame.internal.setLayout(new BoxLayout(frame.internal.getContentPane, BoxLayout.Y_AXIS))
 
     map.foreach {
       entry =>
