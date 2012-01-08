@@ -21,7 +21,7 @@ trait Canvas {
     this.heightBeh
   }
 
-  def update(occurrence: Occurrence[Unit], draw: Boolean = false)
+  def update(occurrence: Occurrence[Unit])
 
   def draw(occurrence: Occurrence[Unit])
 }

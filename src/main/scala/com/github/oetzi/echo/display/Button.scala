@@ -28,10 +28,8 @@ class Button private() extends Canvas {
     this.textBeh
   }
 
-  def update(occurrence: Occurrence[Unit], draw: Boolean = false) {
+  def update(occurrence: Occurrence[Unit]) {
     redraw.occur(occurrence)
-
-    if (draw) this.draw(occurrence)
   }
 
   def draw(occurrence: Occurrence[Unit]) {

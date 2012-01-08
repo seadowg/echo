@@ -21,25 +21,19 @@ class Frame private() extends Canvas {
   def startClock() {
     new Timer().schedule(new TimerTask() {
       override def run() {
-        Frame.this.update(new Occurrence(now, ()), true)
+        val occ = new Occurrence(now, ())
+        Frame.this.update(occ)
+        Frame.this.draw(occ)
       }
     }, 0, 40)
   }
 
-  def update(occurrence: Occurrence[Unit], draw: Boolean = false) {
+  def update(occurrence: Occurrence[Unit]) {
     redraw.occur(occurrence)
 
     this.components.foreach {
       canvas =>
         canvas.update(occurrence)
-    }
-
-    if (draw) {
-      this.draw(occurrence)
-      this.components.foreach {
-        canvas =>
-          canvas.draw(occurrence)
-      }
     }
   }
 
@@ -47,6 +41,11 @@ class Frame private() extends Canvas {
     this.internal.setSize(widthBeh.at(occurrence.time), heightBeh.at(occurrence.time))
 
     this.internal.repaint()
+
+    this.components.foreach {
+      canvas =>
+        canvas.draw(occurrence)
+    }
   }
 }
 
