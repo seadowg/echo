@@ -6,7 +6,6 @@ import com.github.oetzi.echo.Echo._
 import java.awt.event.{ActionEvent, ActionListener}
 
 class Button private() extends Canvas {
-  val redraw: Event[Unit] = new Event[Unit]
   val click: Event[Unit] = new Event[Unit]
 
   val internal: JButton = new JButton() {

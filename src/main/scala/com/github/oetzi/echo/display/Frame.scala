@@ -2,12 +2,10 @@ package com.github.oetzi.echo.display {
 
 import javax.swing.JFrame
 import com.github.oetzi.echo.Echo._
-import com.github.oetzi.echo.core.{Occurrence, Behaviour, Event}
+import com.github.oetzi.echo.core.{Occurrence, Behaviour}
 import java.util.{TimerTask, Timer}
 
 class Frame private() extends Canvas {
-  val redraw: Event[Unit] = new Event[Unit]()
-
   val internal: JFrame = new JFrame() {
     override def repaint() {
       Frame.this.update(new Occurrence(now, ()))
