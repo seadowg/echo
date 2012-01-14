@@ -18,11 +18,11 @@ object FrameSpec extends Specification {
     }
 
     "have a width" in {
-      frame.width.at(now) must_!= null
+      frame.width must_!= null
     }
 
     "have a height" in {
-      frame.height.at(now) must_!= null
+      frame.height must_!= null
     }
 
     "be 'visible'" in {
