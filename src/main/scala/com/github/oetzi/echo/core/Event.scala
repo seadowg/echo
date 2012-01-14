@@ -32,7 +32,7 @@ trait EventSource[T] {
     }
   }
 
-  def occur(occurrence: Occurrence[T]) {
+  protected[echo] def occur(occurrence: Occurrence[T]) {
     synchronized {
       if (!occurrences.isEmpty && occurrence.time < occurrences.last.time) {
         for (i <- 0 until occurrences.length) {
