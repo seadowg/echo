@@ -45,17 +45,17 @@ class Block private() extends Canvas {
 
 object Block {
   def apply(width: Behaviour[Int], height: Behaviour[Int], color: Behaviour[Color] = Color.GRAY,
-            map: Map[String, Canvas] = Map()): Block = {
+            components: List[Canvas] = List()): Block = {
     val block = new Block()
 
     block.widthBeh = width
     block.heightBeh = height
     block.colorBeh = color
 
-    map.foreach {
-      entry =>
-        block.internal.add(entry._2.internal)
-        block.components = block.components ++ List(entry._2)
+    components.foreach {
+      component =>
+        block.internal.add(component.internal)
+        block.components = block.components ++ List(component)
     }
 
     block

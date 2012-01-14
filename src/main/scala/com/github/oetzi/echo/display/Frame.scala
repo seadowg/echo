@@ -49,7 +49,7 @@ class Frame private() extends Canvas {
 }
 
 object Frame {
-  def apply(width: Behaviour[Int], height: Behaviour[Int], map: Map[String, Canvas] = Map()): Frame = {
+  def apply(width: Behaviour[Int], height: Behaviour[Int], components: List[Canvas] = List()): Frame = {
     val frame = new Frame()
 
     def insets = frame.internal.getInsets()
@@ -60,10 +60,10 @@ object Frame {
     frame.internal.setResizable(false)
     frame.internal.setLayout(new BoxLayout(frame.internal.getContentPane, BoxLayout.Y_AXIS))
 
-    map.foreach {
-      entry =>
-        frame.internal.getContentPane().add(entry._2.internal)
-        frame.components = frame.components ++ List(entry._2)
+    components.foreach {
+      component =>
+        frame.internal.getContentPane().add(component.internal)
+        frame.components = frame.components ++ List(component)
     }
 
     frame
