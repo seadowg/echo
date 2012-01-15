@@ -13,6 +13,11 @@ object BehaviourSpec extends Specification {
       beh must_!= null
     }
 
+    "be created from from Behaviour.apply" in {
+      val behaviour = Behaviour(time => 5)
+      behaviour.isInstanceOf[Behaviour[Int]] mustBe true
+    }
+
     "provide an at function" >> {
       "returning the result of the rule with the passed value" in {
         val beh = new Behaviour(time => time * 5)
@@ -24,19 +29,19 @@ object BehaviourSpec extends Specification {
       "returning a new Behaviour" in {
         val beh = new Behaviour(time => 5)
 
-        beh.until(new Event[Int], time => 5) must_!= beh
+        beh.until(new Event[Int], new Behaviour(time => 5)) must_!= beh
       }
 
       "returning a new Behaviour with the current rule when the Event hasn't occured" in {
         val beh = new Behaviour(time => 5)
 
-        beh.until(new Event[Int], time => 10).at(now) mustBe 5
+        beh.until(new Event[Int], new Behaviour(time => 10)).at(now) mustBe 5
       }
 
       "returning a new Behaviour with the new rule after the Event occurs" in {
         var beh = new Behaviour(time => 5)
         val event = new Event[Int]
-        beh = beh.until(event, time => 10)
+        beh = beh.until(event, new Behaviour(time => 10))
         event.occur(new Occurrence(System.currentTimeMillis, 5))
 
         beh.at(now) mustBe 10
@@ -44,7 +49,7 @@ object BehaviourSpec extends Specification {
 
       "returning a Behaviour thats rule only 'changes' if the time is after the event" in {
         val event = new Event[Int]
-        val beh = new Behaviour(time => 5).until(event, time => 10)
+        val beh = new Behaviour(time => 5).until(event, new Behaviour(time => 10))
         event.occur(new Occurrence(System.currentTimeMillis, 5))
 
         beh.at(1) mustBe 5

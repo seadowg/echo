@@ -14,14 +14,14 @@ class Behaviour[T](private val rule: Time => T) {
     }
   }
 
-  def until[A](event: EventSource[A], newRule: Time => T): Behaviour[T] = {
+  def until[A](event: EventSource[A], behaviour : Behaviour[T]): Behaviour[T] = {
     val rule: Time => T = {
       time =>
         if (!event.occs().isEmpty && event.occs().head.time <= time) {
-          newRule(time)
+          behaviour.at(time)
         }
         else {
-          this.rule(time)
+          this.at(time)
         }
     }
 
@@ -30,6 +30,12 @@ class Behaviour[T](private val rule: Time => T) {
 
   def map[B](func: T => B): Behaviour[B] = {
     new Behaviour(time => func(this.at(time)))
+  }
+}
+  
+object Behaviour {
+  def apply[T](rule: Time => T) : Behaviour[T] =  {
+    new Behaviour(rule)
   }
 }
 
