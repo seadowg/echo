@@ -6,11 +6,75 @@
   \newpage
   \twocolumn
   \section{Introduction}
+   \begin{itemize}
+     \item Motivation behind FRP -
+      Many elements of programming rely on imperative state based logic. This creates
+      messy code and often causes concurrency issues (shared state etc).
+     \item Introduction to general concept - 
+     FRP hopes to solve this by introducing new first class values for dealing with
+     these elements by modeling them within a domain of continuously changing values
+     and discretely changing streams of input/output.
+     \item Basic goals (FRP and Scala) - 
+     This project attempts to implement FRP in the form of a framework for Scala.
+     \item Discussion of Scala - 
+     Scala is a multi-paradigm programming language designed to run on JVM. This 
+     means it can run on most major platforms. Scala supports a high enough level
+     of functional programming and provides nice features for designing embedded
+     language/frameworks (implicit methods etc).
+     \item Reference prior work - 
+     Haskell frameworks (FRAN, Reactive Banana, Yampa) and Scala.react/Reactive
+     (discuss that they are not actually FRP).
+   \end{itemize}
   \section{Analysis of FRP}
+    \begin{itemize}
+      \item Define semantics of FRP - 
+      Behaviours are time varying values, Events are a list of time and value pairs.
+      'at' function evaluates a Behaviour at a given time and 'occ' function returns 
+      all the occurrences of an event.
+      \item Explore functions (until, map etc)
+      \item Discuss requirements of FRP (hint at limitations) - 
+      A language has to include first class functions to be effective, must have
+      generics etc.
+    \end{itemize}
   \section{Goals and Specification}
+    \begin{itemize}
+      \item Define goals and introduce 'echo' -
+      Develop a framework for Scala ('echo'). It will be based on the classic FRAN
+      paper. Focus will be on meeting semantics/rules and creating a simple DSL
+      that can be used easily and intuitively. Some inspiration will be taken from
+      'Push-Pull' also.
+      \item Derive basic specification from goals and semantics - 
+      Behaviour type, EventSoure trait.
+    \end{itemize}
   \section{Implementation}
+    \begin{itemize}
+      \item Discuss development methodologies - 
+      Use TDD as much as possible as this has a clear relevance to simple semantic
+      definitions (define semantics in tests and then implement). Can also be used
+      to ensure optimizations match spec.
+      \item Discuss implementation choices
+      \item Mention problems and how they were solved
+      \item Justify implementation quirks
+    \end{itemize}
   \section{Applications}
+    \begin{itemize}
+      \item Introduce and discuss display and io packages - 
+      A small UI framework and an abstraction over common IO was also developed to
+      provide a simple way to build rich, interactive applications with FRP.
+      \item Discuss example applications developed
+      \item Discuss performance/latency
+      \item Theorize larger uses
+    \end{itemize}
   \section{Limitations}
+    \begin{itemize}
+      \item Discuss efficiency issues
+      FRP uses constant reevaluation and large amounts of memory for Events. Both
+      can be optimized in some way (trimming, caching, constant behaviours)
+      \item Discuss limitations of laws/rules
+      FRP limits uses of Events for execution of Events. This can be useful but
+      breaks principles of the paradigm. Possibly not a good thing to do.
+      \item Reference similar approaches (Scala.react)
+    \end{itemize}
   \section{Conclusion}
-  \section{Acknowledgments} 
+  \section{Acknowledgments}
 \end{document}
