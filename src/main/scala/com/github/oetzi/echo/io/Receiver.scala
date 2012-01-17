@@ -7,9 +7,7 @@ import com.github.oetzi.echo.Echo._
 import java.io.{InputStreamReader, BufferedReader}
 
 
-class Receiver(val port: Int) extends EventSource[String] {
-  val errors: Event[Exception] = Event[Exception]
-
+class Receiver(val port: Int) extends EventSource[String] with Breakable {
   new Thread(new Runnable() {
     def run() {
       try {

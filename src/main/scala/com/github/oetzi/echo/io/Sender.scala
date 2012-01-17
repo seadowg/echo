@@ -5,9 +5,7 @@ import com.github.oetzi.echo.core.{Occurrence, Event, EventSource}
 import java.io.PrintWriter
 import actors.Actor
 
-class Sender(val ip: String, val port: Int, event: EventSource[String]) {
-  val errors: Event[Exception] = Event[Exception]
-
+class Sender(val ip: String, val port: Int, event: EventSource[String]) extends Breakable {
   event.map {
     occ =>
       try {
@@ -37,5 +35,4 @@ class Sender(val ip: String, val port: Int, event: EventSource[String]) {
       socket.close()
     }
   }
-
 }
