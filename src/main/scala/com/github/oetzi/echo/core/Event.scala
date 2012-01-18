@@ -156,7 +156,8 @@ object Event {
       occEvent =>
         occEvent.value.map {
           occ =>
-            newEvent.occur(occ)
+            val delayedOcc = new Occurrence(math.max(occEvent.time, occ.time), occ.value)
+            newEvent.occur(delayedOcc)
             occ
         }
         occEvent

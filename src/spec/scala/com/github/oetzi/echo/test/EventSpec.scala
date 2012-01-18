@@ -30,13 +30,18 @@ object EventSpec extends Specification {
 
         for (i <- 0 until 3) {
           val e = Event[Int]
-          val o = new Occurrence(i, 5)
+          val o = new Occurrence(i, i)
           e.occur(o)
           list = list ++ List(o)
           event.occur(new Occurrence(i, e))
         }
 
-        Event.join(event).occs() mustEqual list
+        val occs = Event.join(event).occs()
+
+        for (i <- 0 until occs.length) {
+          occs(i).time mustBe list(i).time
+          occs(i).value mustBe list(i).value
+        }
       }
 
       "that returns a flattened event that is kept up to date with the original's occurence event's occurences" in {
@@ -59,6 +64,18 @@ object EventSpec extends Specification {
         occEvent.occur(new Occurrence(now, 5))
 
         joined.occs().length mustBe 1
+      }
+
+      "that delays any inner occurrences that happen before its event parent" in {
+        val event = Event[Event[Int]]()
+        val occEvent = new Event[Int]()
+
+        occEvent.occur(new Occurrence(4, 10))
+        event.occur(new Occurrence(5, occEvent))
+
+        val joined = Event.join(event)
+
+        joined.occs().head.time mustEqual 5
       }
     }
 
