@@ -5,6 +5,8 @@ import java.io.PrintWriter
 import actors.Actor
 
 class Sender(val ip: String, val port: Int, event: EventSource[String]) extends Breakable {
+  SenderActor.start()
+
   event.map {
     occ =>
       SenderActor ! occ.value
