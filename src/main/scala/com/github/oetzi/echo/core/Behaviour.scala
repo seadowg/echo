@@ -14,7 +14,7 @@ class Behaviour[T](private val rule: Time => T) {
     }
   }
 
-  def until[A](event: EventSource[A], behaviour : Behaviour[T]): Behaviour[T] = {
+  def until[A](event: EventSource[A], behaviour: Behaviour[T]): Behaviour[T] = {
     val rule: Time => T = {
       time =>
         if (!event.occs().isEmpty && event.occs().head.time <= time) {
@@ -28,13 +28,17 @@ class Behaviour[T](private val rule: Time => T) {
     new Behaviour(rule)
   }
 
+  def until[A](time: Time, event: EventSource[A], behaviour: Behaviour[T]): Behaviour[T] = {
+    this.until(event.filter(occ => occ.time >= time), behaviour)
+  }
+
   def map[B](func: T => B): Behaviour[B] = {
     new Behaviour(time => func(this.at(time)))
   }
 }
-  
+
 object Behaviour {
-  def apply[T](rule: Time => T) : Behaviour[T] =  {
+  def apply[T](rule: Time => T): Behaviour[T] = {
     new Behaviour(rule)
   }
 }

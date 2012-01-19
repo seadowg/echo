@@ -25,7 +25,7 @@ object BehaviourSpec extends Specification {
       }
     }
 
-    "provide an until function" >> {
+    "provide an until(non-relative) function" >> {
       "returning a new Behaviour" in {
         val beh = new Behaviour(time => 5)
 
@@ -51,6 +51,43 @@ object BehaviourSpec extends Specification {
         val event = new Event[Int]
         val beh = new Behaviour(time => 5).until(event, new Behaviour(time => 10))
         event.occur(new Occurrence(System.currentTimeMillis, 5))
+
+        beh.at(1) mustBe 5
+      }
+    }
+
+    "provide an until(relative) function" >> {
+      "returning a new Behaviour" in {
+        val beh = new Behaviour(time => 5)
+
+        beh.until(0L, new Event[Int], new Behaviour(time => 5)) must_!= beh
+      }
+
+      "returning a new Behaviour with the current rule when the Event hasn't occured" in {
+        val beh = new Behaviour(time => 5)
+
+        beh.until(0L, new Event[Int], new Behaviour(time => 10)).at(now) mustBe 5
+      }
+
+      "returning a new Behaviour with the current rule when the Event has occurred before the time" in {
+        val beh = new Behaviour(time => 5)
+
+        beh.until(1L, Event[Int](0L, 0), new Behaviour(time => 10)).at(now) mustBe 5
+      }
+
+      "returning a new Behaviour with the current rule when the Event has occurred after/on the time" in {
+        val beh = new Behaviour(time => 5)
+        val event = new Event[Int]
+        val untilBeh = beh.until(1L, event, new Behaviour(time => 10))
+        event.occur(new Occurrence(1L, 0))
+
+        untilBeh.at(now) mustBe 10
+      }
+
+      "returning a Behaviour thats rule only 'changes' if the time is after the event" in {
+        val event = new Event[Int]
+        val beh = new Behaviour(time => 5).until(1L, event, new Behaviour(time => 10))
+        event.occur(new Occurrence(2L, 5))
 
         beh.at(1) mustBe 5
       }
