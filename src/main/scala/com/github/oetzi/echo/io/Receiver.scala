@@ -8,20 +8,29 @@ import java.io.{InputStreamReader, BufferedReader}
 
 
 class Receiver(val port: Int) extends EventSource[String] with Breakable {
-  new Thread(new Runnable() {
+  private var running = true
+
+  private val thread = new Thread(new Runnable() {
     def run() {
       dangerous {
         () =>
           val socket = new ServerSocket(port)
 
-          while (true) {
+          while (Receiver.this.running) {
             val request = socket.accept()
             val in = new BufferedReader(new InputStreamReader(request.getInputStream()))
             Receiver.this.occur(new Occurrence(now, in.readLine()))
             in.close()
             request.close()
           }
+
+          socket.close()
       }
     }
-  }).start()
+  })
+  thread.start()
+
+  protected[echo] def die() {
+    this.running = false
+  }
 }
