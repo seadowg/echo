@@ -4,7 +4,6 @@ import org.specs._
 import com.github.oetzi.echo.core.Behaviour
 import com.github.oetzi.echo.core.Event
 import com.github.oetzi.echo.core.Occurrence
-import com.github.oetzi.echo.Echo._
 
 object BehaviourSpec extends Specification {
   "Behaviour" should {
@@ -35,22 +34,22 @@ object BehaviourSpec extends Specification {
       "returning a new Behaviour with the current rule when the Event hasn't occured" in {
         val beh = new Behaviour(time => 5)
 
-        beh.until(new Event[Int], new Behaviour(time => 10)).at(now) mustBe 5
+        beh.until(new Event[Int], new Behaviour(time => 10)).at(0) mustBe 5
       }
 
       "returning a new Behaviour with the new rule after the Event occurs" in {
         var beh = new Behaviour(time => 5)
         val event = new Event[Int]
         beh = beh.until(event, new Behaviour(time => 10))
-        event.occur(new Occurrence(System.currentTimeMillis, 5))
+        event.occur(new Occurrence(1, 5))
 
-        beh.at(now) mustBe 10
+        beh.at(1) mustBe 10
       }
 
       "returning a Behaviour thats rule only 'changes' if the time is after the event" in {
         val event = new Event[Int]
         val beh = new Behaviour(time => 5).until(event, new Behaviour(time => 10))
-        event.occur(new Occurrence(System.currentTimeMillis, 5))
+        event.occur(new Occurrence(2, 5))
 
         beh.at(1) mustBe 5
       }
@@ -66,13 +65,13 @@ object BehaviourSpec extends Specification {
       "returning a new Behaviour with the current rule when the Event hasn't occured" in {
         val beh = new Behaviour(time => 5)
 
-        beh.until(0L, new Event[Int], new Behaviour(time => 10)).at(now) mustBe 5
+        beh.until(0L, new Event[Int], new Behaviour(time => 10)).at(1) mustBe 5
       }
 
       "returning a new Behaviour with the current rule when the Event has occurred before the time" in {
         val beh = new Behaviour(time => 5)
 
-        beh.until(1L, Event[Int](0L, 0), new Behaviour(time => 10)).at(now) mustBe 5
+        beh.until(1L, Event[Int](0L, 0), new Behaviour(time => 10)).at(1) mustBe 5
       }
 
       "returning a new Behaviour with the current rule when the Event has occurred after/on the time" in {
@@ -81,7 +80,7 @@ object BehaviourSpec extends Specification {
         val untilBeh = beh.until(1L, event, new Behaviour(time => 10))
         event.occur(new Occurrence(1L, 0))
 
-        untilBeh.at(now) mustBe 10
+        untilBeh.at(1) mustBe 10
       }
 
       "returning a Behaviour thats rule only 'changes' if the time is after the event" in {
@@ -113,8 +112,8 @@ object BehaviourSpec extends Specification {
         val occ = new Occurrence(10, 5)
         event.occur(occ)
 
-        sampler.occs().last.time mustBe occ.time
-        sampler.occs().last.value mustBe occ.value
+        sampler.occs().last.time mustEqual occ.time
+        sampler.occs().last.value mustEqual occ.value
       }
     }
 
@@ -125,7 +124,7 @@ object BehaviourSpec extends Specification {
           int => int.toString
         }
 
-        beh.map(func).at(now) mustEqual "5"
+        beh.map(func).at(0) mustEqual "5"
       }
     }
   }

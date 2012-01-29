@@ -1,7 +1,6 @@
 package com.github.oetzi.echo.test
 
 import org.specs._
-import com.github.oetzi.echo.Echo._
 import com.github.oetzi.echo.core._
 import com.github.oetzi.echo.types.Switcher
 
@@ -13,7 +12,7 @@ object SwitcherSpec extends Specification {
         val behaviour = new Behaviour(time => 5)
         val switcher = new Switcher(behaviour, new Event[Behaviour[Int]])
 
-        switcher.at(now) mustBe 5
+        switcher.at(0) mustBe 5
       }
 
       "returning b.at for initial behaviour b if time is before first event occurrence" in {
