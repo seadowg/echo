@@ -11,7 +11,7 @@ class Behaviour[T](private val rule: Time => T) {
     new Behaviour(time => this.at(func(time)))
   }
 
-  def sample[A](event: EventSource[A]): EventSource[T] = {
+  def sample[A](event: EventSource[A]): Event[T] = {
     event.map {
       occurrence =>
         new Occurrence(occurrence.time, this.at(occurrence.time))

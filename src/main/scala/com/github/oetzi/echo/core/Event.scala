@@ -51,7 +51,7 @@ trait EventSource[T] {
     }
   }
 
-  def filter(func: Occurrence[T] => Boolean) = {
+  def filter(func: Occurrence[T] => Boolean): Event[T] = {
     synchronized {
       val newEvent = new Event[T]
       newEvent.occurrences = this.occurrences.filter(func)
@@ -60,7 +60,7 @@ trait EventSource[T] {
     }
   }
 
-  def map[B](func: Occurrence[T] => Occurrence[B]): EventSource[B] = {
+  def map[B](func: Occurrence[T] => Occurrence[B]): Event[B] = {
     synchronized {
       val newEvent = new Event[B]
       newEvent.occurrences = this.occurrences.map(func)
@@ -69,7 +69,7 @@ trait EventSource[T] {
     }
   }
 
-  def merge(event: EventSource[T]): EventSource[T] = {
+  def merge(event: EventSource[T]): Event[T] = {
     synchronized {
       val newEvent = new Event[T]
       newEvent.mergeList(this.occs())
