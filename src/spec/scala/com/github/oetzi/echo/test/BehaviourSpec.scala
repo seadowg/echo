@@ -106,7 +106,6 @@ object BehaviourSpec extends Specification {
       "returning an Event that occurs with the current value of the Behaviour" in {
         val beh = new Behaviour(time => 5)
         val event = new Event[Int]
-        var firedVal = 0
 
         val sampler = beh.sample(event)
         val occ = new Occurrence(10, 5)
@@ -118,13 +117,21 @@ object BehaviourSpec extends Specification {
     }
 
     "provide a map function" >> {
-      "returning a new Behaviour thats rule is func(this.at(now))" in {
+      "returning a new Behaviour thats rule is func(this.at(t))" in {
         val beh = new Behaviour(time => 5)
         val func: Int => String = {
           int => int.toString
         }
 
         beh.map(func).at(0) mustEqual "5"
+      }
+    }
+
+    "provide a transform function" >> {
+      "returning a new Behaviour thats rule is this.at(func(t))" in {
+        val beh = new Behaviour(time => time)
+
+        beh.transform(t => t * 2).at(1) mustEqual 2
       }
     }
   }

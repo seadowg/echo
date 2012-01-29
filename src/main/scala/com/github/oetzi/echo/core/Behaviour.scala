@@ -7,6 +7,10 @@ class Behaviour[T](private val rule: Time => T) {
     rule(time)
   }
 
+  def transform(func: Time => Time): Behaviour[T] = {
+    new Behaviour(time => this.at(func(time)))
+  }
+
   def sample[A](event: EventSource[A]): EventSource[T] = {
     event.map {
       occurrence =>
