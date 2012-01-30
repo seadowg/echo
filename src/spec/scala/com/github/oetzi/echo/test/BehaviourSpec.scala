@@ -4,6 +4,7 @@ import org.specs._
 import com.github.oetzi.echo.core.Behaviour
 import com.github.oetzi.echo.core.Event
 import com.github.oetzi.echo.core.Occurrence
+import com.github.oetzi.echo.Echo._
 
 object BehaviourSpec extends Specification {
   "Behaviour" should {
@@ -117,13 +118,22 @@ object BehaviourSpec extends Specification {
     }
 
     "provide a map function" >> {
+      "returning a new Behaviour thats rule is func(time, this.at(t))" in {
+        val beh = new Behaviour(time => 5)
+        val func: (Time, Int) => String = {
+          (time, int) => (int * time).toString
+        }
+
+        beh.map(func).at(2) mustEqual "10.0"
+      }
+
       "returning a new Behaviour thats rule is func(this.at(t))" in {
         val beh = new Behaviour(time => 5)
         val func: Int => String = {
           int => int.toString
         }
 
-        beh.map(func).at(0) mustEqual "5"
+        beh.map(func).at(1) mustEqual "5"
       }
     }
 
