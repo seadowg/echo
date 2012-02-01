@@ -36,12 +36,16 @@ class Behaviour[T](private val rule: Time => T) {
     this.until(event.filter(occ => occ.time >= time), behaviour)
   }
 
-  def map[B](func: (Time, T) => B): Behaviour[B] = {
-    new Behaviour(time => func(time, this.at(time)))
-  }
-
   def map[B](func: T => B): Behaviour[B] = {
     new Behaviour(time => func(this.at(time)))
+  }
+
+  def map1[U, V](func: (T, U) => V, behaviour: Behaviour[U]): Behaviour[V] = {
+    new Behaviour(time => func(this.at(time), behaviour.at(time)))
+  }
+
+  def map2[U, V, W](func: (T, U, V) => W, beh1: Behaviour[U], beh2: Behaviour[V]): Behaviour[W] = {
+    new Behaviour(time => func(this.at(time), beh1.at(time), beh2.at(time)))
   }
 }
 

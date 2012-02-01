@@ -4,7 +4,6 @@ import org.specs._
 import com.github.oetzi.echo.core.Behaviour
 import com.github.oetzi.echo.core.Event
 import com.github.oetzi.echo.core.Occurrence
-import com.github.oetzi.echo.Echo._
 
 object BehaviourSpec extends Specification {
   "Behaviour" should {
@@ -118,15 +117,6 @@ object BehaviourSpec extends Specification {
     }
 
     "provide a map function" >> {
-      "returning a new Behaviour thats rule is func(time, this.at(t))" in {
-        val beh = new Behaviour(time => 5)
-        val func: (Time, Int) => String = {
-          (time, int) => (int * time).toString
-        }
-
-        beh.map(func).at(2) mustEqual "10.0"
-      }
-
       "returning a new Behaviour thats rule is func(this.at(t))" in {
         val beh = new Behaviour(time => 5)
         val func: Int => String = {
@@ -134,6 +124,29 @@ object BehaviourSpec extends Specification {
         }
 
         beh.map(func).at(1) mustEqual "5"
+      }
+    }
+
+    "provide a combining map1 function" >> {
+      "returning a new Behaviour thats rule is func(this.at(t), beh.at(t))" in {
+        val beh = new Behaviour(time => time.toInt)
+        val func: (Int, String) => String = {
+          (int, string) => int.toString ++ string
+        }
+
+        beh.map1(func, new Behaviour(time => time.toString)).at(5) mustEqual "55.0"
+      }
+    }
+
+    "provide a combining map1 function" >> {
+      "returning a new Behaviour thats rule is func(this.at(t), beh.at(t), beh.at(t))" in {
+        val beh = new Behaviour(time => time.toInt)
+        val beh1 = new Behaviour(time => time.toString)
+        val func: (Int, String, String) => String = {
+          (int, string, string1) => int.toString ++ string ++ string1
+        }
+
+        beh.map2(func, beh1, beh1).at(5) mustEqual "55.05.0"
       }
     }
 
