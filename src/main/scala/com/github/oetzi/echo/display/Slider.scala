@@ -8,9 +8,9 @@ import com.github.oetzi.echo.Echo._
 
 
 class Slider private() extends Canvas {
-  val internal : JSlider = new JSlider() with EventSource[Int] {
+  val internal: JSlider = new JSlider() with EventSource[Int] {
     this.addChangeListener(new ChangeListener() {
-      def stateChanged(e : ChangeEvent) {
+      def stateChanged(e: ChangeEvent) {
         occur(new Occurrence(now, internal.getValue()))
       }
     })
@@ -21,13 +21,13 @@ class Slider private() extends Canvas {
     }
   }
 
-  val value : Behaviour[Int] = new Stepper(0, internal.asInstanceOf[EventSource[Int]])
+  val value: Behaviour[Int] = new Stepper(internal.getValue(), internal.asInstanceOf[EventSource[Int]])
 
-  def update(occurrence : Occurrence[Unit]) {
+  def update(occurrence: Occurrence[Unit]) {
     redraw.occur(occurrence)
   }
 
-  def draw(occurrence : Occurrence[Unit]) {
+  def draw(occurrence: Occurrence[Unit]) {
     this.internal.setSize(widthBeh.at(occurrence.time), heightBeh.at(occurrence.time))
 
     this.internal.repaint()
