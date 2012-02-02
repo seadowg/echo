@@ -40,11 +40,11 @@ class Behaviour[T](private val rule: Time => T) {
     new Behaviour(time => func(this.at(time)))
   }
 
-  def map1[U, V](func: (T, U) => V, behaviour: Behaviour[U]): Behaviour[V] = {
+  def map1[U, V](behaviour: Behaviour[U])(func: (T, U) => V): Behaviour[V] = {
     new Behaviour(time => func(this.at(time), behaviour.at(time)))
   }
 
-  def map2[U, V, W](func: (T, U, V) => W, beh1: Behaviour[U], beh2: Behaviour[V]): Behaviour[W] = {
+  def map2[U, V, W](beh1: Behaviour[U], beh2: Behaviour[V])(func: (T, U, V) => W): Behaviour[W] = {
     new Behaviour(time => func(this.at(time), beh1.at(time), beh2.at(time)))
   }
 }

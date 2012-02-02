@@ -134,11 +134,11 @@ object BehaviourSpec extends Specification {
           (int, string) => int.toString ++ string
         }
 
-        beh.map1(func, new Behaviour(time => time.toString)).at(5) mustEqual "55.0"
+        beh.map1(new Behaviour(time => time.toString))(func).at(5) mustEqual "55.0"
       }
     }
 
-    "provide a combining map1 function" >> {
+    "provide a combining map2 function" >> {
       "returning a new Behaviour thats rule is func(this.at(t), beh.at(t), beh.at(t))" in {
         val beh = new Behaviour(time => time.toInt)
         val beh1 = new Behaviour(time => time.toString)
@@ -146,7 +146,7 @@ object BehaviourSpec extends Specification {
           (int, string, string1) => int.toString ++ string ++ string1
         }
 
-        beh.map2(func, beh1, beh1).at(5) mustEqual "55.05.0"
+        beh.map2(beh1, beh1)(func).at(5) mustEqual "55.05.0"
       }
     }
 
