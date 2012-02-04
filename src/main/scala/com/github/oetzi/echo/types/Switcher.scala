@@ -11,15 +11,7 @@ object Switcher {
   private def construct[T](initial: Behaviour[T], event: EventSource[Behaviour[T]]): Time => T = {
     {
       time =>
-        val filter = event.occs().filter(occ => occ.time <= time)
-
-        if (filter.length > 0) {
-          filter.last.value.at(time)
-        }
-
-        else {
-          initial.at(time)
-        }
+        event.lastValueAt(time).getOrElse(initial).at(time)
     }
   }
 }
