@@ -157,5 +157,43 @@ object BehaviourSpec extends Specification {
         beh.transform(t => t * 2).at(1) mustEqual 2
       }
     }
+
+    "provide a toggle function" >> {
+      "returning a new Behaviour that uses the original rule for an empty Event" in {
+        val beh = new Behaviour(time => 5)
+
+        beh.toggle(new Event[Unit], new Behaviour(time => 10)).at(0) mustBe 5
+      }
+      
+      "returning a new Behaviour that uses the original rule when time < first occurrence" in {
+        val beh = new Behaviour(time => 5)
+        
+        beh.toggle(Event(1, ()), new Behaviour(time => 10)).at(0) mustBe 5
+      }
+
+      "returning a new Behaviour that uses the next rule when time >= only occurrence" in {
+        val beh = new Behaviour(time => 5)
+
+        beh.toggle(Event(1, ()), new Behaviour(time => 10)).at(1) mustBe 10
+      }
+      
+      "returning a new Behaviour that uses the next rule when time >= first but < second occurrence" in {
+        val beh = new Behaviour(time => 5)
+        val event = new Event[Unit]
+        event.occur(new Occurrence(1, ()))
+        event.occur(new Occurrence(3, ()))
+
+        beh.toggle(event, new Behaviour(time => 10)).at(2) mustBe 10
+      }
+
+      "returning a new Behaviour that uses the first rule when time >= second (only two)" in {
+        val beh = new Behaviour(time => 5)
+        val event = new Event[Unit]
+        event.occur(new Occurrence(1, ()))
+        event.occur(new Occurrence(3, ()))
+
+        beh.toggle(event, new Behaviour(time => 10)).at(3) mustBe 5
+      }
+    }
   }
 }
