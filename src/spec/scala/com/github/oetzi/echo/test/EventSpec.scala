@@ -30,13 +30,18 @@ object EventSpec extends Specification {
 
         for (i <- 0 until 3) {
           val e = Event[Int]
-          val o = new Occurrence(i, 5)
+          val o = new Occurrence(i, i)
           e.occur(o)
           list = list ++ List(o)
           event.occur(new Occurrence(i, e))
         }
 
-        Event.join(event).occs() mustEqual list
+        val occs = Event.join(event).occs()
+
+        for (i <- 0 until occs.length) {
+          occs(i).time mustEqual list(i).time
+          occs(i).value mustEqual list(i).value
+        }
       }
 
       "that returns a flattened event that is kept up to date with the original's occurence event's occurences" in {
@@ -45,7 +50,7 @@ object EventSpec extends Specification {
         event.occur(new Occurrence(5, occEvent))
         val joined = Event.join(event)
 
-        occEvent.occur(new Occurrence(now, 5))
+        occEvent.occur(new Occurrence(5, 5))
 
         joined.occs().length mustBe 1
       }
@@ -56,9 +61,21 @@ object EventSpec extends Specification {
         val joined = Event.join(event)
 
         event.occur(new Occurrence(5, occEvent))
-        occEvent.occur(new Occurrence(now, 5))
+        occEvent.occur(new Occurrence(5, 5))
 
         joined.occs().length mustBe 1
+      }
+
+      "that delays any inner occurrences that happen before its event parent" in {
+        val event = Event[Event[Int]]()
+        val occEvent = new Event[Int]()
+
+        occEvent.occur(new Occurrence(4, 10))
+        event.occur(new Occurrence(5, occEvent))
+
+        val joined = Event.join(event)
+
+        joined.occs().head.time mustEqual 5
       }
     }
 
@@ -72,8 +89,8 @@ object EventSpec extends Specification {
       "that's occurrence has the same paramaters as those passed" in {
         val event = Event(0, 5)
 
-        event.occs().head.value mustBe 5
-        event.occs().head.time mustBe 0.asInstanceOf[Time]
+        event.occs().head.value mustEqual 5
+        event.occs().head.time mustEqual 0.asInstanceOf[Time]
       }
     }
 
@@ -86,98 +103,18 @@ object EventSpec extends Specification {
 
       "returning a List with the correct length" in {
         val event = new Event[Int]
-        event.occur(new Occurrence(now, 5))
-        event.occur(new Occurrence(now, 5))
+        event.occur(new Occurrence(0, 5))
+        event.occur(new Occurrence(0, 5))
 
         event.occs().length mustBe 2
       }
 
       "returning a list with the correct values" in {
         val event = new Event[Int]
-        val occurrence = new Occurrence(now, 5)
+        val occurrence = new Occurrence(0, 5)
         event.occur(occurrence)
 
         event.occs()(0) mustBe occurrence
-      }
-    }
-
-    "provide an occAt function (with paramater)" in {
-      "returning a None for empty events" in {
-        val event = new Event[Int]
-
-        event.occAt(0) mustBe None
-      }
-
-      "returning an Occurrence if the time has a match" in {
-        val event = new Event[Int]
-        val occ = new Occurrence(5, 10)
-        event.occur(occ)
-
-        event.occAt(5).getOrElse(()) mustBe occ
-      }
-
-      "returning the rightmost Occurrence if time has muliple matches" in {
-        val event = new Event[Int]
-        val occ = new Occurrence(5, 9)
-        val occ1 = new Occurrence(5, 10)
-        event.occur(occ)
-        event.occur(occ1)
-
-        event.occAt(5).getOrElse(()) mustBe occ1
-      }
-
-      "returning None if the time is before the first event" in {
-        val event = new Event[Int]
-        val occ = new Occurrence(5, 9)
-        event.occur(occ)
-
-        event.occAt(4) mustBe None
-      }
-
-      "returning None if the time is after the last event" in {
-        val event = new Event[Int]
-        val occ = new Occurrence(5, 9)
-        event.occur(occ)
-
-        event.occAt(6) mustBe None
-      }
-    }
-
-    "provide a occsBefore function" in {
-      "returning an empty list for a new Event" in {
-        val event = new Event[Int]
-
-        event.occsBefore(now).isEmpty mustBe true
-      }
-
-      "returning an empty list if the time is before the first occurrence" in {
-        val event = new Event[Int]
-        event.occur(new Occurrence(5, 10))
-
-        event.occsBefore(4).isEmpty mustBe true
-      }
-
-      "returning an empty list if the time is equal to the first occurrence" in {
-        val event = new Event[Int]
-        event.occur(new Occurrence(5, 10))
-
-        event.occsBefore(5).isEmpty mustBe true
-      }
-
-      "returning all the occurences if the time is after the last event" in {
-        val event = new Event[Int]
-        event.occur(new Occurrence(5, 10))
-
-        event.occsBefore(6).length mustBe 1
-      }
-
-      "returning the occurences before a certain event if first < time >= last" in {
-        val event = new Event[Int]
-        val matcher = new Occurrence(5, 10)
-        event.occur(matcher)
-        event.occur(new Occurrence(6, 10))
-
-        event.occsBefore(6).last mustBe matcher
       }
     }
 
@@ -185,7 +122,7 @@ object EventSpec extends Specification {
       "that increase the length of occs" in {
         val event = new Event[Int]
         val length = event.occs().length
-        event.occur(new Occurrence(now, 5))
+        event.occur(new Occurrence(0, 5))
 
         event.occs().length mustBe length + 1
       }
@@ -195,21 +132,21 @@ object EventSpec extends Specification {
         event.occur(new Occurrence(15, 5))
         event.occur(new Occurrence(10, 5))
 
-        event.occs().last.time mustBe 15L
+        event.occs().last.time mustEqual 15
       }
     }
 
     "provide a map function" >> {
       "returning an event that returns the the same number of occurences" in {
         val event = new Event[Int]
-        event.occur(new Occurrence(now, 5))
+        event.occur(new Occurrence(0, 5))
 
         event.map(occ => occ).occs().length mustBe 1
       }
 
       "returning an event that contains occurences that have been mapped correctly" in {
         val event = new Event[Int]
-        event.occur(new Occurrence(now, 5))
+        event.occur(new Occurrence(0, 5))
 
         event.map(occ => new Occurrence(occ.time, occ.value.toString)).occs().head.value mustEqual "5"
       }
@@ -217,7 +154,7 @@ object EventSpec extends Specification {
       "returning an event that contains new occurences from the original" in {
         val event = new Event[Int]
         val newEvent = event.map(occ => occ)
-        event.occur(new Occurrence(now, 5))
+        event.occur(new Occurrence(0, 5))
 
         newEvent.occs().length mustBe 1
       }
@@ -226,9 +163,9 @@ object EventSpec extends Specification {
     "provide a filter function" >> {
       "returning an event that contains the matching occurences of the original" in {
         val event = new Event[Int]
-        event.occur(new Occurrence(now, 4))
-        event.occur(new Occurrence(now, 5))
-        event.occur(new Occurrence(now, 6))
+        event.occur(new Occurrence(0, 4))
+        event.occur(new Occurrence(0, 5))
+        event.occur(new Occurrence(0, 6))
 
         event.filter(occ => occ.value > 5).occs().length mustBe 1
       }
@@ -236,7 +173,7 @@ object EventSpec extends Specification {
       "returning an event that contains new events from the original" in {
         val event = new Event[Int]
         val newEvent = event.filter(occ => occ.value > 5)
-        event.occur(new Occurrence(now, 6))
+        event.occur(new Occurrence(0, 6))
 
         newEvent.occs().length mustBe 1
       }
@@ -244,8 +181,8 @@ object EventSpec extends Specification {
       "returning an event that only matching contains new events from the original" in {
         val event = new Event[Int]
         val newEvent = event.filter(occ => occ.value > 5)
-        event.occur(new Occurrence(now, 6))
-        event.occur(new Occurrence(now, 5))
+        event.occur(new Occurrence(0, 6))
+        event.occur(new Occurrence(0, 5))
 
         newEvent.occs().length mustBe 1
       }
@@ -255,8 +192,8 @@ object EventSpec extends Specification {
       "returning an Event that contains all the occurences of each" in {
         val eventOne = new Event[Int]
         val eventTwo = new Event[Int]
-        val occurOne = new Occurrence(now, 5)
-        val occurTwo = new Occurrence(now, 5)
+        val occurOne = new Occurrence(0, 5)
+        val occurTwo = new Occurrence(0, 5)
         eventOne.occur(occurOne)
         eventTwo.occur(occurTwo)
         var matcher = List(occurOne, occurTwo)
@@ -292,7 +229,7 @@ object EventSpec extends Specification {
         val eventTwo = new Event[Int]
 
         val combEvent = eventOne.merge(eventTwo)
-        eventOne.occur(new Occurrence(now, 5))
+        eventOne.occur(new Occurrence(0, 5))
 
         combEvent.occs().length mustBe 1
       }
@@ -302,7 +239,7 @@ object EventSpec extends Specification {
         val eventTwo = new Event[Int]
 
         val combEvent = eventOne.merge(eventTwo)
-        eventTwo.occur(new Occurrence(now, 5))
+        eventTwo.occur(new Occurrence(0, 5))
 
         combEvent.occs().length mustBe 1
       }

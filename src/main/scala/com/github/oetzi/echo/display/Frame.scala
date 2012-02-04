@@ -1,9 +1,12 @@
 package com.github.oetzi.echo.display {
 
 import com.github.oetzi.echo.Echo._
-import com.github.oetzi.echo.core.{Occurrence, Behaviour}
 import java.util.{TimerTask, Timer}
 import javax.swing.{BoxLayout, JFrame}
+import java.awt.event.{MouseEvent, MouseMotionListener}
+import java.awt.Point
+import com.github.oetzi.echo.core.{Event, Occurrence, Behaviour}
+import com.github.oetzi.echo.types.Stepper
 
 class Frame private() extends Canvas {
   private var components: List[Canvas] = List[Canvas]()
@@ -25,6 +28,27 @@ class Frame private() extends Canvas {
         Frame.this.draw(occ)
       }
     }, 0, 40)
+  }
+
+  private var mouseBeh: Behaviour[Point] = null
+
+  def mouse(): Behaviour[Point] = {
+    if (this.mouseBeh == null) {
+      val mouseEvent = new Event[Point]
+      this.mouseBeh = new Stepper(new Point(0, 0), mouseEvent)
+
+      val mouseListener = new MouseMotionListener {
+        def mouseDragged(event: MouseEvent) {
+          //nothing  
+        }
+
+        def mouseMoved(event: MouseEvent) {
+          mouseEvent.occur(new Occurrence(event.getWhen(), event.getPoint()))
+        }
+      }
+    }
+
+    mouseBeh
   }
 
   def update(occurrence: Occurrence[Unit]) {

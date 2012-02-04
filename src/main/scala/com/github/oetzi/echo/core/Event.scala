@@ -12,26 +12,6 @@ trait EventSource[T] {
     }
   }
 
-  def occAt(time: Time): Option[Occurrence[T]] = {
-    synchronized {
-      val filtered = this.occs().filter(occ => occ.time == time)
-
-      if (filtered.isEmpty) {
-        None
-      }
-
-      else {
-        Some(filtered.last)
-      }
-    }
-  }
-
-  def occsBefore(time: Time): List[Occurrence[T]] = {
-    synchronized {
-      this.occs().filter(occ => occ.time < time)
-    }
-  }
-
   protected[echo] def occur(occurrence: Occurrence[T]) {
     synchronized {
       if (!occurrences.isEmpty && occurrence.time < occurrences.last.time) {
@@ -51,7 +31,7 @@ trait EventSource[T] {
     }
   }
 
-  def filter(func: Occurrence[T] => Boolean) = {
+  def filter(func: Occurrence[T] => Boolean): Event[T] = {
     synchronized {
       val newEvent = new Event[T]
       newEvent.occurrences = this.occurrences.filter(func)
@@ -60,7 +40,7 @@ trait EventSource[T] {
     }
   }
 
-  def map[B](func: Occurrence[T] => Occurrence[B]): EventSource[B] = {
+  def map[B](func: Occurrence[T] => Occurrence[B]): Event[B] = {
     synchronized {
       val newEvent = new Event[B]
       newEvent.occurrences = this.occurrences.map(func)
@@ -69,7 +49,7 @@ trait EventSource[T] {
     }
   }
 
-  def merge(event: EventSource[T]): EventSource[T] = {
+  def merge(event: EventSource[T]): Event[T] = {
     synchronized {
       val newEvent = new Event[T]
       newEvent.mergeList(this.occs())
@@ -156,7 +136,8 @@ object Event {
       occEvent =>
         occEvent.value.map {
           occ =>
-            newEvent.occur(occ)
+            val delayedOcc = new Occurrence(math.max(occEvent.time, occ.time), occ.value)
+            newEvent.occur(delayedOcc)
             occ
         }
         occEvent

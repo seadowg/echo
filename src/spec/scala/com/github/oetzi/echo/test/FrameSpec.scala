@@ -17,6 +17,10 @@ object FrameSpec extends Specification {
       frame.redraw must_!= null
     }
 
+    "create a mouse behaviour when prompted" in {
+      frame.mouse must_!= null
+    }
+
     "have a width" in {
       frame.width must_!= null
     }
