@@ -11,6 +11,20 @@ trait EventSource[T] {
       occurrences
     }
   }
+  
+  def lastValueAt(time : Time) : Option[T] = {
+    synchronized {
+      if (occurrences.length > 0) {
+        for (i <- occurrences.length - 1 to 0 by -1) {
+          if (occurrences(i).time <= time) {
+            return Some(occurrences(i).value)
+          }
+        }
+      }
+      
+      None
+    }  
+  }
 
   protected[echo] def occur(occurrence: Occurrence[T]) {
     synchronized {
