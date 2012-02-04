@@ -245,8 +245,27 @@ object EventSpec extends Specification {
       }
     }
 
+    "provide a lastIndexAt function" in {
+      "that returns None for an empty Event" in {
+        val event = new Event[Unit]
+
+        event.lastIndexAt(0) mustBe None
+      }
+
+      "that retunrns the last index for a filled Event" in {
+        val event = new Event[Int]
+        event.occur(new Occurrence(0, 1))
+        event.occur(new Occurrence(1, 2))
+        event.occur(new Occurrence(2, 3))
+        
+        event.lastIndexAt(1) mustEqual Some(1)
+        event.lastIndexAt(3) mustEqual Some(2)
+        event.lastIndexAt(0) mustEqual Some(0)
+      }
+    }
+
     "provide a lastValueAt function" in {
-      "that returns an empty list for an empty Event" in {
+      "that returns None for an empty Event" in {
         val event = new Event[Unit]
 
         event.lastValueAt(0) mustBe None
@@ -257,7 +276,7 @@ object EventSpec extends Specification {
         event.occur(new Occurrence(0, 1))
         event.occur(new Occurrence(1, 2))
         event.occur(new Occurrence(2, 3))
-        
+
         event.lastValueAt(1) mustEqual Some(2)
         event.lastValueAt(3) mustEqual Some(3)
         event.lastValueAt(0) mustEqual Some(1)

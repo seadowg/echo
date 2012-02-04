@@ -2,28 +2,42 @@ import com.github.oetzi.echo.Echo._
 
 package com.github.oetzi.echo.core {
 
+import collection.mutable.ArrayBuffer
+
 trait EventSource[T] {
-  private var occurrences: List[Occurrence[T]] = Nil
+  private var occurrences: ArrayBuffer[Occurrence[T]] = new ArrayBuffer[Occurrence[T]]()
   private var edges: List[Channel[T, _]] = Nil
 
   def occs(): List[Occurrence[T]] = {
     synchronized {
-      occurrences
+      occurrences.toList
     }
   }
   
   protected[echo] def lastValueAt(time : Time) : Option[T] = {
     synchronized {
-      if (occurrences.length > 0) {
-        for (i <- occurrences.length - 1 to 0 by -1) {
-          if (occurrences(i).time <= time) {
-            return Some(occurrences(i).value)
-          }
+      val index = lastIndexAt(time).getOrElse(-1)
+
+      if (index >= 0) {
+        Some(occurrences(index).value)
+      }
+
+      else {
+        None
+      }
+    }
+  }
+  
+  protected[echo] def lastIndexAt(time : Time) : Option[Int] = {
+    synchronized {
+      for (i <- occurrences.length - 1 to 0 by -1) {
+        if (occurrences(i).time <= time) {
+          return Some(i)
         }
       }
-      
+
       None
-    }  
+    }
   }
 
   protected[echo] def occur(occurrence: Occurrence[T]) {
@@ -31,14 +45,14 @@ trait EventSource[T] {
       if (!occurrences.isEmpty && occurrence.time < occurrences.last.time) {
         for (i <- 0 until occurrences.length) {
           if (occurrence.time >= occurrences(i).time) {
-            occurrences = occurrences.slice(0, i + 1) ++ List(occurrence) ++
+            occurrences = occurrences.slice(0, i + 1) + occurrence ++
               occurrences.slice(i + 1, occurrences.length)
           }
         }
       }
 
       else {
-        occurrences = occurrences ++ List(occurrence)
+        occurrences = occurrences + occurrence
       }
 
       echo(occurrence)
@@ -56,18 +70,18 @@ trait EventSource[T] {
 
   def map[B](func: Occurrence[T] => Occurrence[B]): Event[B] = {
     synchronized {
-      val newEvent = new Event[B]
-      newEvent.occurrences = this.occurrences.map(func)
-      this.addEdge(newEvent, occ => true, func)
-      newEvent
+        val newEvent = new Event[B]
+        newEvent.occurrences = this.occurrences.map(func)
+        this.addEdge(newEvent, occ => true, func)
+        newEvent
     }
   }
 
   def merge(event: EventSource[T]): Event[T] = {
     synchronized {
       val newEvent = new Event[T]
-      newEvent.mergeList(this.occs())
-      newEvent.mergeList(event.occs())
+      newEvent.mergeList(this.occurrences)
+      newEvent.mergeList(event.occurrences)
       this.addEdge(newEvent, occ => true, occ => occ)
       event.addEdge(newEvent, occ => true, occ => occ)
       newEvent
@@ -86,31 +100,31 @@ trait EventSource[T] {
     }
   }
 
-  private def mergeList(toMerge: List[Occurrence[T]]) {
-    var newList = List[Occurrence[T]]()
+  private def mergeList(toMerge: ArrayBuffer[Occurrence[T]]) {
+    var newList = new ArrayBuffer[Occurrence[T]]()
     var left = occurrences
     var right = toMerge
 
     while (!left.isEmpty || !right.isEmpty) {
       if (!left.isEmpty && !right.isEmpty) {
         if (left.head.time <= right.head.time) {
-          newList = newList ++ List(left.head)
+          newList = newList + left.head
           left = left.drop(1)
         }
 
         else {
-          newList = newList ++ List(right.head)
+          newList = newList + right.head
           right = right.drop(1)
         }
       }
 
       else if (!left.isEmpty) {
-        newList = newList ++ List(left.head)
+        newList = newList + left.head
         left = left.drop(1)
       }
 
       else if (!right.isEmpty) {
-        newList = newList ++ List(right.head)
+        newList = newList + right.head
         right = right.drop(1)
       }
     }

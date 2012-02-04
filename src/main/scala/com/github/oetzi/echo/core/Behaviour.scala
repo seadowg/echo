@@ -21,11 +21,18 @@ class Behaviour[T](private val rule: Time => T) {
   def until[A](event: EventSource[A], behaviour: Behaviour[T]): Behaviour[T] = {
     val rule: Time => T = {
       time =>
-        if (!event.occs().isEmpty && event.occs().head.time <= time) {
-          behaviour.at(time)
-        }
-        else {
+        val first = event.occs().headOption
+        
+        if (first == None) {
           this.at(time)
+        }
+        
+        else if (first.get.time > time) {
+          this.at(time)
+        }
+    
+        else {
+          behaviour.at(time)
         }
     }
 
@@ -39,7 +46,9 @@ class Behaviour[T](private val rule: Time => T) {
   def toggle[A](event : EventSource[A], behaviour : Behaviour[T]) : Behaviour[T] = {
     val rule: Time => T = {
       time =>
-        if (event.occs().filter(occ => occ.time <= time).length % 2 == 0) {
+        val length = event.lastIndexAt(time).getOrElse(-1) + 1
+        
+        if (length % 2 == 0) {
           this.rule(time)
         }
 
