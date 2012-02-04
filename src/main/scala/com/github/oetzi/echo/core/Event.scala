@@ -12,7 +12,7 @@ trait EventSource[T] {
     }
   }
   
-  def lastValueAt(time : Time) : Option[T] = {
+  protected[echo] def lastValueAt(time : Time) : Option[T] = {
     synchronized {
       if (occurrences.length > 0) {
         for (i <- occurrences.length - 1 to 0 by -1) {
