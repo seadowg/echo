@@ -8,7 +8,7 @@ import java.awt.Point
 import com.github.oetzi.echo.core.{Event, Occurrence, Behaviour}
 import com.github.oetzi.echo.types.Stepper
 
-class Frame private(val visibleBeh: Behaviour[Boolean]) extends Canvas {
+class Frame private(private val visibleBeh: Behaviour[Boolean]) extends Canvas {
   private var components: List[Canvas] = List[Canvas]()
 
   val internal: JFrame = new JFrame() {
@@ -63,10 +63,17 @@ class Frame private(val visibleBeh: Behaviour[Boolean]) extends Canvas {
         canvas.update(occurrence)
     }
   }
+  
+  private var lastVis = false
 
   def draw(occurrence: Occurrence[Unit]) {
     this.internal.setSize(widthBeh.at(occurrence.time), heightBeh.at(occurrence.time))
-    this.internal.setVisible(visibleBeh.at(occurrence.time))
+    
+    val vis = visibleBeh.at(occurrence.time)
+    if (vis != lastVis) {
+      this.internal.setVisible(vis)
+      lastVis = vis
+    }
 
     this.internal.repaint()
 
