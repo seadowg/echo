@@ -45,7 +45,7 @@ class Frame private(private val visibleBeh: Behaviour[Boolean]) extends Canvas {
         }
 
         def mouseMoved(event: MouseEvent) {
-          mouseEvent.occur(new Occurrence(event.getWhen(), event.getPoint()))
+          mouseEvent.occur(new Occurrence(event.getWhen, event.getPoint))
         }
       }
     }
@@ -91,7 +91,7 @@ object Frame {
             visible: Behaviour[Boolean] = true): Frame = {
     val frame = new Frame(visible)
 
-    def insets = frame.internal.getInsets()
+    def insets = frame.internal.getInsets
     frame.widthBeh = width.map(width => width + insets.left + insets.right)
     frame.heightBeh = height.map(height => height + insets.top + insets.bottom)
     frame.internal.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
@@ -100,7 +100,7 @@ object Frame {
 
     components.foreach {
       component =>
-        frame.internal.getContentPane().add(component.internal)
+        frame.internal.getContentPane.add(component.internal)
         frame.components = frame.components ++ List(component)
     }
 

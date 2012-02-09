@@ -29,7 +29,7 @@ object EventSpec extends Specification {
         var list = List[Occurrence[Int]]()
 
         for (i <- 0 until 3) {
-          val e = Event[Int]
+          val e = Event[Int]()
           val o = new Occurrence(i, i)
           e.occur(o)
           list = list ++ List(o)
@@ -131,8 +131,13 @@ object EventSpec extends Specification {
         val event = new Event[Int]
         event.occur(new Occurrence(15, 5))
         event.occur(new Occurrence(10, 5))
+        event.occur(new Occurrence(14, 5))
+        event.occur(new Occurrence(16, 5))
 
-        event.occs().last.time mustEqual 15
+        event.occs()(0).time mustEqual 10
+        event.occs()(1).time mustEqual 14
+        event.occs()(2).time mustEqual 15
+        event.occs()(3).time mustEqual 16
       }
     }
 

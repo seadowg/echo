@@ -11,7 +11,7 @@ class Button private() extends Canvas {
   val internal: JButton = new JButton() {
     this.addActionListener(new ActionListener() {
       def actionPerformed(event: ActionEvent) {
-        Button.this.click.occur(new Occurrence(event.getWhen(), ()))
+        Button.this.click.occur(new Occurrence(event.getWhen, ()))
       }
     })
 
@@ -21,7 +21,7 @@ class Button private() extends Canvas {
     }
   }
 
-  private var textBeh: Behaviour[String] = new Behaviour(t => this.internal.getText())
+  private var textBeh: Behaviour[String] = new Behaviour(t => this.internal.getText)
 
   def text(): Behaviour[String] = {
     this.textBeh

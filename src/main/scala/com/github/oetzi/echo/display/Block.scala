@@ -15,7 +15,7 @@ class Block private() extends Canvas {
     }
   }
 
-  private var colorBeh: Behaviour[Color] = this.internal.getBackground()
+  private var colorBeh: Behaviour[Color] = this.internal.getBackground
 
   def color() {
     colorBeh

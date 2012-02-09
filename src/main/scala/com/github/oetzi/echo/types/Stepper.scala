@@ -1,7 +1,7 @@
+package com.github.oetzi.echo.types
+
 import com.github.oetzi.echo.core._
 import com.github.oetzi.echo.Echo._
-
-package com.github.oetzi.echo.types {
 
 class Stepper[T](initial: T, val event: EventSource[T]) extends Behaviour[T](
   Stepper.construct(initial, event)) {}
@@ -13,6 +13,4 @@ object Stepper {
         event.lastValueAt(time).getOrElse(initial)
     }
   }
-}
-
 }

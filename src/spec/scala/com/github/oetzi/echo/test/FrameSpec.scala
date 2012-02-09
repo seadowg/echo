@@ -37,7 +37,7 @@ object FrameSpec extends Specification {
       val button = Button("Hello")
       val frame = Frame(100, 100, List(button))
 
-      frame.internal.getContentPane().getComponent(0) mustBe button.internal
+      frame.internal.getContentPane.getComponent(0) mustBe button.internal
     }
   }
 }

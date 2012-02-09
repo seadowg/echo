@@ -26,7 +26,7 @@ class Sender(val ip: String, val port: Int, event: EventSource[String]) extends 
       dangerous {
         () =>
           val socket = new java.net.Socket(ip, port)
-          val out = new PrintWriter(socket.getOutputStream(), true)
+          val out = new PrintWriter(socket.getOutputStream, true)
           out.println(message)
           out.close()
           socket.close()
