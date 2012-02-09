@@ -13,8 +13,8 @@ trait EventSource[T] {
       occurrences.toList
     }
   }
-  
-  protected[echo] def lastValueAt(time : Time) : Option[T] = {
+
+  protected[echo] def lastValueAt(time: Time): Option[T] = {
     synchronized {
       val index = lastIndexAt(time).getOrElse(-1)
 
@@ -27,8 +27,8 @@ trait EventSource[T] {
       }
     }
   }
-  
-  protected[echo] def lastIndexAt(time : Time) : Option[Int] = {
+
+  protected[echo] def lastIndexAt(time: Time): Option[Int] = {
     synchronized {
       for (i <- occurrences.length - 1 to 0 by -1) {
         if (occurrences(i).time <= time) {
@@ -70,10 +70,22 @@ trait EventSource[T] {
 
   def map[B](func: Occurrence[T] => Occurrence[B]): Event[B] = {
     synchronized {
-        val newEvent = new Event[B]
-        newEvent.occurrences = this.occurrences.map(func)
-        this.addEdge(newEvent, occ => true, func)
-        newEvent
+      val newEvent = new Event[B]
+      newEvent.occurrences = this.occurrences.map(func)
+      this.addEdge(newEvent, occ => true, func)
+      newEvent
+    }
+  }
+
+  def mapV[B](func: T => B): Event[B] = {
+    synchronized {
+      this.map(occ => new Occurrence(occ.time, func(occ.value)))
+    }
+  }
+
+  def mapT[B](func: Time => Time): Event[T] = {
+    synchronized {
+      this.map(occ => new Occurrence(func(occ.time), occ.value))
     }
   }
 

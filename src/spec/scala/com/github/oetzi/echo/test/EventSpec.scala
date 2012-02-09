@@ -160,6 +160,54 @@ object EventSpec extends Specification {
       }
     }
 
+    "provide a mapV function" >> {
+      "returning an event that returns the the same number of occurences" in {
+        val event = new Event[Int]
+        event.occur(new Occurrence(0, 5))
+
+        event.mapV(occ => occ).occs().length mustBe 1
+      }
+
+      "returning an event that contains occurences that have been mapped correctly" in {
+        val event = new Event[Int]
+        event.occur(new Occurrence(0, 5))
+
+        event.mapV(occ => occ.toString).occs().head.value mustEqual "5"
+      }
+
+      "returning an event that contains new occurences from the original" in {
+        val event = new Event[Int]
+        val newEvent = event.mapV(occ => occ)
+        event.occur(new Occurrence(0, 5))
+
+        newEvent.occs().length mustBe 1
+      }
+    }
+
+    "provide a mapT function" >> {
+      "returning an event that returns the the same number of occurences" in {
+        val event = new Event[Int]
+        event.occur(new Occurrence(0, 5))
+
+        event.mapT(occ => occ).occs().length mustBe 1
+      }
+
+      "returning an event that contains occurences that have been mapped correctly" in {
+        val event = new Event[Int]
+        event.occur(new Occurrence(0, 5))
+
+        event.mapT(occ => occ + 1).occs().head.time mustEqual 1
+      }
+
+      "returning an event that contains new occurences from the original" in {
+        val event = new Event[Int]
+        val newEvent = event.mapT(occ => occ)
+        event.occur(new Occurrence(0, 5))
+
+        newEvent.occs().length mustBe 1
+      }
+    }
+
     "provide a filter function" >> {
       "returning an event that contains the matching occurences of the original" in {
         val event = new Event[Int]
@@ -257,7 +305,7 @@ object EventSpec extends Specification {
         event.occur(new Occurrence(0, 1))
         event.occur(new Occurrence(1, 2))
         event.occur(new Occurrence(2, 3))
-        
+
         event.lastIndexAt(1) mustEqual Some(1)
         event.lastIndexAt(3) mustEqual Some(2)
         event.lastIndexAt(0) mustEqual Some(0)
