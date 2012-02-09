@@ -8,7 +8,7 @@ import java.awt.Point
 import com.github.oetzi.echo.core.{Event, Occurrence, Behaviour}
 import com.github.oetzi.echo.types.Stepper
 
-class Frame private() extends Canvas {
+class Frame private(val visibleBeh: Behaviour[Boolean]) extends Canvas {
   private var components: List[Canvas] = List[Canvas]()
 
   val internal: JFrame = new JFrame() {
@@ -51,6 +51,10 @@ class Frame private() extends Canvas {
     mouseBeh
   }
 
+  def visible(): Behaviour[Boolean] = {
+    visibleBeh
+  }
+
   def update(occurrence: Occurrence[Unit]) {
     redraw.occur(occurrence)
 
@@ -62,6 +66,7 @@ class Frame private() extends Canvas {
 
   def draw(occurrence: Occurrence[Unit]) {
     this.internal.setSize(widthBeh.at(occurrence.time), heightBeh.at(occurrence.time))
+    this.internal.setVisible(visibleBeh.at(occurrence.time))
 
     this.internal.repaint()
 
@@ -73,13 +78,13 @@ class Frame private() extends Canvas {
 }
 
 object Frame {
-  def apply(width: Behaviour[Int], height: Behaviour[Int], components: List[Canvas] = List()): Frame = {
-    val frame = new Frame()
+  def apply(width: Behaviour[Int], height: Behaviour[Int], components: List[Canvas] = List(),
+            visible: Behaviour[Boolean] = true): Frame = {
+    val frame = new Frame(visible)
 
     def insets = frame.internal.getInsets()
     frame.widthBeh = width.map(width => width + insets.left + insets.right)
     frame.heightBeh = height.map(height => height + insets.top + insets.bottom)
-    frame.internal.setVisible(true)
     frame.internal.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
     frame.internal.setResizable(false)
     frame.internal.setLayout(new BoxLayout(frame.internal.getContentPane, BoxLayout.Y_AXIS))

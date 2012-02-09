@@ -29,8 +29,8 @@ object FrameSpec extends Specification {
       frame.height must_!= null
     }
 
-    "be 'visible'" in {
-      frame.internal.isVisible() mustBe true
+    "have a visible'" in {
+      frame.visible must_!= null
     }
 
     "adds components to the JFrame's content" in {
