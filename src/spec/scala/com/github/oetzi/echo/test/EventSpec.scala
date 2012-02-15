@@ -189,30 +189,6 @@ object EventSpec extends Specification {
       }
     }
 
-    "provide a mapT function" >> {
-      "returning an event that returns the the same number of occurences" in {
-        val event = new Event[Int]
-        event.occur(new Occurrence(0, 5))
-
-        event.mapT(occ => occ).occs().length mustBe 1
-      }
-
-      "returning an event that contains occurences that have been mapped correctly" in {
-        val event = new Event[Int]
-        event.occur(new Occurrence(0, 5))
-
-        event.mapT(occ => occ + 1).occs().head.time mustEqual 1
-      }
-
-      "returning an event that contains new occurences from the original" in {
-        val event = new Event[Int]
-        val newEvent = event.mapT(occ => occ)
-        event.occur(new Occurrence(0, 5))
-
-        newEvent.occs().length mustBe 1
-      }
-    }
-
     "provide a filter function" >> {
       "returning an event that contains the matching occurences of the original" in {
         val event = new Event[Int]

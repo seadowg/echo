@@ -87,12 +87,6 @@ trait EventSource[T] {
     }
   }
 
-  def mapT[B](func: Time => Time): Event[T] = {
-    synchronized {
-      this.map(occ => new Occurrence(func(occ.time), occ.value))
-    }
-  }
-
   def merge(event: EventSource[T]): Event[T] = {
     synchronized {
       val newEvent = new Event[T]
