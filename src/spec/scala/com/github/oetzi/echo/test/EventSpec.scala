@@ -29,7 +29,7 @@ object EventSpec extends Specification {
         var list = List[Occurrence[Int]]()
 
         for (i <- 0 until 3) {
-          val e = Event[Int]
+          val e = Event[Int]()
           val o = new Occurrence(i, i)
           e.occur(o)
           list = list ++ List(o)
@@ -131,8 +131,13 @@ object EventSpec extends Specification {
         val event = new Event[Int]
         event.occur(new Occurrence(15, 5))
         event.occur(new Occurrence(10, 5))
+        event.occur(new Occurrence(14, 5))
+        event.occur(new Occurrence(16, 5))
 
-        event.occs().last.time mustEqual 15
+        event.occs()(0).time mustEqual 10
+        event.occs()(1).time mustEqual 14
+        event.occs()(2).time mustEqual 15
+        event.occs()(3).time mustEqual 16
       }
     }
 
@@ -154,6 +159,30 @@ object EventSpec extends Specification {
       "returning an event that contains new occurences from the original" in {
         val event = new Event[Int]
         val newEvent = event.map(occ => occ)
+        event.occur(new Occurrence(0, 5))
+
+        newEvent.occs().length mustBe 1
+      }
+    }
+
+    "provide a mapV function" >> {
+      "returning an event that returns the the same number of occurences" in {
+        val event = new Event[Int]
+        event.occur(new Occurrence(0, 5))
+
+        event.mapV(occ => occ).occs().length mustBe 1
+      }
+
+      "returning an event that contains occurences that have been mapped correctly" in {
+        val event = new Event[Int]
+        event.occur(new Occurrence(0, 5))
+
+        event.mapV(occ => occ.toString).occs().head.value mustEqual "5"
+      }
+
+      "returning an event that contains new occurences from the original" in {
+        val event = new Event[Int]
+        val newEvent = event.mapV(occ => occ)
         event.occur(new Occurrence(0, 5))
 
         newEvent.occs().length mustBe 1
@@ -257,7 +286,7 @@ object EventSpec extends Specification {
         event.occur(new Occurrence(0, 1))
         event.occur(new Occurrence(1, 2))
         event.occur(new Occurrence(2, 3))
-        
+
         event.lastIndexAt(1) mustEqual Some(1)
         event.lastIndexAt(3) mustEqual Some(2)
         event.lastIndexAt(0) mustEqual Some(0)

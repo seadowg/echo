@@ -10,8 +10,8 @@ trait Canvas {
   val redraw: Event[Unit] = new Event[Unit]()
   val internal: Component
 
-  protected var widthBeh: Behaviour[Int] = new Behaviour(t => this.internal.getWidth())
-  protected var heightBeh: Behaviour[Int] = new Behaviour(t => this.internal.getHeight())
+  protected var widthBeh: Behaviour[Int] = new Behaviour(t => this.internal.getWidth)
+  protected var heightBeh: Behaviour[Int] = new Behaviour(t => this.internal.getHeight)
 
   def width(): Behaviour[Int] = {
     this.widthBeh

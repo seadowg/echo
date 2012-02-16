@@ -2,7 +2,7 @@
 require 'buildr/scala'
 
 # Version number for this release
-VERSION_NUMBER = "0.10.1"
+VERSION_NUMBER = "0.11.0"
 
 # Group identifier for your projects
 GROUP = "echo"

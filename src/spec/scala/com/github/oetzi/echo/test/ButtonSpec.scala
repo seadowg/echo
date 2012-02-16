@@ -27,14 +27,14 @@ object ButtonSpec extends Specification {
       }
 
       "that is empty initially" in {
-        button.click.occs.length mustBe 0
+        button.click.occs().length mustBe 0
       }
 
       "that occurs every time the JButton is clicked" in {
-        val before = button.click.occs.length
+        val before = button.click.occs().length
         button.internal.doClick()
 
-        button.click.occs.length mustBe before + 1
+        button.click.occs().length mustBe before + 1
       }
     }
   }

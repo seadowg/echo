@@ -29,15 +29,15 @@ object FrameSpec extends Specification {
       frame.height must_!= null
     }
 
-    "be 'visible'" in {
-      frame.internal.isVisible() mustBe true
+    "have a visible'" in {
+      frame.visible must_!= null
     }
 
     "adds components to the JFrame's content" in {
       val button = Button("Hello")
       val frame = Frame(100, 100, List(button))
 
-      frame.internal.getContentPane().getComponent(0) mustBe button.internal
+      frame.internal.getContentPane.getComponent(0) mustBe button.internal
     }
   }
 }

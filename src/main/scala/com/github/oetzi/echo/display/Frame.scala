@@ -8,10 +8,12 @@ import java.awt.Point
 import com.github.oetzi.echo.core.{Event, Occurrence, Behaviour}
 import com.github.oetzi.echo.types.Stepper
 
-class Frame private() extends Canvas {
+class Frame private(private val visibleBeh: Behaviour[Boolean]) extends Canvas {
   private var components: List[Canvas] = List[Canvas]()
 
   val internal: JFrame = new JFrame() {
+    setLocationRelativeTo(null)
+
     override def repaint() {
       Frame.this.update(new Occurrence(now, ()))
       super.repaint()
@@ -43,12 +45,16 @@ class Frame private() extends Canvas {
         }
 
         def mouseMoved(event: MouseEvent) {
-          mouseEvent.occur(new Occurrence(event.getWhen(), event.getPoint()))
+          mouseEvent.occur(new Occurrence(event.getWhen, event.getPoint))
         }
       }
     }
 
     mouseBeh
+  }
+
+  def visible(): Behaviour[Boolean] = {
+    visibleBeh
   }
 
   def update(occurrence: Occurrence[Unit]) {
@@ -60,8 +66,16 @@ class Frame private() extends Canvas {
     }
   }
 
+  private var lastVis = false
+
   def draw(occurrence: Occurrence[Unit]) {
     this.internal.setSize(widthBeh.at(occurrence.time), heightBeh.at(occurrence.time))
+
+    val vis = visibleBeh.at(occurrence.time)
+    if (vis != lastVis) {
+      this.internal.setVisible(vis)
+      lastVis = vis
+    }
 
     this.internal.repaint()
 
@@ -73,20 +87,20 @@ class Frame private() extends Canvas {
 }
 
 object Frame {
-  def apply(width: Behaviour[Int], height: Behaviour[Int], components: List[Canvas] = List()): Frame = {
-    val frame = new Frame()
+  def apply(width: Behaviour[Int], height: Behaviour[Int], components: List[Canvas] = List(),
+            visible: Behaviour[Boolean] = true): Frame = {
+    val frame = new Frame(visible)
 
-    def insets = frame.internal.getInsets()
+    def insets = frame.internal.getInsets
     frame.widthBeh = width.map(width => width + insets.left + insets.right)
     frame.heightBeh = height.map(height => height + insets.top + insets.bottom)
-    frame.internal.setVisible(true)
     frame.internal.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
     frame.internal.setResizable(false)
     frame.internal.setLayout(new BoxLayout(frame.internal.getContentPane, BoxLayout.Y_AXIS))
 
     components.foreach {
       component =>
-        frame.internal.getContentPane().add(component.internal)
+        frame.internal.getContentPane.add(component.internal)
         frame.components = frame.components ++ List(component)
     }
 

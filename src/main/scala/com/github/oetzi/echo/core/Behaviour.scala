@@ -1,6 +1,6 @@
-import com.github.oetzi.echo.Echo._
+package com.github.oetzi.echo.core
 
-package com.github.oetzi.echo.core {
+import com.github.oetzi.echo.Echo._
 
 class Behaviour[T](private val rule: Time => T) {
   def at(time: Time): T = {
@@ -77,6 +77,4 @@ object Behaviour {
   def apply[T](rule: Time => T): Behaviour[T] = {
     new Behaviour(rule)
   }
-}
-
 }
