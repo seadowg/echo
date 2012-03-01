@@ -7,7 +7,7 @@ import com.github.oetzi.echo.types.Switcher
 
 object SwitcherSpec extends Specification {
   "Switcher" should {
-    "have an at" >> {
+    /*"have an at" >> {
       "returning b.at for initial behaviour b for empty event" in {
         val behaviour = new Behaviour(time => 5)
         val switcher = new Switcher(behaviour, new Event[Behaviour[Int]])
@@ -52,6 +52,6 @@ object SwitcherSpec extends Specification {
 
         switcher.at(6) mustBe 6
       }
-    }
+    }*/
   }
 }

@@ -24,7 +24,7 @@ object BehaviourSpec extends Specification {
       }
     }
 
-    "provide an until(non-relative) function" >> {
+    /*"provide an until(non-relative) function" >> {
       "returning a new Behaviour" in {
         val beh = new Behaviour(time => 5)
 
@@ -53,9 +53,9 @@ object BehaviourSpec extends Specification {
 
         beh.at(1) mustBe 5
       }
-    }
+    }*/
 
-    "provide an until(relative) function" >> {
+    /*"provide an until(relative) function" >> {
       "returning a new Behaviour" in {
         val beh = new Behaviour(time => 5)
 
@@ -90,9 +90,9 @@ object BehaviourSpec extends Specification {
 
         beh.at(1) mustBe 5
       }
-    }
+    }*/
 
-    "provide a sample function" >> {
+    /*"provide a sample function" >> {
       "returning an Event that fires when the passed in event fires" in {
         val beh = new Behaviour(time => 5)
         val event = new Event[Int]
@@ -114,7 +114,7 @@ object BehaviourSpec extends Specification {
         sampler.occs().last.time mustEqual occ.time
         sampler.occs().last.value mustEqual occ.value
       }
-    }
+    }*/
 
     "provide a map function" >> {
       "returning a new Behaviour thats rule is func(this.at(t))" in {
@@ -127,18 +127,18 @@ object BehaviourSpec extends Specification {
       }
     }
 
-    "provide a combining map1 function" >> {
+    "provide a combining map2 function" >> {
       "returning a new Behaviour thats rule is func(this.at(t), beh.at(t))" in {
         val beh = new Behaviour(time => time.toInt)
         val func: (Int, String) => String = {
           (int, string) => int.toString ++ string
         }
 
-        beh.map1(new Behaviour(time => time.toString))(func).at(5) mustEqual "55.0"
+        beh.map2(new Behaviour(time => time.toString))(func).at(5) mustEqual "55.0"
       }
     }
 
-    "provide a combining map2 function" >> {
+    "provide a combining map3 function" >> {
       "returning a new Behaviour thats rule is func(this.at(t), beh.at(t), beh.at(t))" in {
         val beh = new Behaviour(time => time.toInt)
         val beh1 = new Behaviour(time => time.toString)
@@ -146,7 +146,7 @@ object BehaviourSpec extends Specification {
           (int, string, string1) => int.toString ++ string ++ string1
         }
 
-        beh.map2(beh1, beh1)(func).at(5) mustEqual "55.05.0"
+        beh.map3(beh1, beh1)(func).at(5) mustEqual "55.05.0"
       }
     }
 
@@ -158,7 +158,7 @@ object BehaviourSpec extends Specification {
       }
     }
 
-    "provide a toggle function" >> {
+    /*"provide a toggle function" >> {
       "returning a new Behaviour that uses the original rule for an empty Event" in {
         val beh = new Behaviour(time => 5)
 
@@ -194,6 +194,6 @@ object BehaviourSpec extends Specification {
 
         beh.toggle(event, new Behaviour(time => 10)).at(3) mustBe 5
       }
-    }
+    }*/
   }
 }

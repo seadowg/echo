@@ -13,10 +13,6 @@ object FrameSpec extends Specification {
       frame.internal must_!= null
     }
 
-    "have a redraw event" in {
-      frame.redraw must_!= null
-    }
-
     "create a mouse behaviour when prompted" in {
       frame.mouse must_!= null
     }

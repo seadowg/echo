@@ -7,7 +7,7 @@ import com.github.oetzi.echo.types.Stepper
 
 object StepperSpec extends Specification {
   "Stepper" should {
-    "have an at" >> {
+    /*"have an at" >> {
       "returning 'initial' if event hasn't occured" in {
         val stepper = new Stepper(0, new Event[Int])
 
@@ -48,6 +48,6 @@ object StepperSpec extends Specification {
 
         stepper.at(5) mustBe 10
       }
-    }
+    } */
   }
 }
