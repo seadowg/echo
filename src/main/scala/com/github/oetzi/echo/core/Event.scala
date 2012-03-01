@@ -10,14 +10,14 @@ trait Event[T] {
 
   def map[U](func : T => U) : Event[U] = {
     new EventView(() => occs().map {
-      occ => 
+      occ =>
         new Occurrence(occ.time, func(occ.value))
     })
   }
   
   def filter(func : Occurrence[T] => Boolean) = {
     new EventView(() => occs().filter {
-      occ => 
+      occ =>
         func(occ)
     })
   }
@@ -64,7 +64,7 @@ trait EventSource[T] extends Event[T] {
   }
 }
 
-protected class EventView[T, U](source : () => Seq[Occurrence[T]]) extends Event[T] { 
+protected class EventView[T, U](private val source : () => Seq[Occurrence[T]]) extends Event[T] {
   protected def occs() : Seq[Occurrence[T]] = {
     this synchronized {
       source()
