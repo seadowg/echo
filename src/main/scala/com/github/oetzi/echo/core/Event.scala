@@ -51,7 +51,7 @@ trait EventSource[T] extends Event[T] {
   
   def occur(time : Time, value : T) {
     this synchronized {
-      val nowCache = System.currentTimeMillis()
+      val nowCache = now()
       
       if (time < nowCache) {
         occsList += new Occurrence(nowCache, value)
@@ -73,3 +73,13 @@ protected class EventView[T, U](source : () => Seq[Occurrence[T]]) extends Event
 }
 
 class Occurrence[T](val time: Double, val value: T) { }
+
+object Event {
+  def apply[T](time : Time, value : T) : Event[T] = {
+    val source = new EventSource[T] {
+      occur(time, value)
+    }
+    
+    source.event()
+  }
+}
