@@ -72,7 +72,7 @@ protected class EventView[T, U](source : () => Seq[Occurrence[T]]) extends Event
   }
 }
 
-class Occurrence[T](val time: Double, val value: T) { }
+class Occurrence[T](val time: Time, val value: T) { }
 
 object Event {
   def apply[T](time : Time, value : T) : Event[T] = {
