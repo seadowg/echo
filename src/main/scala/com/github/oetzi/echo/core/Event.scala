@@ -7,7 +7,7 @@ import com.github.oetzi.echo.Echo._
 
 trait Event[T] {
   protected def occs() : Seq[Occurrence[T]]
-  
+
   def map[U](func : T => U) : Event[U] = {
     new EventView(() => occs().map {
       occ => 
@@ -49,7 +49,7 @@ trait EventSource[T] extends Event[T] {
     }
   }
   
-  def occur(time : Time, value : T) {
+  protected def occur(time : Time, value : T) {
     this synchronized {
       val nowCache = now()
       
