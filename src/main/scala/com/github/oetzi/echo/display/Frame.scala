@@ -5,7 +5,7 @@ import java.util.{TimerTask, Timer}
 import javax.swing.{BoxLayout, JFrame}
 import java.awt.event.{MouseEvent, MouseMotionListener}
 import java.awt.Point
-import com.github.oetzi.echo.core.{Event, Occurrence, Behaviour}
+import com.github.oetzi.echo.core.{EventSource, Occurrence, Behaviour}
 import com.github.oetzi.echo.types.Stepper
 
 class Frame private(private val visibleBeh: Behaviour[Boolean]) extends Canvas {
@@ -36,18 +36,18 @@ class Frame private(private val visibleBeh: Behaviour[Boolean]) extends Canvas {
 
   def mouse(): Behaviour[Point] = {
     if (this.mouseBeh == null) {
-      val mouseEvent = new Event[Point]
-      this.mouseBeh = new Stepper(new Point(0, 0), mouseEvent)
-
-      val mouseListener = new MouseMotionListener {
+      val mouseListener = new MouseMotionListener with EventSource[Point] {
         def mouseDragged(event: MouseEvent) {
           //nothing  
         }
 
         def mouseMoved(event: MouseEvent) {
-          mouseEvent.occur(new Occurrence(event.getWhen, event.getPoint))
+          occur(event.getWhen, event.getPoint)
         }
       }
+      
+      this.mouseBeh = new Stepper(new Point(0, 0), mouseListener)
+      this.internal.addMouseMotionListener(mouseListener)
     }
 
     mouseBeh
@@ -58,8 +58,6 @@ class Frame private(private val visibleBeh: Behaviour[Boolean]) extends Canvas {
   }
 
   def update(occurrence: Occurrence[Unit]) {
-    redraw.occur(occurrence)
-
     this.components.foreach {
       canvas =>
         canvas.update(occurrence)

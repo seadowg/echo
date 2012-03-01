@@ -19,7 +19,7 @@ class Receiver(val port: Int) extends EventSource[String] with Breakable {
           while (Receiver.this.running) {
             val request = socket.accept()
             val in = new BufferedReader(new InputStreamReader(request.getInputStream))
-            Receiver.this.occur(new Occurrence(now, in.readLine()))
+            Receiver.this.occur(now, in.readLine())
             in.close()
             request.close()
           }

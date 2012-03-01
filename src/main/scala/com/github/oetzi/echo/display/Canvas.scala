@@ -7,7 +7,6 @@ package com.github.oetzi.echo.display {
 import java.awt.Component
 
 trait Canvas {
-  val redraw: Event[Unit] = new Event[Unit]()
   val internal: Component
 
   protected var widthBeh: Behaviour[Int] = new Behaviour(t => this.internal.getWidth)

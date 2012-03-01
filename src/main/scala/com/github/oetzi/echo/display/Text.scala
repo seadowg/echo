@@ -13,7 +13,7 @@ class Text private(private val textBeh : Behaviour[String]) extends Canvas {
   }
 
   def update(occurrence: Occurrence[Unit]) {
-    redraw.occur(occurrence)
+
   }
 
   def draw(occurrence: Occurrence[Unit]) {

@@ -1,185 +1,75 @@
 package com.github.oetzi.echo.core
 
-import com.github.oetzi.echo.Echo._
+import collection.Seq
 import collection.mutable.ArrayBuffer
 
-trait EventSource[T] {
-  private var occurrences: ArrayBuffer[Occurrence[T]] = new ArrayBuffer[Occurrence[T]]()
-  private var edges: List[Channel[T, _]] = Nil
+import com.github.oetzi.echo.Echo._
 
-  def occs(): List[Occurrence[T]] = {
-    synchronized {
-      occurrences.toList
+trait Event[T] {
+  protected def occs() : Seq[Occurrence[T]]
+  
+  def map[U](func : T => U) : Event[U] = {
+    new EventView(() => occs().map {
+      occ => 
+        new Occurrence(occ.time, func(occ.value))
+    })
+  }
+  
+  def filter(func : Occurrence[T] => Boolean) = {
+    new EventView(() => occs().filter {
+      occ => 
+        func(occ)
+    })
+  }
+  
+  // echo utility functions
+  private[echo] def head() : Option[Occurrence[T]] = {
+    occs().headOption
+  }
+  
+  private[echo] def lastValueAt(time : Time) : Option[T] = {
+    occs().map(occ => occ.value).lastOption
+  }
+  
+  private[echo] def lengthAt(time : Time) : Int = {
+    occs().filter(occ => occ.time <= time).length
+  }
+}
+
+trait EventSource[T] extends Event[T] {
+  private val occsList = new ArrayBuffer[Occurrence[T]]
+  
+  def event() : Event[T] = {
+    new EventView(() => occs())
+  }
+  
+  protected def occs() : Seq[Occurrence[T]] = {
+    this synchronized {
+      this.occsList.toArray.view
     }
   }
-
-  protected[echo] def lastValueAt(time: Time): Option[T] = {
-    synchronized {
-      val index = lastIndexAt(time).getOrElse(-1)
-
-      if (index >= 0) {
-        Some(occurrences(index).value)
+  
+  def occur(time : Time, value : T) {
+    this synchronized {
+      val nowCache = System.currentTimeMillis()
+      
+      if (time < nowCache) {
+        occsList += new Occurrence(nowCache, value)
       }
 
       else {
-        None
+        occsList += new Occurrence(time, value)
       }
-    }
-  }
-
-  protected[echo] def lastIndexAt(time: Time): Option[Int] = {
-    synchronized {
-      for (i <- occurrences.length - 1 to 0 by -1) {
-        if (occurrences(i).time <= time) {
-          return Some(i)
-        }
-      }
-
-      None
-    }
-  }
-
-  protected[echo] def occur(occurrence: Occurrence[T]) {
-    synchronized {
-      if (!occurrences.isEmpty && occurrence.time < occurrences.last.time) {
-        for (i <- occurrences.length - 1 to 0 by -1) {
-          if (occurrence.time >= occurrences(i).time) {
-            val left = occurrences.slice(0, i + 1) :+ occurrence
-            val right = occurrences.slice(i + 1, occurrences.length)
-            occurrences = left ++ right
-          }
-
-          else if (i == 0) {
-            occurrence +=: occurrences
-          }
-        }
-      }
-
-      else {
-        occurrences += occurrence
-      }
-
-      echo(occurrence)
-    }
-  }
-
-  def filter(func: Occurrence[T] => Boolean): Event[T] = {
-    synchronized {
-      val newEvent = new Event[T]
-      newEvent.occurrences = this.occurrences.filter(func)
-      this.addEdge(newEvent, func, occ => occ)
-      newEvent
-    }
-  }
-
-  def map[B](func: Occurrence[T] => Occurrence[B]): Event[B] = {
-    synchronized {
-      val newEvent = new Event[B]
-      newEvent.occurrences = this.occurrences.map(func)
-      this.addEdge(newEvent, occ => true, func)
-      newEvent
-    }
-  }
-
-  def mapV[B](func: T => B): Event[B] = {
-    synchronized {
-      this.map(occ => new Occurrence(occ.time, func(occ.value)))
-    }
-  }
-
-  def merge(event: EventSource[T]): Event[T] = {
-    synchronized {
-      val newEvent = new Event[T]
-      newEvent.mergeList(this.occurrences)
-      newEvent.mergeList(event.occurrences)
-      this.addEdge(newEvent, occ => true, occ => occ)
-      event.addEdge(newEvent, occ => true, occ => occ)
-      newEvent
-    }
-  }
-
-  private def addEdge[U](endPoint: EventSource[U], filter: Occurrence[T] => Boolean,
-                         map: Occurrence[T] => Occurrence[U]) {
-    this.edges = this.edges ++ List[Channel[T, U]](new Channel[T, U](endPoint, filter, map))
-  }
-
-  private def echo(occurrence: Occurrence[T]) {
-    edges.foreach {
-      channel =>
-        channel.send(occurrence)
-    }
-  }
-
-  private def mergeList(toMerge: ArrayBuffer[Occurrence[T]]) {
-    var newList = new ArrayBuffer[Occurrence[T]]()
-    var left = occurrences
-    var right = toMerge
-
-    while (!left.isEmpty || !right.isEmpty) {
-      if (!left.isEmpty && !right.isEmpty) {
-        if (left.head.time <= right.head.time) {
-          newList += left.head
-          left = left.drop(1)
-        }
-
-        else {
-          newList += right.head
-          right = right.drop(1)
-        }
-      }
-
-      else if (!left.isEmpty) {
-        newList += left.head
-        left = left.drop(1)
-      }
-
-      else if (!right.isEmpty) {
-        newList += right.head
-        right = right.drop(1)
-      }
-    }
-
-    occurrences = newList
-  }
-}
-
-class Occurrence[T](val time: Time, val value: T) {}
-
-class Channel[T, U](val endPoint: EventSource[U], val filter: Occurrence[T] => Boolean,
-                    val map: Occurrence[T] => Occurrence[U]) {
-
-  def send(occurrence: Occurrence[T]) {
-    if (filter(occurrence)) {
-      endPoint.occur(map(occurrence))
     }
   }
 }
 
-class Event[T] extends EventSource[T] {}
-
-object Event {
-  def apply[T]() = {
-    new Event[T]
-  }
-
-  def apply[T](time: Time, value: T): EventSource[T] = {
-    val event = new Event[T]
-    event.occur(new Occurrence(time, value))
-    event
-  }
-
-  def join[T, U[T] <: EventSource[T]](event: EventSource[U[T]]): EventSource[T] = {
-    val newEvent: EventSource[T] = new Event[T]
-    event.map {
-      occEvent =>
-        occEvent.value.map {
-          occ =>
-            val delayedOcc = new Occurrence(math.max(occEvent.time, occ.time), occ.value)
-            newEvent.occur(delayedOcc)
-            occ
-        }
-        occEvent
+protected class EventView[T, U](source : () => Seq[Occurrence[T]]) extends Event[T] { 
+  protected def occs() : Seq[Occurrence[T]] = {
+    this synchronized {
+      source()
     }
-    newEvent
   }
 }
+
+class Occurrence[T](val time: Double, val value: T) { }

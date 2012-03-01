@@ -22,8 +22,6 @@ class Block private() extends Canvas {
   }
 
   def update(occurrence: Occurrence[Unit]) {
-    redraw.occur(occurrence)
-
     this.components.foreach {
       canvas =>
         canvas.update(occurrence)

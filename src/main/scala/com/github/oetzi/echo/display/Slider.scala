@@ -11,7 +11,7 @@ class Slider private() extends Canvas {
   val internal: JSlider = new JSlider() with EventSource[Int] {
     this.addChangeListener(new ChangeListener() {
       def stateChanged(e: ChangeEvent) {
-        occur(new Occurrence(now, internal.getValue))
+        occur(now, internal.getValue)
       }
     })
 
@@ -24,7 +24,7 @@ class Slider private() extends Canvas {
   val value: Behaviour[Int] = new Stepper(internal.getValue, internal.asInstanceOf[EventSource[Int]])
 
   def update(occurrence: Occurrence[Unit]) {
-    redraw.occur(occurrence)
+    
   }
 
   def draw(occurrence: Occurrence[Unit]) {
