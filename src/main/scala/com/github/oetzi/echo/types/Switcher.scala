@@ -11,7 +11,15 @@ object Switcher {
   private def construct[T](initial: Behaviour[T], event: EventSource[Behaviour[T]]): Time => T = {
     {
       time =>
-        event.lastValueAt(time).getOrElse(initial).at(time)
+        val occ = event.top(time)
+
+        if (occ == None) {
+          initial.at(time)
+        }
+
+        else {
+          occ.get.value.at(time)
+        }
     }
   }
 }

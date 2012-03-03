@@ -10,7 +10,15 @@ object Stepper {
   private def construct[T](initial: T, event: EventSource[T]): Time => T = {
     {
       time =>
-        event.lastValueAt(time).getOrElse(initial)
+        val occ = event.top(time)
+
+        if (occ == None) {
+          initial
+        }
+        
+        else {
+          occ.get.value
+        }
     }
   }
 }

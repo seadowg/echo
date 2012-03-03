@@ -14,7 +14,7 @@ class Button private() extends Canvas {
     })
 
     override def repaint() {
-      Button.this.update(new Occurrence(now, ()))
+      Button.this.update(now())
       super.repaint()
     }
   }
@@ -27,13 +27,13 @@ class Button private() extends Canvas {
     this.textBeh
   }
 
-  def update(occurrence: Occurrence[Unit]) {
+  def update(time: Time) {
     
   }
 
-  def draw(occurrence: Occurrence[Unit]) {
-    this.internal.setSize(widthBeh.at(occurrence.time), heightBeh.at(occurrence.time))
-    this.internal.setText(textBeh.at(occurrence.time))
+  def draw(time : Time) {
+    this.internal.setSize(widthBeh.at(time), heightBeh.at(time))
+    this.internal.setText(textBeh.at(time))
 
     this.internal.repaint()
   }

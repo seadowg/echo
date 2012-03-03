@@ -16,19 +16,19 @@ class Slider private() extends Canvas {
     })
 
     override def repaint() {
-      Slider.this.update(new Occurrence(now, ()))
+      Slider.this.update(now())
       super.repaint()
     }
   }
 
   val value: Behaviour[Int] = new Stepper(internal.getValue, internal.asInstanceOf[EventSource[Int]])
 
-  def update(occurrence: Occurrence[Unit]) {
+  def update(time: Time) {
     
   }
 
-  def draw(occurrence: Occurrence[Unit]) {
-    this.internal.setSize(widthBeh.at(occurrence.time), heightBeh.at(occurrence.time))
+  def draw(time: Time) {
+    this.internal.setSize(widthBeh.at(time), heightBeh.at(time))
 
     this.internal.repaint()
   }

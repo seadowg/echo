@@ -1,78 +1,81 @@
 package com.github.oetzi.echo.core
 
-import collection.Seq
-import collection.mutable.ArrayBuffer
-
 import com.github.oetzi.echo.Echo._
+import collection.mutable.Queue
 
 trait Event[T] {
-  protected def occs() : Seq[Occurrence[T]]
+  protected def occs(time : Time) : Occurrence[T]
 
   def map[U](func : T => U) : Event[U] = {
-    new EventView(() => occs().map {
-      occ =>
-        new Occurrence(occ.time, func(occ.value))
-    })
-  }
-  
-  def filter(func : Occurrence[T] => Boolean) = {
-    new EventView(() => occs().filter {
-      occ =>
-        func(occ)
-    })
+    new EventView(time => occs(time).map(func))
   }
   
   // echo utility functions
-  private[echo] def head() : Option[Occurrence[T]] = {
-    occs().headOption
-  }
-  
-  private[echo] def lastValueAt(time : Time) : Option[T] = {
-    occs().map(occ => occ.value).lastOption
-  }
-  
-  private[echo] def lengthAt(time : Time) : Int = {
-    occs().filter(occ => occ.time <= time).length
+  def top(time : Time) : Option[Occurrence[T]] = {
+    val top = occs(time)
+    
+    if (top != null) {
+      Some(top)
+    }
+
+    else {
+      None
+    }
   }
 }
 
 trait EventSource[T] extends Event[T] {
-  private val occsList = new ArrayBuffer[Occurrence[T]]
+  private var future : Queue[Occurrence[T]] = new Queue[Occurrence[T]]()
+  private var present : Occurrence[T] = null
+  private var length = 0
   
   def event() : Event[T] = {
-    new EventView(() => occs())
+    new EventView(time => occs(time))
   }
   
-  protected def occs() : Seq[Occurrence[T]] = {
+  protected def occs(time : Time) : Occurrence[T] = {
     this synchronized {
-      this.occsList.toArray.view
+      if (future.length > 0) {
+        val head = future.head
+
+        if (head.time <= time) {
+          present = future.dequeue()
+        }
+      }
+      
+      present
     }
   }
   
   protected def occur(time : Time, value : T) {
     this synchronized {
       val nowCache = now()
+      length += 1
       
       if (time < nowCache) {
-        occsList += new Occurrence(nowCache, value)
+        future += new Occurrence(nowCache, value, length)
       }
 
       else {
-        occsList += new Occurrence(time, value)
+        future += new Occurrence(time, value, length)
       }
     }
   }
 }
 
-protected class EventView[T, U](private val source : () => Seq[Occurrence[T]]) extends Event[T] {
-  protected def occs() : Seq[Occurrence[T]] = {
+protected class EventView[T, U](private val source : Time => Occurrence[T]) extends Event[T] {
+  protected def occs(time : Time) : Occurrence[T] = {
     this synchronized {
-      source()
+      source(time)
     }
   }
 }
 
-class Occurrence[T](val time: Time, val value: T) { }
+class Occurrence[T](val time: Time, val value: T, val num : Int) {
+  def map[U](func : T => U) : Occurrence[U] = {
+    new Occurrence(time, func(value), num)
+  }
+}
 
 object Event {
   def apply[T](time : Time, value : T) : Event[T] = {

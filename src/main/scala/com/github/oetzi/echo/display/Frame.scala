@@ -15,7 +15,7 @@ class Frame private(private val visibleBeh: Behaviour[Boolean]) extends Canvas {
     setLocationRelativeTo(null)
 
     override def repaint() {
-      Frame.this.update(new Occurrence(now, ()))
+      Frame.this.update(now())
       super.repaint()
     }
   }
@@ -25,9 +25,9 @@ class Frame private(private val visibleBeh: Behaviour[Boolean]) extends Canvas {
   def startClock() {
     new Timer().schedule(new TimerTask() {
       override def run() {
-        val occ = new Occurrence(now, ())
-        Frame.this.update(occ)
-        Frame.this.draw(occ)
+        val time = now()
+        Frame.this.update(time)
+        Frame.this.draw(time)
       }
     }, 0, 40)
   }
@@ -57,19 +57,19 @@ class Frame private(private val visibleBeh: Behaviour[Boolean]) extends Canvas {
     visibleBeh
   }
 
-  def update(occurrence: Occurrence[Unit]) {
+  def update(time : Time) {
     this.components.foreach {
       canvas =>
-        canvas.update(occurrence)
+        canvas.update(time)
     }
   }
 
   private var lastVis = false
 
-  def draw(occurrence: Occurrence[Unit]) {
-    this.internal.setSize(widthBeh.at(occurrence.time), heightBeh.at(occurrence.time))
+  def draw(time : Time) {
+    this.internal.setSize(widthBeh.at(time), heightBeh.at(time))
 
-    val vis = visibleBeh.at(occurrence.time)
+    val vis = visibleBeh.at(time)
     if (vis != lastVis) {
       this.internal.setVisible(vis)
       lastVis = vis
@@ -79,7 +79,7 @@ class Frame private(private val visibleBeh: Behaviour[Boolean]) extends Canvas {
 
     this.components.foreach {
       canvas =>
-        canvas.draw(occurrence)
+        canvas.draw(time)
     }
   }
 }

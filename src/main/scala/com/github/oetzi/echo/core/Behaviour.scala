@@ -3,7 +3,11 @@ package com.github.oetzi.echo.core
 import com.github.oetzi.echo.Echo._
 
 class Behaviour[T](private val rule: Time => T) {
-  def at(time: Time): T = {
+  def eval() : T = {
+    this.at(now())
+  }
+
+  private[echo] def at(time: Time): T = {
     rule(time)
   }
 
@@ -14,13 +18,9 @@ class Behaviour[T](private val rule: Time => T) {
   def until[A](event: Event[A], behaviour: Behaviour[T]): Behaviour[T] = {
     val rule: Time => T = {
       time =>
-        val first = event.head()
+        val occ = event.top(time)
         
-        if (first == None) {
-          this.at(time)
-        }
-        
-        else if (first.get.time > time) {
+        if (occ == None) {
           this.at(time)
         }
     
@@ -28,23 +28,38 @@ class Behaviour[T](private val rule: Time => T) {
           behaviour.at(time)
         }
     }
-
+         
     new Behaviour(rule)
   }
 
-  def until[A](time: Time, event: Event[A], behaviour: Behaviour[T]): Behaviour[T] = {
-    this.until(event.filter(occ => occ.time >= time), behaviour)
+  def until[A](after: Time, event: Event[A], behaviour: Behaviour[T]): Behaviour[T] = {
+    val rule : Time => T = {
+      time =>
+        val occ = event.top(time)
+        
+        if (occ == None || occ.get.time < after) {
+          this.at(time)
+        }
+
+        else {
+          behaviour.at(time)
+        }
+    }
+
+    new Behaviour(rule)
   }
   
   def toggle[A](event : Event[A], behaviour : Behaviour[T]) : Behaviour[T] = {
     val rule: Time => T = {
-      time =>        
-        if (event.lengthAt(time) % 2 == 0) {
-          this.rule(time)
+      time => 
+        val occ = event.top(time)
+        
+        if (occ == None || occ.get.num % 2 == 0) {
+          this.at(time)
         }
 
         else {
-          behaviour.rule(time)
+          behaviour.at(time)
         }
     }
 
