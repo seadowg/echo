@@ -17,13 +17,6 @@ object BehaviourSpec extends Specification {
       behaviour.isInstanceOf[Behaviour[Int]] mustBe true
     }
 
-    "provide an at function" >> {
-      "returning the result of the rule with the passed value" in {
-        val beh = new Behaviour(time => time * 5)
-        beh.at(5).asInstanceOf[Int] mustBe 25
-      }
-    }
-
     "provide an until(non-relative) function" >> {
       "returning a new Behaviour" in {
         val beh = new Behaviour(time => 5)
@@ -34,7 +27,7 @@ object BehaviourSpec extends Specification {
       "returning a new Behaviour with the current rule when the Event hasn't occured" in {
         val beh = new Behaviour(time => 5)
 
-        beh.until(new TestEvent[Int], new Behaviour(time => 10)).at(0) mustBe 5
+        beh.until(new TestEvent[Int], new Behaviour(time => 10)).eval() mustBe 5
       }
 
       "returning a new Behaviour with the new rule after the Event occurs" in {
@@ -45,8 +38,11 @@ object BehaviourSpec extends Specification {
         freezeTime(0) { () =>
           event.pubOccur(1, 5)
         }
-
-        beh.at(1) mustBe 10
+        
+        freezeTime(1) {
+          () =>
+            beh.eval()
+        }.mustEqual(10)
       }
 
       "returning a Behaviour thats rule only 'changes' if the time is after the event" in {
@@ -57,7 +53,10 @@ object BehaviourSpec extends Specification {
           event.pubOccur(2, 5)
         }
 
-        beh.at(1) mustBe 5
+        freezeTime(1) {
+          () =>
+            beh.eval()
+        }.mustEqual(5)
       }
     }
 
@@ -71,7 +70,10 @@ object BehaviourSpec extends Specification {
       "returning a new Behaviour with the current rule when the Event hasn't occured" in {
         val beh = new Behaviour(time => 5)
 
-        beh.until(0L, new TestEvent[Int], new Behaviour(time => 10)).at(1) mustBe 5
+        freezeTime(1) {
+          () =>
+            beh.until(0L, new TestEvent[Int], new Behaviour(time => 10)).eval()
+        }.mustEqual(5)
       }
 
       "returning a new Behaviour with the current rule when the Event has occurred before the time" in {
@@ -82,7 +84,10 @@ object BehaviourSpec extends Specification {
           event.pubOccur(0L, 0)
         }
 
-        beh.until(1L, event, new Behaviour(time => 10)).at(1) mustBe 5
+        freezeTime(1) {
+          () =>
+            beh.until(1L, event, new Behaviour(time => 10)).eval()
+        }.mustBe(5)
       }
 
       "returning a new Behaviour with the current rule when the Event has occurred after/on the time" in {
@@ -94,7 +99,10 @@ object BehaviourSpec extends Specification {
           event.pubOccur(1L, 0)
         }
 
-        untilBeh.at(1) mustBe 10
+        freezeTime(1) {
+          () =>
+            untilBeh.eval()
+        }.mustBe(10)
       }
 
       "returning a Behaviour thats rule only 'changes' if the time is after the event" in {
@@ -105,7 +113,10 @@ object BehaviourSpec extends Specification {
           event.pubOccur(2L, 5)
         }
 
-        beh.at(1) mustBe 5
+        freezeTime(1) {
+          () =>
+            beh.eval()
+        }.mustBe(5)
       }
     }
 
@@ -140,7 +151,10 @@ object BehaviourSpec extends Specification {
           int => int.toString
         }
 
-        beh.map(func).at(1) mustEqual "5"
+        freezeTime(1) {
+          () =>
+            beh.map(func).eval()
+        }.mustEqual("5")
       }
     }
 
@@ -151,7 +165,10 @@ object BehaviourSpec extends Specification {
           (int, string) => int.toString ++ string
         }
 
-        beh.map2(new Behaviour(time => time.toString))(func).at(5) mustEqual "55.0"
+        freezeTime(5) {
+          () =>
+            beh.map2(new Behaviour(time => time.toString))(func).eval()
+        }.mustEqual("55.0")
       }
     }
 
@@ -163,7 +180,10 @@ object BehaviourSpec extends Specification {
           (int, string, string1) => int.toString ++ string ++ string1
         }
 
-        beh.map3(beh1, beh1)(func).at(5) mustEqual "55.05.0"
+        freezeTime(5) {
+          () =>
+            beh.map3(beh1, beh1)(func).eval()
+        }.mustEqual("55.05.0")
       }
     }
 
@@ -171,7 +191,10 @@ object BehaviourSpec extends Specification {
       "returning a new Behaviour thats rule is this.at(func(t))" in {
         val beh = new Behaviour(time => time)
 
-        beh.transform(t => t * 2).at(1) mustEqual 2
+        freezeTime(1) {
+          () =>
+            beh.transform(t => t * 2).eval()  
+        }.mustEqual(2)
       }
     }
 
@@ -179,14 +202,17 @@ object BehaviourSpec extends Specification {
       "returning a new Behaviour that uses the original rule for an empty Event" in {
         val beh = new Behaviour(time => 5)
 
-        beh.toggle(new TestEvent[Unit], new Behaviour(time => 10)).at(0) mustBe 5
+        freezeTime(0) {
+          () =>
+            beh.toggle(new TestEvent[Unit], new Behaviour(time => 10)).eval()   
+        }.mustBe(5)
       }
       
       "returning a new Behaviour that uses the original rule when time < first occurrence" in {
         val beh = new Behaviour(time => 5)
 
         val value = freezeTime(0) { () =>
-          beh.toggle(Event(1, ()), new Behaviour(time => 10)).at(0)
+          beh.toggle(Event(1, ()), new Behaviour(time => 10)).eval()
         }
 
         value mustBe 5
@@ -196,7 +222,7 @@ object BehaviourSpec extends Specification {
         val beh = new Behaviour(time => 5)
 
         val value = freezeTime(0) { () =>
-          beh.toggle(Event(1, ()), new Behaviour(time => 10)).at(0)
+          beh.toggle(Event(1, ()), new Behaviour(time => 10)).eval
         }
 
         value mustBe 5
@@ -211,7 +237,10 @@ object BehaviourSpec extends Specification {
           event.pubOccur(3, ())  
         }
 
-        beh.toggle(event, new Behaviour(time => 10)).at(2) mustBe 10
+        freezeTime(2) {
+          () =>
+            beh.toggle(event, new Behaviour(time => 10)).eval()
+        }.mustBe(10)
       }
 
       "returning a new Behaviour that uses the first rule when time >= second (only two)" in {
@@ -223,7 +252,10 @@ object BehaviourSpec extends Specification {
           event.pubOccur(3, ())
         }
 
-        beh.toggle(event, new Behaviour(time => 10)).at(3) mustBe 5
+        freezeTime(3) {
+          () =>
+            beh.toggle(event, new Behaviour(time => 10)).eval()
+        }.mustBe(5)
       }
     }
   }

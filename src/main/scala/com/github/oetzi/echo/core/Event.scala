@@ -35,11 +35,12 @@ trait EventSource[T] extends Event[T] {
   
   protected def occs(time : Time) : Occurrence[T] = {
     this synchronized {
-      if (future.length > 0) {
-        val head = future.head
-
-        if (head.time <= time) {
+      if (!future.isEmpty) {
+        var head = future.headOption
+        
+        while (head != None && future.head.time <= time) {
           present = future.dequeue()
+          head = future.headOption
         }
       }
       
