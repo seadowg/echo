@@ -10,6 +10,40 @@ trait Event[T] {
     new EventView(time => occs(time).map(func))
   }
   
+  def merge(event : Event[T]) : Event[T] = {
+    val func : Time => Occurrence[T] = {
+      time =>
+        this synchronized  {
+          event synchronized  {
+            val left = this.occs(time)
+            val right = event.top(time).getOrElse(null)
+
+            if (left == null && right == null) {
+              null
+            }
+
+            else if (left == null) {
+              right
+            }
+
+            else if (right == null) {
+              left
+            }
+
+            else if (left.time <= right.time) {
+              new Occurrence(right.time, right.value, left.num + right.num)
+            }
+
+            else {
+              new Occurrence(left.time, left.value, left.num + right.num)
+            }
+          }
+        }
+    }
+    
+    new EventView(func)
+  }
+  
   // echo utility functions
   def top(time : Time) : Option[Occurrence[T]] = {
     val top = occs(time)
