@@ -1,10 +1,10 @@
 package com.github.oetzi.echo.io
 
-import com.github.oetzi.echo.core.EventSource
+import com.github.oetzi.echo.core.Event
 import java.io.PrintWriter
 import actors.Actor
 
-class Sender(val ip: String, val port: Int, event: EventSource[String]) extends Breakable {
+class Sender(val ip: String, val port: Int, event: Event[String]) extends Breakable {
   SenderActor.start()
 
   private object SenderActor extends Actor {
