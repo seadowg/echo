@@ -46,8 +46,4 @@ object Receiver {
   def apply(port : Int)(reply : String => Behaviour[String]) : Receiver = {
     new Receiver(port, reply)  
   }
-  
-  def apply(port : Int) : Receiver = {
-    new Receiver(port, string => "")
-  }
 }
