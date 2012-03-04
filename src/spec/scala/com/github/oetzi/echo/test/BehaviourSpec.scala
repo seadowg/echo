@@ -187,17 +187,6 @@ object BehaviourSpec extends Specification {
       }
     }
 
-    "provide a transform function" >> {
-      "returning a new Behaviour thats rule is this.at(func(t))" in {
-        val beh = new Behaviour(time => time)
-
-        freezeTime(1) {
-          () =>
-            beh.transform(t => t * 2).eval()  
-        }.mustEqual(2)
-      }
-    }
-
     "provide a toggle function" >> {
       "returning a new Behaviour that uses the original rule for an empty Event" in {
         val beh = new Behaviour(time => 5)

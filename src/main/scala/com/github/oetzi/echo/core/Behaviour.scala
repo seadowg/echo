@@ -11,10 +11,6 @@ class Behaviour[T](private val rule: Time => T) {
     rule(time)
   }
 
-  def transform(func: Time => Time): Behaviour[T] = {
-    new Behaviour(time => this.at(func(time)))
-  }
-
   def until[A](event: Event[A], behaviour: Behaviour[T]): Behaviour[T] = {
     val rule: Time => T = {
       time =>
