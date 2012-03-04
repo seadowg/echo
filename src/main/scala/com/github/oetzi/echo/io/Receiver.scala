@@ -2,12 +2,13 @@ package com.github.oetzi.echo.io
 
 import java.lang.Thread
 import java.net.ServerSocket
-import com.github.oetzi.echo.core.EventSource
 import com.github.oetzi.echo.Echo._
-import java.io.{InputStreamReader, BufferedReader}
+import com.github.oetzi.echo.core.{Behaviour, EventSource}
+import java.io.{PrintWriter, InputStreamReader, BufferedReader}
 
 
-class Receiver(val port: Int) extends EventSource[String] with Breakable {
+class Receiver private (val port: Int, val reply : String => Behaviour[String]) extends EventSource[String]
+  with Breakable {
   private var running = true
 
   private val thread = new Thread(new Runnable() {
@@ -19,7 +20,13 @@ class Receiver(val port: Int) extends EventSource[String] with Breakable {
           while (Receiver.this.running) {
             val request = socket.accept()
             val in = new BufferedReader(new InputStreamReader(request.getInputStream))
-            Receiver.this.occur(now(), in.readLine())
+            val out = new PrintWriter(request.getOutputStream(), true)
+
+            val message = in.readLine()
+            Receiver.this.occur(now(), message)
+            out.println(reply(message).eval())
+
+            out.close()
             in.close()
             request.close()
           }
@@ -32,5 +39,15 @@ class Receiver(val port: Int) extends EventSource[String] with Breakable {
 
   protected[echo] def die() {
     this.running = false
+  }
+}
+
+object Receiver {
+  def apply(port : Int)(reply : String => Behaviour[String]) : Receiver = {
+    new Receiver(port, reply)  
+  }
+  
+  def apply(port : Int) : Receiver = {
+    new Receiver(port, string => "")
   }
 }
