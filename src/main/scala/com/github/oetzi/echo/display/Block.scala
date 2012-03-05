@@ -10,7 +10,7 @@ class Block private() extends Canvas {
 
   val internal: JPanel = new JPanel() {
     override def repaint() {
-      Block.this.update(new Occurrence(now, ()))
+      Block.this.update(now())
       super.repaint()
     }
   }
@@ -21,24 +21,22 @@ class Block private() extends Canvas {
     colorBeh
   }
 
-  def update(occurrence: Occurrence[Unit]) {
-    redraw.occur(occurrence)
-
+  def update(time: Time) {
     this.components.foreach {
       canvas =>
-        canvas.update(occurrence)
+        canvas.update(time)
     }
   }
 
-  def draw(occurrence: Occurrence[Unit]) {
-    this.internal.setSize(widthBeh.at(occurrence.time), heightBeh.at(occurrence.time))
-    this.internal.setBackground(colorBeh.at(occurrence.time))
+  def draw(time: Time) {
+    this.internal.setSize(widthBeh.at(time), heightBeh.at(time))
+    this.internal.setBackground(colorBeh.at(time))
 
     this.internal.repaint()
 
     this.components.foreach {
       canvas =>
-        canvas.draw(occurrence)
+        canvas.draw(time)
     }
   }
 }

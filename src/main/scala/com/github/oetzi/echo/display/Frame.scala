@@ -5,7 +5,7 @@ import java.util.{TimerTask, Timer}
 import javax.swing.{BoxLayout, JFrame}
 import java.awt.event.{MouseEvent, MouseMotionListener}
 import java.awt.Point
-import com.github.oetzi.echo.core.{Event, Occurrence, Behaviour}
+import com.github.oetzi.echo.core.{EventSource, Occurrence, Behaviour}
 import com.github.oetzi.echo.types.Stepper
 
 class Frame private(private val visibleBeh: Behaviour[Boolean]) extends Canvas {
@@ -15,7 +15,7 @@ class Frame private(private val visibleBeh: Behaviour[Boolean]) extends Canvas {
     setLocationRelativeTo(null)
 
     override def repaint() {
-      Frame.this.update(new Occurrence(now, ()))
+      Frame.this.update(now())
       super.repaint()
     }
   }
@@ -25,9 +25,9 @@ class Frame private(private val visibleBeh: Behaviour[Boolean]) extends Canvas {
   def startClock() {
     new Timer().schedule(new TimerTask() {
       override def run() {
-        val occ = new Occurrence(now, ())
-        Frame.this.update(occ)
-        Frame.this.draw(occ)
+        val time = now()
+        Frame.this.update(time)
+        Frame.this.draw(time)
       }
     }, 0, 40)
   }
@@ -36,18 +36,18 @@ class Frame private(private val visibleBeh: Behaviour[Boolean]) extends Canvas {
 
   def mouse(): Behaviour[Point] = {
     if (this.mouseBeh == null) {
-      val mouseEvent = new Event[Point]
-      this.mouseBeh = new Stepper(new Point(0, 0), mouseEvent)
-
-      val mouseListener = new MouseMotionListener {
+      val mouseListener = new MouseMotionListener with EventSource[Point] {
         def mouseDragged(event: MouseEvent) {
           //nothing  
         }
 
         def mouseMoved(event: MouseEvent) {
-          mouseEvent.occur(new Occurrence(event.getWhen, event.getPoint))
+          occur(event.getWhen, event.getPoint)
         }
       }
+      
+      this.mouseBeh = new Stepper(new Point(0, 0), mouseListener)
+      this.internal.addMouseMotionListener(mouseListener)
     }
 
     mouseBeh
@@ -57,21 +57,19 @@ class Frame private(private val visibleBeh: Behaviour[Boolean]) extends Canvas {
     visibleBeh
   }
 
-  def update(occurrence: Occurrence[Unit]) {
-    redraw.occur(occurrence)
-
+  def update(time : Time) {
     this.components.foreach {
       canvas =>
-        canvas.update(occurrence)
+        canvas.update(time)
     }
   }
 
   private var lastVis = false
 
-  def draw(occurrence: Occurrence[Unit]) {
-    this.internal.setSize(widthBeh.at(occurrence.time), heightBeh.at(occurrence.time))
+  def draw(time : Time) {
+    this.internal.setSize(widthBeh.at(time), heightBeh.at(time))
 
-    val vis = visibleBeh.at(occurrence.time)
+    val vis = visibleBeh.at(time)
     if (vis != lastVis) {
       this.internal.setVisible(vis)
       lastVis = vis
@@ -81,7 +79,7 @@ class Frame private(private val visibleBeh: Behaviour[Boolean]) extends Canvas {
 
     this.components.foreach {
       canvas =>
-        canvas.draw(occurrence)
+        canvas.draw(time)
     }
   }
 }

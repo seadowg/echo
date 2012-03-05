@@ -10,5 +10,25 @@ object EchoSpec extends Specification {
       val beh: Behaviour[Int] = 5
       beh must_!= null
     }
+
+    "has a freezeTime function" >> {
+      "that exectues the passed block" in {
+        var done = false
+
+        freezeTime(0) { () =>
+          done = true
+        }
+
+        done mustBe true
+      }
+
+      "that freezes time during execution of its block" in {
+        val value = freezeTime(0) { () =>
+          now
+        }
+
+        value mustEqual 0
+      }
+    }
   }
 }

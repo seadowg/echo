@@ -1,13 +1,11 @@
-import com.github.oetzi.echo.core.Event
 import com.github.oetzi.echo.core.Behaviour
-import com.github.oetzi.echo.core.Occurrence
+import com.github.oetzi.echo.Echo._
 
 package com.github.oetzi.echo.display {
 
 import java.awt.Component
 
 trait Canvas {
-  val redraw: Event[Unit] = new Event[Unit]()
   val internal: Component
 
   protected var widthBeh: Behaviour[Int] = new Behaviour(t => this.internal.getWidth)
@@ -21,9 +19,9 @@ trait Canvas {
     this.heightBeh
   }
 
-  def update(occurrence: Occurrence[Unit])
+  def update(time : Time)
 
-  def draw(occurrence: Occurrence[Unit])
+  def draw(time : Time)
 }
 
 }

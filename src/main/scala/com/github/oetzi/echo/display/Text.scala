@@ -7,18 +7,18 @@ import com.github.oetzi.echo.Echo._
 class Text private(private val textBeh : Behaviour[String]) extends Canvas {
   val internal : JLabel = new JLabel() {
     override def repaint() {
-      Text.this.update(new Occurrence(now, ()))
+      Text.this.update(now())
       super.repaint()
     }
   }
 
-  def update(occurrence: Occurrence[Unit]) {
-    redraw.occur(occurrence)
+  def update(time: Time) {
+
   }
 
-  def draw(occurrence: Occurrence[Unit]) {
-    this.internal.setSize(widthBeh.at(occurrence.time), heightBeh.at(occurrence.time))
-    this.internal.setText(textBeh.at(occurrence.time))
+  def draw(time: Time) {
+    this.internal.setSize(widthBeh.at(time), heightBeh.at(time))
+    this.internal.setText(textBeh.at(time))
 
     this.internal.repaint()
   }

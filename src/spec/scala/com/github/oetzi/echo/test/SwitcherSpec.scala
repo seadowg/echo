@@ -1,56 +1,65 @@
 package com.github.oetzi.echo.test
 
 import org.specs._
-import com.github.oetzi.echo.core._
+import com.github.oetzi.echo.Echo._
+import com.github.oetzi.echo.core.Behaviour
+import com.github.oetzi.echo.test.help.TestEvent
 import com.github.oetzi.echo.types.Switcher
 
 
 object SwitcherSpec extends Specification {
   "Switcher" should {
     "have an at" >> {
-      "returning b.at for initial behaviour b for empty event" in {
-        val behaviour = new Behaviour(time => 5)
-        val switcher = new Switcher(behaviour, new Event[Behaviour[Int]])
+      "returning 'initial' if event hasn't occured" in {
+        val stepper = new Switcher(0, new TestEvent[Behaviour[Int]])
 
-        switcher.at(0) mustBe 5
+        stepper.eval() mustBe 0
       }
 
-      "returning b.at for initial behaviour b if time is before first event occurrence" in {
-        val behaviour = new Behaviour(time => 5)
-        val event = new Event[Behaviour[Int]]
-        val switcher = new Switcher(behaviour, event)
-        event.occur(new Occurrence(5, new Behaviour(time => 6)))
+      "returning the newest event if time is >= last event occurrence" in {
+        val event = new TestEvent[Behaviour[Int]]
+        event.pubOccur(now(), 5)
+        val stepper = new Switcher(0, event)
 
-        switcher.at(4) mustBe 5
+        stepper.eval mustBe 5
       }
 
-      "returning b.at for the newest behaviour if time is after last event" in {
-        val behaviour = new Behaviour(time => 5)
-        val event = new Event[Behaviour[Int]]
-        val switcher = new Switcher(behaviour, event)
-        event.occur(new Occurrence(5, new Behaviour(time => 6)))
+      "returning the initial value if the time is < the first event" in {
+        val event = new TestEvent[Behaviour[Int]]
 
-        switcher.at(6) mustBe 6
+        val result = freezeTime(0) {
+          () =>
+            event.pubOccur(1, 5)
+            val stepper = new Switcher(0, event)
+            stepper.eval()
+        }
+
+        result mustBe 0
       }
 
-      "returning b.at for a behaviour thats occurrence matches time" in {
-        val behaviour = new Behaviour(time => 5)
-        val event = new Event[Behaviour[Int]]
-        val switcher = new Switcher(behaviour, event)
-        event.occur(new Occurrence(5, new Behaviour(time => 6)))
-        event.occur(new Occurrence(6, new Behaviour(time => 7)))
+      "returning an event's value if the time is equal to it" in {
+        val event = new TestEvent[Behaviour[Int]]
 
-        switcher.at(5) mustBe 6
+        freezeTime(5) {
+          () =>
+            event.pubOccur(5, 10)
+            event.pubOccur(7, 11)
+            val stepper = new Switcher(0, event)
+            stepper.eval()
+        }.mustBe(10)
       }
 
-      "returning b.at for a the newest behaviour thats occurrence is less than time" in {
-        val behaviour = new Behaviour(time => 5)
-        val event = new Event[Behaviour[Int]]
-        val switcher = new Switcher(behaviour, event)
-        event.occur(new Occurrence(5, new Behaviour(time => 6)))
-        event.occur(new Occurrence(7, new Behaviour(time => 7)))
+      "returning an events value if it has the max before time" in {
+        val event = new TestEvent[Behaviour[Int]]
 
-        switcher.at(6) mustBe 6
+        freezeTime(5) {
+          () =>
+            event.pubOccur(5, 10)
+            event.pubOccur(6, 9)
+            event.pubOccur(8, 11)
+            val stepper = new Switcher(0, event)
+            stepper.eval()
+        }.mustBe(10)
       }
     }
   }

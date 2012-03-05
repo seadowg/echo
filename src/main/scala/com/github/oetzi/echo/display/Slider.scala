@@ -11,24 +11,24 @@ class Slider private() extends Canvas {
   val internal: JSlider = new JSlider() with EventSource[Int] {
     this.addChangeListener(new ChangeListener() {
       def stateChanged(e: ChangeEvent) {
-        occur(new Occurrence(now, internal.getValue))
+        occur(now, internal.getValue)
       }
     })
 
     override def repaint() {
-      Slider.this.update(new Occurrence(now, ()))
+      Slider.this.update(now())
       super.repaint()
     }
   }
 
   val value: Behaviour[Int] = new Stepper(internal.getValue, internal.asInstanceOf[EventSource[Int]])
 
-  def update(occurrence: Occurrence[Unit]) {
-    redraw.occur(occurrence)
+  def update(time: Time) {
+    
   }
 
-  def draw(occurrence: Occurrence[Unit]) {
-    this.internal.setSize(widthBeh.at(occurrence.time), heightBeh.at(occurrence.time))
+  def draw(time: Time) {
+    this.internal.setSize(widthBeh.at(time), heightBeh.at(time))
 
     this.internal.repaint()
   }
