@@ -7,7 +7,20 @@ trait Event[T] {
   protected def occs(time : Time) : Occurrence[T]
 
   def map[U](func : T => U) : Event[U] = {
-    new EventView(time => occs(time).map(func))
+    val mapFun : Time => Occurrence[U] = {
+      time =>
+        val occ = occs(time)
+        
+        if (occ == null) {
+          null
+        }
+
+        else {
+          occs(time).map(func)
+        }
+    }
+    
+    new EventView(mapFun)
   }
   
   def merge(event : Event[T]) : Event[T] = {

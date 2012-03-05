@@ -120,30 +120,6 @@ object BehaviourSpec extends Specification {
       }
     }
 
-    /*"provide a sample function" >> {
-      "returning an Event that fires when the passed in event fires" in {
-        val beh = new Behaviour(time => 5)
-        val event = new Event[Int]
-
-        val sampler = beh.sample(event)
-        event.occur(new Occurrence(10, 5))
-
-        sampler.occs().isEmpty mustBe false
-      }
-
-      "returning an Event that occurs with the current value of the Behaviour" in {
-        val beh = new Behaviour(time => 5)
-        val event = new Event[Int]
-
-        val sampler = beh.sample(event)
-        val occ = new Occurrence(10, 5)
-        event.occur(occ)
-
-        sampler.occs().last.time mustEqual occ.time
-        sampler.occs().last.value mustEqual occ.value
-      }
-    }*/
-
     "provide a map function" >> {
       "returning a new Behaviour thats rule is func(this.at(t))" in {
         val beh = new Behaviour(time => 5)
