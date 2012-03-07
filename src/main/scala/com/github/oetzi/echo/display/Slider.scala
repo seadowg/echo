@@ -28,7 +28,7 @@ class Slider private() extends Canvas {
   }
 
   def draw(time: Time) {
-    this.internal.setSize(widthBeh.at(time), heightBeh.at(time))
+    this.internal.setSize(widthBeh.eval(), heightBeh.eval())
 
     this.internal.repaint()
   }

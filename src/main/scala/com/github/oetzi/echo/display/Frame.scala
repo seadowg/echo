@@ -29,7 +29,7 @@ class Frame private(private val visibleBeh: Behavior[Boolean]) extends Canvas {
         Frame.this.update(time)
         Frame.this.draw(time)
       }
-    }, 0, 40)
+    }, 0, 20)
   }
 
   private var mouseBeh: Behavior[Point] = null
@@ -67,9 +67,9 @@ class Frame private(private val visibleBeh: Behavior[Boolean]) extends Canvas {
   private var lastVis = false
 
   def draw(time : Time) {
-    this.internal.setSize(widthBeh.at(time), heightBeh.at(time))
+    this.internal.setSize(widthBeh.eval(), heightBeh.eval())
 
-    val vis = visibleBeh.at(time)
+    val vis = visibleBeh.eval()
     if (vis != lastVis) {
       this.internal.setVisible(vis)
       lastVis = vis

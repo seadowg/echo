@@ -14,7 +14,7 @@ object Switcher {
         val occ = event.top(time)
 
         if (occ == None) {
-          initial.at(time)
+           initial.at(time)
         }
 
         else {

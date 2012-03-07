@@ -32,8 +32,8 @@ class Button private() extends Canvas {
   }
 
   def draw(time : Time) {
-    this.internal.setSize(widthBeh.at(time), heightBeh.at(time))
-    this.internal.setText(textBeh.at(time))
+    this.internal.setSize(widthBeh.eval(), heightBeh.eval())
+    this.internal.setText(textBeh.eval())
 
     this.internal.repaint()
   }

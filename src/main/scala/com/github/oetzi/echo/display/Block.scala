@@ -29,8 +29,8 @@ class Block private() extends Canvas {
   }
 
   def draw(time: Time) {
-    this.internal.setSize(widthBeh.at(time), heightBeh.at(time))
-    this.internal.setBackground(colorBeh.at(time))
+    this.internal.setSize(widthBeh.eval(), heightBeh.eval())
+    this.internal.setBackground(colorBeh.eval())
 
     this.internal.repaint()
 
