@@ -12,6 +12,7 @@ COPYRIGHT = "Callum Stott 2011"
 repositories.remote << "http://www.ibiblio.org/maven2/"
 
 Project.local_task :typeset
+Project.local_task :tcc
 Project.local_task :console
 
 define "echo" do
@@ -24,7 +25,13 @@ define "echo" do
   
   task :typeset do
     FileUtils.makedirs('target/pdfs') unless File.exists?('target/pdfs')
-    system 'xelatex -output-directory=target/pdfs src/report/*.tex'
+    system 'xelatex -output-directory=target/pdfs src/report/echo.tex'
+    system 'open target/pdfs/echo.pdf'
+  end
+  
+  task :tcc => :typeset do
+    FileUtils.makedirs('target/pdfs') unless File.exists?('target/pdfs')
+    system 'kicker -e "xelatex -output-directory=target/pdfs src/report/echo.tex" src/report/echo.tex'
   end
   
   task :console => :compile do
