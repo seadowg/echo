@@ -1,4 +1,4 @@
-import com.github.oetzi.echo.core.Behaviour
+import com.github.oetzi.echo.core.Behavior
 import com.github.oetzi.echo.Echo._
 
 package com.github.oetzi.echo.display {
@@ -8,14 +8,14 @@ import java.awt.Component
 trait Canvas {
   val internal: Component
 
-  protected var widthBeh: Behaviour[Int] = new Behaviour(t => this.internal.getWidth)
-  protected var heightBeh: Behaviour[Int] = new Behaviour(t => this.internal.getHeight)
+  protected var widthBeh: Behavior[Int] = new Behavior(t => this.internal.getWidth)
+  protected var heightBeh: Behavior[Int] = new Behavior(t => this.internal.getHeight)
 
-  def width(): Behaviour[Int] = {
+  def width(): Behavior[Int] = {
     this.widthBeh
   }
 
-  def height(): Behaviour[Int] = {
+  def height(): Behavior[Int] = {
     this.heightBeh
   }
 

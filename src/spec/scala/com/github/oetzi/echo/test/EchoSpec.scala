@@ -7,7 +7,7 @@ import com.github.oetzi.echo.core._
 object EchoSpec extends Specification {
   "Echo" should {
     "allow values to lifted to constant Behaviours" in {
-      val beh: Behaviour[Int] = 5
+      val beh: Behavior[Int] = 5
       beh must_!= null
     }
 

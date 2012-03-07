@@ -3,11 +3,11 @@ package com.github.oetzi.echo.io
 import java.lang.Thread
 import java.net.ServerSocket
 import com.github.oetzi.echo.Echo._
-import com.github.oetzi.echo.core.{Behaviour, EventSource}
+import com.github.oetzi.echo.core.{Behavior, EventSource}
 import java.io.{PrintWriter, InputStreamReader, BufferedReader}
 
 
-class Receiver private (val port: Int, val reply : String => Behaviour[String]) extends EventSource[String]
+class Receiver private (val port: Int, val reply : String => Behavior[String]) extends EventSource[String]
   with Breakable {
   private var running = true
 
@@ -43,7 +43,7 @@ class Receiver private (val port: Int, val reply : String => Behaviour[String]) 
 }
 
 object Receiver {
-  def apply(port : Int)(reply : String => Behaviour[String]) : Receiver = {
+  def apply(port : Int)(reply : String => Behavior[String]) : Receiver = {
     new Receiver(port, reply)  
   }
 }

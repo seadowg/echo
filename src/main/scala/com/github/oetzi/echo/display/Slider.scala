@@ -3,7 +3,7 @@ package com.github.oetzi.echo.display
 import com.github.oetzi.echo.types.Stepper
 import javax.swing.event.{ChangeEvent, ChangeListener}
 import javax.swing.JSlider
-import com.github.oetzi.echo.core.{EventSource, Behaviour, Occurrence}
+import com.github.oetzi.echo.core.{EventSource, Behavior, Occurrence}
 import com.github.oetzi.echo.Echo._
 
 
@@ -21,7 +21,7 @@ class Slider private() extends Canvas {
     }
   }
 
-  val value: Behaviour[Int] = new Stepper(internal.getValue, internal.asInstanceOf[EventSource[Int]])
+  val value: Behavior[Int] = new Stepper(internal.getValue, internal.asInstanceOf[EventSource[Int]])
 
   def update(time: Time) {
     

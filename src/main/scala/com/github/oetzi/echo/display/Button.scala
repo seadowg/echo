@@ -1,7 +1,7 @@
 package com.github.oetzi.echo.display
 
 import javax.swing.JButton
-import com.github.oetzi.echo.core.{Occurrence, Behaviour, Event, EventSource}
+import com.github.oetzi.echo.core.{Occurrence, Behavior, Event, EventSource}
 import com.github.oetzi.echo.Echo._
 import java.awt.event.{ActionEvent, ActionListener}
 
@@ -21,9 +21,9 @@ class Button private() extends Canvas {
   
   val click: Event[Unit] = internal.asInstanceOf[EventSource[Unit]].event
 
-  private var textBeh: Behaviour[String] = new Behaviour(t => this.internal.getText)
+  private var textBeh: Behavior[String] = new Behavior(t => this.internal.getText)
 
-  def text(): Behaviour[String] = {
+  def text(): Behavior[String] = {
     this.textBeh
   }
 
@@ -40,14 +40,14 @@ class Button private() extends Canvas {
 }
 
 object Button {
-  def apply(text: Behaviour[String]): Button = {
+  def apply(text: Behavior[String]): Button = {
     val button = new Button()
     button.textBeh = text
 
     button
   }
 
-  def apply(func: Button => Behaviour[String]) = {
+  def apply(func: Button => Behavior[String]) = {
     val button = new Button()
     button.textBeh = func(button)
 
