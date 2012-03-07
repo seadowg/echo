@@ -2,11 +2,11 @@
 require 'buildr/scala'
 
 # Version number for this release
-VERSION_NUMBER = "0.12.0"
+VERSION_NUMBER = "1.0.0"
 
 # Group identifier for your projects
 GROUP = "echo"
-COPYRIGHT = "Callum Stott 2011"
+COPYRIGHT = "Callum Stott 2012"
 
 # Specify Maven 2.0 remote repositories here, like this:
 repositories.remote << "http://www.ibiblio.org/maven2/"
