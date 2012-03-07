@@ -74,7 +74,7 @@ trait Event[T] {
 trait EventSource[T] extends Event[T] {
   private var future : Queue[Occurrence[T]] = new Queue[Occurrence[T]]()
   private var present : Occurrence[T] = null
-  private var length = 0
+  private var length : BigInt = 0
   
   def event() : Event[T] = {
     new EventView(time => occs(time))
@@ -119,7 +119,7 @@ protected class EventView[T, U](private val source : Time => Occurrence[T]) exte
   }
 }
 
-class Occurrence[T](val time: Time, val value: T, val num : Int) {
+class Occurrence[T](val time: Time, val value: T, val num : BigInt) {
   def map[U](func : T => U) : Occurrence[U] = {
     new Occurrence(time, func(value), num)
   }
