@@ -5,7 +5,7 @@ import org.specs._
 import com.github.oetzi.echo.Echo._
 import com.github.oetzi.echo.core.{Event, Behavior}
 
-object BehaviourSpec extends Specification {
+object BehaviorSpec extends Specification {
   "Behavior" should {
     "create a new instance given a valid block" in {
       val beh = new Behavior(time => time)
