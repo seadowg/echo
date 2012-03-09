@@ -81,6 +81,16 @@ class Behavior[T](private val rule: Time => T) {
   }
 }
 
+class Constant[T](val value : T) extends Behavior[T](time => value) {
+  override def eval() : T = {
+    value
+  }
+  
+  override private[echo] def at(time: Time): T = {
+    value
+  }
+}
+
 object Behavior {
   private val sLock = new Lock()
   

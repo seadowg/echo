@@ -15,7 +15,7 @@ object Echo {
     this.fakeTime = time
   }
 
-  implicit def lift[T](value: T): Behavior[T] = new Behavior(time => value)
+  implicit def lift[T](value: T): Behavior[T] = new Constant(value)
 
   type Time = Double
 
