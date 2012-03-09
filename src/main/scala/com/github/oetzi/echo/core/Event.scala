@@ -1,6 +1,7 @@
 package com.github.oetzi.echo.core
 
 import com.github.oetzi.echo.Echo._
+import com.github.oetzi.echo.Control._
 import collection.mutable.Queue
 
 trait Event[T] {
@@ -93,6 +94,8 @@ trait EventSource[T] extends Event[T] {
   
   protected def occur(time : Time, value : T) {
     this synchronized {
+			while (!writeLock.available) {}
+	
       val nowCache = now()
       length += 1
       

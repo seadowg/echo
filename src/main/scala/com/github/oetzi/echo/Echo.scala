@@ -41,4 +41,5 @@ object Echo {
 
 private[echo] object Control {
 	val readLock = new Lock()
+	val writeLock = new Lock()
 }
