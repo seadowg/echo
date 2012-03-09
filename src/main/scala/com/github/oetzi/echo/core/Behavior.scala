@@ -2,9 +2,15 @@ package com.github.oetzi.echo.core
 
 import com.github.oetzi.echo.Echo._
 
+import concurrent.Lock
+
 class Behavior[T](private val rule: Time => T) {
   def eval() : T = {
-    this.at(now())
+    Behavior.sLock.acquire()
+    val value = this.at(now())
+    Behavior.sLock.release()
+    
+    value
   }
 
   private[echo] def at(time: Time): T = {
@@ -76,6 +82,8 @@ class Behavior[T](private val rule: Time => T) {
 }
 
 object Behavior {
+  private val sLock = new Lock()
+  
   def apply[T](rule: Time => T): Behavior[T] = {
     new Behavior(rule)
   }
