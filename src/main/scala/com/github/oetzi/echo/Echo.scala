@@ -1,6 +1,7 @@
 package com.github.oetzi.echo
 
 import com.github.oetzi.echo.core._
+import concurrent.Lock
 
 object Echo {
   private var fake = false
@@ -36,4 +37,8 @@ object Echo {
 
     returnValue
   }
+}
+
+private[echo] object Control {
+	val readLock = new Lock()
 }
