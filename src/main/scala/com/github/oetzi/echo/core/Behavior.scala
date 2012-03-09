@@ -13,7 +13,7 @@ class Behavior[T](private val rule: Time => T) {
     value
   }
 
-  private[echo] def at(time: Time): T = {
+  protected[echo] def at(time: Time): T = {
     rule(time)
   }
 
@@ -86,7 +86,7 @@ class Constant[T](val value : T) extends Behavior[T](time => value) {
     value
   }
   
-  override private[echo] def at(time: Time): T = {
+  override protected[echo] def at(time: Time): T = {
     value
   }
 }
