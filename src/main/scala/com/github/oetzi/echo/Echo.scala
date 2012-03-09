@@ -37,3 +37,11 @@ object Echo {
     returnValue
   }
 }
+
+abstract class EchoApp {
+	def setup(args : Array[String])
+	
+	def main(args : Array[String]) {
+		setup(args)
+	}
+}
