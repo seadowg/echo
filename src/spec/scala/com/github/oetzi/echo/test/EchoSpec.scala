@@ -33,6 +33,16 @@ object EchoSpec extends Specification {
 
         value mustEqual 0
       }
+
+			"that allows nesting" in {
+				val value = freezeTime(0) { () =>
+					freezeTime(0) { () =>
+						now
+					}
+        }
+
+        value mustEqual 0
+			}
     }
   }
 }
