@@ -3,9 +3,11 @@ package com.github.oetzi.echo.core
 import com.github.oetzi.echo.Echo._
 import com.github.oetzi.echo.Control._
 import collection.mutable.Queue
+import collection.mutable.ArrayBuffer
 
 trait Event[T] {
   protected def occs(time : Time) : Occurrence[T]
+	protected[echo] def hook(block : () => Unit)
 
   def map[U](func : T => U) : Event[U] = {
 		frp {
@@ -23,7 +25,7 @@ trait Event[T] {
 		        }
 		    }
     
-		    new EventView(mapFun)
+		    new EventView(mapFun, this)
 		}
   }
   
@@ -56,7 +58,7 @@ trait Event[T] {
 		        }
 		    }
     
-		    new EventView(func)
+		    new EventView(func, this)
 		}
   }
   
@@ -75,12 +77,13 @@ trait Event[T] {
 }
 
 trait EventSource[T] extends Event[T] {
-  private var future : Queue[Occurrence[T]] = new Queue[Occurrence[T]]()
+  private val future : Queue[Occurrence[T]] = new Queue[Occurrence[T]]()
+	private val hooks : ArrayBuffer[() => Unit] = new ArrayBuffer() 
   private var present : Occurrence[T] = null
   private var length : BigInt = 0
   
   def event() : Event[T] = {
-    new EventView(time => occs(time))
+    new EventView(time => occs(time), this)
   }
   
   protected def occs(time : Time) : Occurrence[T] = {
@@ -101,25 +104,42 @@ trait EventSource[T] extends Event[T] {
   protected def occur(time : Time, value : T) {
     this synchronized {
 			while (!writeLock.available) {}
-	
-      val nowCache = now()
-      length += 1
+			
+			val nowCache = now()
+			
+			freezeTime(nowCache) {
+				() =>
+		      length += 1
       
-      if (time < nowCache) {
-        future += new Occurrence(nowCache, value, length)
-      }
+		      if (time < nowCache) {
+		        future += new Occurrence(nowCache, value, length)
+		      }
 
-      else {
-        future += new Occurrence(time, value, length)
-      }
+		      else {
+		        future += new Occurrence(time, value, length)
+		      }
+		
+					hooks.foreach {
+						hook => hook()
+					}
+			}
     }
   }
+
+	protected[echo] def hook(block : () => Unit) {
+		hooks += block
+	}
 }
 
-protected class EventView[T, U](private val source : Time => Occurrence[T]) extends Event[T] {
+protected class EventView[T, U](private val source : Time => Occurrence[T], 
+	private val origin : Event[U]) extends Event[T] {
   protected def occs(time : Time) : Occurrence[T] = {
     source(time)
   }
+
+	protected[echo] def hook(block : () => Unit) {
+		origin.hook(block)
+	}
 }
 
 class Occurrence[T](val time: Time, val value: T, val num : BigInt) {

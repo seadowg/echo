@@ -5,15 +5,15 @@ import concurrent.Lock
 import java.lang.IllegalAccessException
 
 object Echo {
-  private var fake = false
+  private var fake = 0
   private var fakeTime : Time = 0
   
   private def useRealTime() {
-    this.fake = false
+    this.fake -= 1
   }
 
   private def setTime(time : Time) {
-    this.fake = true
+    this.fake += 1
     this.fakeTime = time
   }
 
@@ -22,7 +22,7 @@ object Echo {
   type Time = Double
 
   def now() : Time = {
-    if (this.fake) {
+    if (this.fake > 0) {
       this.fakeTime
     }
 
