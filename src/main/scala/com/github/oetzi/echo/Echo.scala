@@ -2,6 +2,7 @@ package com.github.oetzi.echo
 
 import com.github.oetzi.echo.core._
 import concurrent.Lock
+import java.lang.IllegalAccessException
 
 object Echo {
   private var fake = false
@@ -42,4 +43,20 @@ object Echo {
 private[echo] object Control {
 	val readLock = new Lock()
 	val writeLock = new Lock()
+	val createLock = new Lock()
+	private var devModeOn = false
+	
+	def devMode() {
+		devModeOn = true
+	}
+	
+	def frp[T](block : () => T) : T = {
+		if (createLock.available && !devModeOn) {
+			throw new IllegalAccessException("You can't do that...")
+		}
+		
+		else {
+			block()
+		}
+	}
 }

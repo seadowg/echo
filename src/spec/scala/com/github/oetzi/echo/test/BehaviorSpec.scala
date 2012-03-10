@@ -3,9 +3,13 @@ package com.github.oetzi.echo.test
 import help.TestEvent
 import org.specs._
 import com.github.oetzi.echo.Echo._
+import com.github.oetzi.echo.Control._
 import com.github.oetzi.echo.core.{Event, Behavior}
 
 object BehaviorSpec extends Specification {
+	
+	devMode()
+	
   "Behavior" should {
     "create a new instance given a valid block" in {
       val beh = new Behavior(time => time)

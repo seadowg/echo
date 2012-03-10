@@ -3,10 +3,13 @@ package com.github.oetzi.echo.test
 import help.TestEvent
 import org.specs._
 import com.github.oetzi.echo.Echo._
+import com.github.oetzi.echo.Control._
 import com.github.oetzi.echo.types.Stepper
 
-
 object StepperSpec extends Specification {
+	
+	devMode()
+	
   "Stepper" should {
     "have an at" >> {
       "returning 'initial' if event hasn't occured" in {

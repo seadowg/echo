@@ -2,10 +2,14 @@ package com.github.oetzi.echo.test
 
 import help.TestEvent
 import com.github.oetzi.echo.Echo._
+import com.github.oetzi.echo.Control._
 
 import org.specs._
 
 object EventSpec extends Specification {
+	
+	devMode()
+	
   "EventSource" should {
     "be empty initially" in {
       val event = new TestEvent[Unit]

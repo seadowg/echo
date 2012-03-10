@@ -2,9 +2,13 @@ package com.github.oetzi.echo.test
 
 import org.specs._
 import com.github.oetzi.echo.Echo._
+import com.github.oetzi.echo.Control._
 import com.github.oetzi.echo.display.{Button, Canvas, Frame}
 
 object FrameSpec extends Specification {
+	
+	devMode()
+	
   "Frame" should {
 
     val frame = Frame(100, 100, List[Canvas]())

@@ -8,50 +8,56 @@ trait Event[T] {
   protected def occs(time : Time) : Occurrence[T]
 
   def map[U](func : T => U) : Event[U] = {
-    val mapFun : Time => Occurrence[U] = {
-      time =>
-        val occ = occs(time)
+		frp {
+			() =>
+    		val mapFun : Time => Occurrence[U] = {
+		      time =>
+		        val occ = occs(time)
         
-        if (occ == null) {
-          null
-        }
+		        if (occ == null) {
+		          null
+		        }
 
-        else {
-          occs(time).map(func)
-        }
-    }
+		        else {
+		          occs(time).map(func)
+		        }
+		    }
     
-    new EventView(mapFun)
+		    new EventView(mapFun)
+		}
   }
   
   def merge(event : Event[T]) : Event[T] = {
-    val func : Time => Occurrence[T] = {
-      time =>
-        val left = this.occs(time)
-        val right = event.top(time).getOrElse(null)
+		frp {
+			() =>
+    		val func : Time => Occurrence[T] = {
+		      time =>
+		        val left = this.occs(time)
+		        val right = event.top(time).getOrElse(null)
 
-        if (left == null && right == null) {
-          null
-        }
+		        if (left == null && right == null) {
+		          null
+		        }
 
-        else if (left == null) {
-          right
-        }
+		        else if (left == null) {
+		          right
+		        }
 
-        else if (right == null) {
-          left
-        }
+		        else if (right == null) {
+		          left
+		        }
 
-        else if (left.time <= right.time) {
-          new Occurrence(right.time, right.value, left.num + right.num)
-        }
+		        else if (left.time <= right.time) {
+		          new Occurrence(right.time, right.value, left.num + right.num)
+		        }
 
-        else {
-          new Occurrence(left.time, left.value, left.num + right.num)
-        }
-    }
+		        else {
+		          new Occurrence(left.time, left.value, left.num + right.num)
+		        }
+		    }
     
-    new EventView(func)
+		    new EventView(func)
+		}
   }
   
   // echo utility functions

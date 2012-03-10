@@ -2,12 +2,16 @@ package com.github.oetzi.echo.test
 
 import org.specs._
 import com.github.oetzi.echo.Echo._
+import com.github.oetzi.echo.Control._
 import com.github.oetzi.echo.core.Behavior
 import com.github.oetzi.echo.test.help.TestEvent
 import com.github.oetzi.echo.types.Switcher
 
 
 object SwitcherSpec extends Specification {
+	
+	devMode()
+	
   "Switcher" should {
     "have an at" >> {
       "returning 'initial' if event hasn't occured" in {

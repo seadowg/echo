@@ -8,11 +8,13 @@ abstract class EchoApp {
 	
 	def main(args : Array[String]) {
 		writeLock.acquire()
+		createLock.acquire()
 		
 		freezeTime(now()) {
 			() => setup(args)
 		}
 		
 		writeLock.release()
+		createLock.release()
 	}
 }
