@@ -94,6 +94,8 @@ trait EventSource[T] extends Event[T] {
   protected def occur(value : T) {
     this synchronized {
 			writeLock synchronized {
+				while(!createLock.available) {}
+				
 				freezeTime(now()) {
 					() =>
 			  		length += 1
