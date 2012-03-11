@@ -6,9 +6,9 @@ import com.github.oetzi.echo.Control._
 import com.github.oetzi.echo.core._
 
 object EchoSpec extends Specification {
-	
-	devMode()
-	
+
+  devMode()
+
   "Echo" should {
     "allow values to lifted to constant Behaviours" in {
       val beh: Behavior[Int] = 5
@@ -19,30 +19,34 @@ object EchoSpec extends Specification {
       "that exectues the passed block" in {
         var done = false
 
-        freezeTime(0) { () =>
-          done = true
+        freezeTime(0) {
+          () =>
+            done = true
         }
 
         done mustBe true
       }
 
       "that freezes time during execution of its block" in {
-        val value = freezeTime(0) { () =>
-          now
+        val value = freezeTime(0) {
+          () =>
+            now()
         }
 
         value mustEqual 0
       }
 
-			"that allows nesting" in {
-				val value = freezeTime(0) { () =>
-					freezeTime(0) { () =>
-						now
-					}
+      "that allows nesting" in {
+        val value = freezeTime(0) {
+          () =>
+            freezeTime(0) {
+              () =>
+                now()
+            }
         }
 
         value mustEqual 0
-			}
+      }
     }
   }
 }

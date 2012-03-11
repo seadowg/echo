@@ -4,12 +4,12 @@ import help.TestEvent
 import org.specs._
 import com.github.oetzi.echo.Echo._
 import com.github.oetzi.echo.Control._
-import com.github.oetzi.echo.core.{Event, EventSource, Behavior}
+import com.github.oetzi.echo.core.Behavior
 
 object BehaviorSpec extends Specification {
-	
-	devMode()
-	
+
+  devMode()
+
   "Behavior" should {
     "create a new instance given a valid block" in {
       val beh = new Behavior(time => time)
@@ -38,10 +38,10 @@ object BehaviorSpec extends Specification {
         var beh = new Behavior(time => 5)
         val event = new TestEvent[Int]
         beh = beh.until(event, new Behavior(time => 10))
-        
+
         freezeTime(1) {
           () =>
-						 event.pubOccur(5)
+            event.pubOccur(5)
             beh.eval()
         }.mustEqual(10)
       }
@@ -66,9 +66,10 @@ object BehaviorSpec extends Specification {
       "returning a new Behavior with the current rule when the Event has occurred before the time" in {
         val beh = new Behavior(time => 5)
         val event = new TestEvent[Int]
-        
-        freezeTime(0) { () =>
-          event.pubOccur(0)
+
+        freezeTime(0) {
+          () =>
+            event.pubOccur(0)
         }
 
         freezeTime(1) {
@@ -84,7 +85,7 @@ object BehaviorSpec extends Specification {
 
         freezeTime(1) {
           () =>
-						event.pubOccur(0)
+            event.pubOccur(0)
             untilBeh.eval()
         }.mustBe(10)
       }
@@ -146,10 +147,11 @@ object BehaviorSpec extends Specification {
       "returning a new Behavior that uses the next rule when time >= only occurrence" in {
         val beh = new Behavior(time => 5)
 
-        val value = freezeTime(0) { () =>
-					val event = new TestEvent[Unit]
-					event.pubOccur(())
-          beh.toggle(event, new Behavior(time => 10)).eval
+        val value = freezeTime(0) {
+          () =>
+            val event = new TestEvent[Unit]
+            event.pubOccur(())
+            beh.toggle(event, new Behavior(time => 10)).eval()
         }
 
         value mustBe 10
@@ -161,34 +163,34 @@ object BehaviorSpec extends Specification {
 
         freezeTime(3) {
           () =>
-						event.pubOccur(())
-	          event.pubOccur(())
+            event.pubOccur(())
+            event.pubOccur(())
             beh.toggle(event, new Behavior(time => 10)).eval()
         }.mustBe(5)
       }
     }
 
-		"provide a sample function" >> {
-			"returning a new Event that is empty for an empty source" in {
-				val event = new TestEvent[Unit]
-				val beh = new Behavior(time => time)
-				
-				beh.sample(event).top(now()) mustBe None
-			}
-			
-			"returning an event that samples the Behaviour on occurrences" in {
-				val event = new TestEvent[Unit]
-				val beh = new Behavior(time => time)
-				val sampler = beh.sample(event)
-				
-				freezeTime(1) {
-					() =>
-						event.pubOccur(())
-				}
-				
-				sampler.top(now()).get.time mustEqual 1
-				sampler.top(now()).get.value mustEqual 1
-			}
-		}
+    "provide a sample function" >> {
+      "returning a new Event that is empty for an empty source" in {
+        val event = new TestEvent[Unit]
+        val beh = new Behavior(time => time)
+
+        beh.sample(event).top(now()) mustBe None
+      }
+
+      "returning an event that samples the Behaviour on occurrences" in {
+        val event = new TestEvent[Unit]
+        val beh = new Behavior(time => time)
+        val sampler = beh.sample(event)
+
+        freezeTime(1) {
+          () =>
+            event.pubOccur(())
+        }
+
+        sampler.top(now()).get.time mustEqual 1
+        sampler.top(now()).get.value mustEqual 1
+      }
+    }
   }
 }

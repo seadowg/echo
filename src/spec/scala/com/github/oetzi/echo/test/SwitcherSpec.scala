@@ -8,10 +8,10 @@ import com.github.oetzi.echo.test.help.TestEvent
 import com.github.oetzi.echo.types.Switcher
 
 
-object switcherSpec extends Specification {
-	
-	devMode()
-	
+object SwitcherSpec extends Specification {
+
+  devMode()
+
   "Switcher" should {
     "have an at" >> {
       "returning 'initial' if event hasn't occured" in {
@@ -42,7 +42,9 @@ object switcherSpec extends Specification {
       "returning an events value if it has the max before time" in {
         val event = new TestEvent[Behavior[Int]]
 
-				freezeTime(5) { () => event.pubOccur(10) }
+        freezeTime(5) {
+          () => event.pubOccur(10)
+        }
 
         freezeTime(6) {
           () =>
