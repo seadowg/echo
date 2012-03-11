@@ -4,7 +4,7 @@ import help.TestEvent
 import org.specs._
 import com.github.oetzi.echo.Echo._
 import com.github.oetzi.echo.Control._
-import com.github.oetzi.echo.core.{Event, Behavior}
+import com.github.oetzi.echo.core.{Event, EventSource, Behavior}
 
 object BehaviorSpec extends Specification {
 	
@@ -167,5 +167,28 @@ object BehaviorSpec extends Specification {
         }.mustBe(5)
       }
     }
+
+		"provide a sample function" >> {
+			"returning a new Event that is empty for an empty source" in {
+				val event = new TestEvent[Unit]
+				val beh = new Behavior(time => time)
+				
+				beh.sample(event).top(now()) mustBe None
+			}
+			
+			"returning an event that samples the Behaviour on occurrences" in {
+				val event = new TestEvent[Unit]
+				val beh = new Behavior(time => time)
+				val sampler = beh.sample(event)
+				
+				freezeTime(1) {
+					() =>
+						event.pubOccur(())
+				}
+				
+				sampler.top(now()).get.time mustEqual 1
+				sampler.top(now()).get.value mustEqual 1
+			}
+		}
   }
 }

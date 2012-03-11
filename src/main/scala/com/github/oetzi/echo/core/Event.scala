@@ -7,7 +7,7 @@ import collection.mutable.ArrayBuffer
 
 trait Event[T] {
   protected def occs(time : Time) : Occurrence[T]
-	protected[echo] def hook(block : () => Unit)
+	protected[echo] def hook(block : Time => Unit)
 
   def map[U](func : T => U) : Event[U] = {
 		frp {
@@ -77,7 +77,7 @@ trait Event[T] {
 }
 
 trait EventSource[T] extends Event[T] {
-	private val hooks : ArrayBuffer[() => Unit] = new ArrayBuffer() 
+	val hooks : ArrayBuffer[Time => Unit] = new ArrayBuffer() 
   private var present : Occurrence[T] = null
   private var length : BigInt = 0
   
@@ -93,23 +93,22 @@ trait EventSource[T] extends Event[T] {
   
   protected def occur(value : T) {
     this synchronized {
-			writeLock.acquire()
-			
-			freezeTime(now()) {
-				() =>
-		  		length += 1
-	   			present = new Occurrence(now(), value, length)
+			writeLock synchronized {
+				freezeTime(now()) {
+					() =>
+			  		length += 1
+		   			present = new Occurrence(now(), value, length)
 
-					hooks.foreach {
-						hook => hook()
-					}
+						hooks.foreach {
+							block => block(present.time)
+
+						}
+				}
 			}
-			
-			writeLock.release()
     }
   }
 
-	protected[echo] def hook(block : () => Unit) {
+	protected[echo] def hook(block : Time => Unit) {
 		hooks += block
 	}
 }
@@ -120,7 +119,7 @@ protected class EventView[T, U](private val source : Time => Occurrence[T],
     source(time)
   }
 
-	protected[echo] def hook(block : () => Unit) {
+	protected[echo] def hook(block : Time => Unit) {
 		origin.hook(block)
 	}
 }

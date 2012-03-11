@@ -16,6 +16,16 @@ class Behavior[T](private val rule: Time => T) {
     rule(time)
   }
 
+	def sample[A](sourceEvent : Event[A]) : Event[T] = {
+		val source = new EventSource[T] {
+			sourceEvent.hook {
+				time => occur(Behavior.this.at(time))
+			}
+		}
+		
+		source.event
+	}
+
   def until[A](event: Event[A], behavior: Behavior[T]): Behavior[T] = {
 		frp {
 			() =>

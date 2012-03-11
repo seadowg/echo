@@ -7,14 +7,14 @@ abstract class EchoApp {
 	def setup(args : Array[String])
 	
 	def main(args : Array[String]) {
-		writeLock.acquire()
-		createLock.acquire()
+		writeLock synchronized {
+			createLock.acquire()
 		
-		freezeTime(now()) {
-			() => setup(args)
+			freezeTime(now()) {
+				() => setup(args)
+			}
+		
+			createLock.release()
 		}
-		
-		writeLock.release()
-		createLock.release()
 	}
 }
