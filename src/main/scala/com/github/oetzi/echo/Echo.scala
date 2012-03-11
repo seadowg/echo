@@ -7,6 +7,11 @@ import java.lang.IllegalAccessException
 object Echo {
   private var fake = 0
   private var fakeTime : Time = 0
+	private var startTime : Time = 0
+	
+	private[echo] def startClock() {
+		startTime = System.nanoTime()
+	}
   
   private def useRealTime() {
     this.fake -= 1
@@ -27,7 +32,7 @@ object Echo {
     }
 
     else {
-      System.currentTimeMillis
+      System.nanoTime() - startTime
     }
   }
   

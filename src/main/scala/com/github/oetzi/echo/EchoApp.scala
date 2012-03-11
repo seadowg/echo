@@ -10,11 +10,12 @@ abstract class EchoApp {
 		writeLock synchronized {
 			createLock.acquire()
 		
-			freezeTime(now()) {
+			freezeTime(0) {
 				() => setup(args)
 			}
-		
+			
 			createLock.release()
+			startClock()
 		}
 	}
 }
