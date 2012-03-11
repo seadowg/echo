@@ -42,7 +42,7 @@ class Frame private(private val visibleBeh: Behavior[Boolean]) extends Canvas {
         }
 
         def mouseMoved(event: MouseEvent) {
-          occur(event.getWhen, event.getPoint)
+          occur(event.getPoint)
         }
       }
       

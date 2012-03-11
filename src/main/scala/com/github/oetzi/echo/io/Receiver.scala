@@ -23,7 +23,7 @@ class Receiver private (val port: Int, val reply : String => Behavior[String]) e
             val out = new PrintWriter(request.getOutputStream(), true)
 
             val message = in.readLine()
-            Receiver.this.occur(now(), message)
+            Receiver.this.occur(message)
             out.println(reply(message).eval())
 
             out.close()

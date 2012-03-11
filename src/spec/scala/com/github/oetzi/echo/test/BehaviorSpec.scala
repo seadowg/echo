@@ -39,28 +39,11 @@ object BehaviorSpec extends Specification {
         val event = new TestEvent[Int]
         beh = beh.until(event, new Behavior(time => 10))
         
-        freezeTime(0) { () =>
-          event.pubOccur(1, 5)
-        }
-        
         freezeTime(1) {
           () =>
+						 event.pubOccur(5)
             beh.eval()
         }.mustEqual(10)
-      }
-
-      "returning a Behavior thats rule only 'changes' if the time is after the event" in {
-        val event = new TestEvent[Int]
-        val beh = new Behavior(time => 5).until(event, new Behavior(time => 10))
-
-        freezeTime(0) { () =>
-          event.pubOccur(2, 5)
-        }
-
-        freezeTime(1) {
-          () =>
-            beh.eval()
-        }.mustEqual(5)
       }
     }
 
@@ -85,7 +68,7 @@ object BehaviorSpec extends Specification {
         val event = new TestEvent[Int]
         
         freezeTime(0) { () =>
-          event.pubOccur(0L, 0)
+          event.pubOccur(0)
         }
 
         freezeTime(1) {
@@ -99,28 +82,11 @@ object BehaviorSpec extends Specification {
         val event = new TestEvent[Int]
         val untilBeh = beh.until(1L, event, new Behavior(time => 10))
 
-        freezeTime(0) { () =>
-          event.pubOccur(1L, 0)
-        }
-
         freezeTime(1) {
           () =>
+						event.pubOccur(0)
             untilBeh.eval()
         }.mustBe(10)
-      }
-
-      "returning a Behavior thats rule only 'changes' if the time is after the event" in {
-        val event = new TestEvent[Int]
-        val beh = new Behavior(time => 5).until(1L, event, new Behavior(time => 10))
-
-        freezeTime(0) { () =>
-          event.pubOccur(2L, 5)
-        }
-
-        freezeTime(1) {
-          () =>
-            beh.eval()
-        }.mustBe(5)
       }
     }
 
@@ -176,53 +142,27 @@ object BehaviorSpec extends Specification {
             beh.toggle(new TestEvent[Unit], new Behavior(time => 10)).eval()
         }.mustBe(5)
       }
-      
-      "returning a new Behavior that uses the original rule when time < first occurrence" in {
-        val beh = new Behavior(time => 5)
-
-        val value = freezeTime(0) { () =>
-          beh.toggle(Event(1, ()), new Behavior(time => 10)).eval()
-        }
-
-        value mustBe 5
-      }
 
       "returning a new Behavior that uses the next rule when time >= only occurrence" in {
         val beh = new Behavior(time => 5)
 
         val value = freezeTime(0) { () =>
-          beh.toggle(Event(1, ()), new Behavior(time => 10)).eval
+					val event = new TestEvent[Unit]
+					event.pubOccur(())
+          beh.toggle(event, new Behavior(time => 10)).eval
         }
 
-        value mustBe 5
-      }
-      
-      "returning a new Behavior that uses the next rule when time >= first but < second occurrence" in {
-        val beh = new Behavior(time => 5)
-        val event = new TestEvent[Unit]
-        
-        freezeTime(0) { () =>
-          event.pubOccur(1, ())
-          event.pubOccur(3, ())  
-        }
-
-        freezeTime(2) {
-          () =>
-            beh.toggle(event, new Behavior(time => 10)).eval()
-        }.mustBe(10)
+        value mustBe 10
       }
 
       "returning a new Behavior that uses the first rule when time >= second (only two)" in {
         val beh = new Behavior(time => 5)
         val event = new TestEvent[Unit]
-        
-        freezeTime(0) { () =>
-          event.pubOccur(1, ())
-          event.pubOccur(3, ())
-        }
 
         freezeTime(3) {
           () =>
+						event.pubOccur(())
+	          event.pubOccur(())
             beh.toggle(event, new Behavior(time => 10)).eval()
         }.mustBe(5)
       }

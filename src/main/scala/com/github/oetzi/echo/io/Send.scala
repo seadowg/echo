@@ -26,7 +26,7 @@ class Send private (val ip: String, val port: Int, message : String) extends Eve
           
           out.println(message)
           val reply = in.readLine()
-          Send.this.occur(now(), reply)
+          Send.this.occur(reply)
           
           out.close()
           in.close()

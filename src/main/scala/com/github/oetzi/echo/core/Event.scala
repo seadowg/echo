@@ -77,7 +77,6 @@ trait Event[T] {
 }
 
 trait EventSource[T] extends Event[T] {
-  private val future : Queue[Occurrence[T]] = new Queue[Occurrence[T]]()
 	private val hooks : ArrayBuffer[() => Unit] = new ArrayBuffer() 
   private var present : Occurrence[T] = null
   private var length : BigInt = 0
@@ -88,33 +87,16 @@ trait EventSource[T] extends Event[T] {
   
   protected def occs(time : Time) : Occurrence[T] = {
     this synchronized {
-      if (!future.isEmpty) {
-        var head = future.headOption
-        
-        while (head != None && future.head.time <= time) {
-          present = future.dequeue()
-          head = future.headOption
-        }
-      }
-      
       present
     }
   }
   
-  protected def occur(time : Time, value : T) {
+  protected def occur(value : T) {
     this synchronized {
 			while (!writeLock.available) {}
 			
-			val nowCache = now()
 		  length += 1
-   
-     	if (time < nowCache) {
-	       future += new Occurrence(nowCache, value, length)
-	     }
-
-	     else {
-	       future += new Occurrence(time, value, length)
-	     }
+   		present = new Occurrence(now(), value, length)
 
 			hooks.foreach {
 				hook => hook()
@@ -141,15 +123,5 @@ protected class EventView[T, U](private val source : Time => Occurrence[T],
 class Occurrence[T](val time: Time, val value: T, val num : BigInt) {
   def map[U](func : T => U) : Occurrence[U] = {
     new Occurrence(time, func(value), num)
-  }
-}
-
-object Event {
-  def apply[T](time : Time, value : T) : Event[T] = {
-    val source = new EventSource[T] {
-      occur(time, value)
-    }
-    
-    source.event()
   }
 }

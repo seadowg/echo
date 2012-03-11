@@ -11,7 +11,7 @@ class Slider private() extends Canvas {
   val internal: JSlider = new JSlider() with EventSource[Int] {
     this.addChangeListener(new ChangeListener() {
       def stateChanged(e: ChangeEvent) {
-        occur(now, internal.getValue)
+        occur(internal.getValue)
       }
     })
 

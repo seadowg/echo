@@ -13,7 +13,7 @@ trait Breakable {
 
       catch {
         case e: Exception => {
-          this.occur(now, e)
+          this.occur(e)
           None
         }
       }
