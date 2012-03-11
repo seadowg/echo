@@ -93,14 +93,19 @@ trait EventSource[T] extends Event[T] {
   
   protected def occur(value : T) {
     this synchronized {
-			while (!writeLock.available) {}
+			writeLock.acquire()
 			
-		  length += 1
-   		present = new Occurrence(now(), value, length)
+			freezeTime(now()) {
+				() =>
+		  		length += 1
+	   			present = new Occurrence(now(), value, length)
 
-			hooks.foreach {
-				hook => hook()
+					hooks.foreach {
+						hook => hook()
+					}
 			}
+			
+			writeLock.release()
     }
   }
 
