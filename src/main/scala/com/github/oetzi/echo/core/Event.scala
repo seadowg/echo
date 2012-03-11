@@ -106,22 +106,18 @@ trait EventSource[T] extends Event[T] {
 			while (!writeLock.available) {}
 			
 			val nowCache = now()
-			
-			freezeTime(nowCache) {
-				() =>
-		      length += 1
-      
-		      if (time < nowCache) {
-		        future += new Occurrence(nowCache, value, length)
-		      }
+		  length += 1
+   
+     	if (time < nowCache) {
+	       future += new Occurrence(nowCache, value, length)
+	     }
 
-		      else {
-		        future += new Occurrence(time, value, length)
-		      }
-		
-					hooks.foreach {
-						hook => hook()
-					}
+	     else {
+	       future += new Occurrence(time, value, length)
+	     }
+
+			hooks.foreach {
+				hook => hook()
 			}
     }
   }
