@@ -9,6 +9,20 @@ object Echo {
   private var fakeTime : Time = 0
 	private var startTime : Time = 0
 	
+	def now() : Time = {
+    if (this.fake > 0) {
+      this.fakeTime
+    }
+
+    else {
+      System.nanoTime() - startTime
+    }
+  }
+
+	implicit def lift[T](value: T): Behavior[T] = new Constant(value)
+
+  type Time = Double
+	
 	private[echo] def startClock() {
 		startTime = System.nanoTime()
 	}
@@ -21,22 +35,8 @@ object Echo {
     this.fake += 1
     this.fakeTime = time
   }
-
-  implicit def lift[T](value: T): Behavior[T] = new Constant(value)
-
-  type Time = Double
-
-  def now() : Time = {
-    if (this.fake > 0) {
-      this.fakeTime
-    }
-
-    else {
-      System.nanoTime() - startTime
-    }
-  }
   
-  def freezeTime[T](time : Time)(block : () => T) : T = {
+  private[echo] def freezeTime[T](time : Time)(block : () => T) : T = {
     this.setTime(time)
     val returnValue = block()
     this.useRealTime()
