@@ -5,8 +5,7 @@ import java.util.{TimerTask, Timer}
 import javax.swing.{BoxLayout, JFrame}
 import java.awt.event.{MouseEvent, MouseMotionListener}
 import java.awt.Point
-import com.github.oetzi.echo.core.{EventSource, Occurrence, Behavior}
-import com.github.oetzi.echo.types.Stepper
+import com.github.oetzi.echo.core.{Stepper, EventSource, Occurrence, Behavior}
 
 class Frame private(private val visibleBeh: Behavior[Boolean]) extends Canvas {
   private var components: List[Canvas] = List[Canvas]()

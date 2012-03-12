@@ -3,9 +3,8 @@ package com.github.oetzi.echo.test
 import org.specs._
 import com.github.oetzi.echo.Echo._
 import com.github.oetzi.echo.Control._
-import com.github.oetzi.echo.core.Behavior
 import com.github.oetzi.echo.test.help.TestEvent
-import com.github.oetzi.echo.types.Switcher
+import com.github.oetzi.echo.core.{Switcher, Behavior}
 
 
 object SwitcherSpec extends Specification {

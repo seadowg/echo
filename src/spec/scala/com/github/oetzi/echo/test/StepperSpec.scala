@@ -4,7 +4,7 @@ import help.TestEvent
 import org.specs._
 import com.github.oetzi.echo.Echo._
 import com.github.oetzi.echo.Control._
-import com.github.oetzi.echo.types.Stepper
+import com.github.oetzi.echo.core.Stepper
 
 object StepperSpec extends Specification {
 	

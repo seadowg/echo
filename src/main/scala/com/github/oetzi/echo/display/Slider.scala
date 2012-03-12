@@ -1,9 +1,8 @@
 package com.github.oetzi.echo.display
 
-import com.github.oetzi.echo.types.Stepper
+import com.github.oetzi.echo.core._
 import javax.swing.event.{ChangeEvent, ChangeListener}
 import javax.swing.JSlider
-import com.github.oetzi.echo.core.{EventSource, Behavior, Occurrence}
 import com.github.oetzi.echo.Echo._
 
 

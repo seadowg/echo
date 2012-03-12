@@ -1,4 +1,4 @@
-package com.github.oetzi.echo.types
+package com.github.oetzi.echo.core
 
 import com.github.oetzi.echo.core._
 import com.github.oetzi.echo.Echo._
@@ -8,20 +8,19 @@ class Stepper[T](initial: T, val event: Event[T]) extends Behavior[T](Stepper.co
 
 object Stepper {
   private def construct[T](initial: T, event: Event[T]): Time => T = {
-		frp {
-			() =>
-    		{
-		      time =>
-		        val occ = event.top(time)
+    frp {
+      () => {
+        time =>
+          val occ = event.top(time)
 
-		        if (occ == None) {
-		          initial
-		        }
+          if (occ == None) {
+            initial
+          }
 
-		        else {
-		          occ.get.value
-		        }
-		    }
-		}
+          else {
+            occ.get.value
+          }
+      }
+    }
   }
 }
