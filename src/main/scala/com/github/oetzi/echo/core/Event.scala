@@ -7,7 +7,7 @@ import collection.mutable.ArrayBuffer
 
 trait Event[T] {
   protected def occs(time : Time) : Occurrence[T]
-	protected[echo] def hook(block : Time => Unit)
+	protected[echo] def hook(block : Occurrence[T] => Unit)
 
   def map[U](func : T => U) : Event[U] = {
 		frp {
@@ -24,8 +24,22 @@ trait Event[T] {
 		          occs(time).map(func)
 		        }
 		    }
+		
+				val jsThisTrick = this
     
-		    new EventView(mapFun, this)
+		    new Event[U] {
+					protected def occs(time : Time) : Occurrence[U] = {
+						mapFun(time)
+					}
+					
+					protected[echo] def hook(block : Occurrence[U] => Unit) {
+						val mapBlock : Occurrence[T] => Unit = {
+							occ => block(occ.map(func))
+						}
+						
+						jsThisTrick.hook(mapBlock)
+					}
+				}
 		}
   }
   
@@ -57,8 +71,19 @@ trait Event[T] {
 		          new Occurrence(left.time, left.value, left.num + right.num)
 		        }
 		    }
+		
+				val jsThisTrick = this
     
-		    new EventView(func, this)
+		    new Event[T] {
+					protected def occs(time : Time) : Occurrence[T] = {
+						func(time)
+					}
+					
+					protected[echo] def hook(block : Occurrence[T] => Unit) {
+						jsThisTrick.hook(block)
+						event.hook(block)
+					}
+				}
 		}
   }
   
@@ -77,12 +102,22 @@ trait Event[T] {
 }
 
 trait EventSource[T] extends Event[T] {
-	val hooks : ArrayBuffer[Time => Unit] = new ArrayBuffer() 
+	val hooks : ArrayBuffer[Occurrence[T] => Unit] = new ArrayBuffer() 
   private var present : Occurrence[T] = null
   private var length : BigInt = 0
   
   def event() : Event[T] = {
-    new EventView(time => occs(time), this)
+		val jsThisTrick = this
+		
+    new Event[T] {
+			protected def occs(time : Time) : Occurrence[T] = {
+				jsThisTrick.occs(time)
+			}
+			
+			protected[echo] def hook(block : Occurrence[T] => Unit) {
+				jsThisTrick.hook(block)
+			}
+		}
   }
   
   protected def occs(time : Time) : Occurrence[T] = {
@@ -102,27 +137,15 @@ trait EventSource[T] extends Event[T] {
 		   			present = new Occurrence(now(), value, length)
 
 						hooks.foreach {
-							block => block(present.time)
-
+							block => block(present)
 						}
 				}
 			}
     }
   }
 
-	protected[echo] def hook(block : Time => Unit) {
+	protected[echo] def hook(block :	Occurrence[T] => Unit) {
 		hooks += block
-	}
-}
-
-protected class EventView[T, U](private val source : Time => Occurrence[T], 
-	private val origin : Event[U]) extends Event[T] {
-  protected def occs(time : Time) : Occurrence[T] = {
-    source(time)
-  }
-
-	protected[echo] def hook(block : Time => Unit) {
-		origin.hook(block)
 	}
 }
 

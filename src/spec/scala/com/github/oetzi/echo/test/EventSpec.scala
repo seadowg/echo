@@ -3,6 +3,7 @@ package com.github.oetzi.echo.test
 import help.TestEvent
 import com.github.oetzi.echo.Echo._
 import com.github.oetzi.echo.Control._
+import com.github.oetzi.echo.core.Occurrence
 
 import org.specs._
 
@@ -35,6 +36,15 @@ object EventSpec extends Specification {
       test.top(now()).get.num mustEqual 1
     }
 
+		"executes hooked blocks when it occurs" in {
+			val event = new TestEvent[Int]
+			var passed : Occurrence[Int] = null
+			event.hook(occ => passed = occ)
+			
+			event.pubOccur(5)
+			passed.value mustEqual 5
+		}
+
     "have a map function" >> {
       "returning a mapped version of the Event" in {
         val event = new TestEvent[Int]
@@ -50,6 +60,16 @@ object EventSpec extends Specification {
 
         map.top(now()).get.value mustEqual 2
       }
+
+			"that executes hooks with a mapped occurrence" in {
+				val event = new TestEvent[Int]
+				val map = event.map(v => v * 5)
+				var passed : Occurrence[Int] = null
+				map.hook(occ => passed = occ)
+
+				event.pubOccur(5)
+				passed.value mustEqual 25
+			}
     }
 
     "have a merge function" >> {
@@ -118,6 +138,21 @@ object EventSpec extends Specification {
 
         left.merge(right).top(now()).get.value mustEqual 6
       }
+
+			"that executes hooks when either event occurs" in {
+				val left = new TestEvent[Int]
+				val right = new TestEvent[Int]
+				val merge = left.merge(right)
+				
+				var passed : Occurrence[Int] = null
+				merge.hook(occ => passed = occ)
+
+				left.pubOccur(5)
+				passed.value mustEqual 5
+				
+				right.pubOccur(6)
+				passed.value mustEqual 6
+			}
     }
   }
 }

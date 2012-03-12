@@ -25,7 +25,7 @@ class Behavior[T](private val rule: Time => T) {
   def sample[A](sourceEvent: Event[A]): Event[T] = {
     val source = new EventSource[T] {
       sourceEvent.hook {
-        time => occur(Behavior.this.at(time))
+        occ => occur(Behavior.this.at(occ.time))
       }
     }
 

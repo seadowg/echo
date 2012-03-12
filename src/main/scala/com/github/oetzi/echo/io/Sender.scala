@@ -1,14 +1,16 @@
 package com.github.oetzi.echo.io
 
 import actors.Actor
-import com.github.oetzi.echo.core.EventSource
+import com.github.oetzi.echo.core._
 import com.github.oetzi.echo.Echo._
 import java.io.{InputStreamReader, BufferedReader, PrintWriter}
 
-class Send private (val ip: String, val port: Int, message : String) extends EventSource[String]
+class Sender private (val ip: String, val port: Int, val messages : Event[String]) extends EventSource[String]
   with Breakable {
   val sender = SenderActor.start()
-  sender ! message
+	messages.hook {
+		occ => sender ! occ.value
+	}
 
   private object SenderActor extends Actor {
     def act {
@@ -26,7 +28,6 @@ class Send private (val ip: String, val port: Int, message : String) extends Eve
           
           out.println(message)
           val reply = in.readLine()
-          Send.this.occur(reply)
           
           out.close()
           in.close()
@@ -37,8 +38,8 @@ class Send private (val ip: String, val port: Int, message : String) extends Eve
   }
 }
 
-object Send {
-  def apply(ip : String, port : Int, message : String) : Send = {
-    new Send(ip, port, message)
+object Sender {
+  def apply(ip : String, port : Int, messages : Event[String]) : Sender = {
+    new Sender(ip, port, messages)
   }
 }
