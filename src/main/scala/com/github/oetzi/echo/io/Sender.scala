@@ -28,11 +28,11 @@ class Sender private (val ip: String, val port: Int, val messages : Event[String
           
           out.println(message)
           val reply = in.readLine()
+					Sender.this.occur(reply)
           
           out.close()
           in.close()
           socket.close()
-          this.exit()
       }
     }
   }
