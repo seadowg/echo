@@ -9,7 +9,7 @@ class Button private() extends Canvas {
   protected[echo] val internal: JButton = new JButton() with EventSource[Unit] {
     this.addActionListener(new ActionListener() {
       def actionPerformed(event: ActionEvent) {
-        occur(event.getWhen, ())
+        occur(())
       }
     })
 
