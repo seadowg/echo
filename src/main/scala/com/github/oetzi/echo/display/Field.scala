@@ -1,16 +1,20 @@
 package com.github.oetzi.echo.display
 
 import com.github.oetzi.echo.Echo._
-import java.awt.event.{ActionEvent, ActionListener}
 import javax.swing.JTextField
 import com.github.oetzi.echo.core.{Behavior, Stepper, EventSource}
+import java.awt.event.{KeyEvent, KeyListener, ActionEvent, ActionListener}
 
-class Field private() {
+class Field private() extends Canvas {
   protected[echo] val internal = new JTextField with EventSource[String] {
-    this.addActionListener(new ActionListener() {
-      def actionPerformed(event: ActionEvent) {
+    this.addKeyListener(new KeyListener() {
+      def keyReleased(e : KeyEvent) {
         occur(getText())
       }
+
+      def keyPressed(e : KeyEvent) { }
+
+      def keyTyped(e : KeyEvent) { }
     })
 
     override def repaint() {
@@ -35,7 +39,7 @@ class Field private() {
 }
 
 object Field {
-  def apply() {
+  def apply() : Field = {
     new Field()
   }
 }

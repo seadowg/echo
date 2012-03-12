@@ -1,4 +1,5 @@
-\documentclass{article}
+\documentclass[12pt]{article}
+\usepackage{minted}
 
 \title{Implementing Functional Reactive Programming in Scala}
 \author{Callum Stott - 0832894}
@@ -6,6 +7,13 @@
 \begin{document}
   % Title page
   \maketitle
+  \paragraph*{Abstract}
+  Lorem ipsum
+  
+  % Acknowledgments
+  \newpage
+  \section*{Acknowledgments}
+    Lorem ipsum
   
   % Contents
   \newpage
@@ -14,78 +22,142 @@
   % Start of report
   \newpage
   
-  \section*{Abstract}
-  Lorem ipsum
   \section{Introduction}
   Lorem ipsum
   \section{Functional Reactive Programming}
-  Lorem ipsum
     \subsection{Origins}
-    Lorem ipsum
+      Functional Reactive Programming was originally proposed in the 1997 paper \emph{Functional
+      Reactive Animation} by Conal Elliott and Paul Hudak. In this paper Elliott and Hudak
+      set forth a ``collection of data types and function'' designed for creating interactive 
+      animations. Further work has been carried out in both the semantics and implementation
+      of FRP with Elliott and Hudak remaining pivotal figures in a growing community of researchers
+      and developers.
+      
     \subsection{Semantics}
-    Lorem ipsum
-      \subsubsection{Semantic Domain}
-      Lorem ipsum
-      \subsubsection{Semantic Functions}
-      Lorem ipsum
-      \subsubsection{Behaviors}
-      Lorem ipsum
-      \subsubsection{Events}
-      Lorem ipsum
-    \subsection{Reactivity}
-    Lorem ipsum
+      The ideas in FRA and in following FRP work are based around two key data types: 
+      \emph{Behaviors} and \emph{Events}. This paper will deal with the \emph{classic} flavour of
+      FRP (that descended directly from FRAN) and so will not deal with \emph{signals} and Arrow FRP
+      concepts explored elsewhere. Here the semantics of the FRP explored in this report will be defined.
+    
+      \subsubsection{Types}
+        \paragraph{Behavior}
+          % Behavior data type
+          % at function
+        
+        \paragraph{Event}
+          % Event data type
+          % occs function
+         
+      \subsubsection{Operations}
+        \paragraph{Behaviors}
+          Lorem ipsum
+          
+        \paragraph{Events}
+          Lorem ipsum
+          
+        \paragraph{Reactivity}
+          Lorem ipsum
+          
   \section{Problems and Caveats}
-    Lorem ipsum
+    FRP presents some subtle semantic problems and caveats that are not always immediately obvious.
+    They will be explored here in an attempt to aid the reader's understanding.
+     
     \subsection{Monotonicity}
     Lorem ipsum
-    \subsection{Interactive Behavior}
+    
+    \subsection{Interactive Behaviors}
     Lorem ipsum
+    
   \section{Implementation in Scala}
-    Lorem ipsum
+    As stated earlier this project dealt with implementing a framework for utilising FRP in the Scala programming
+    language. This framework was dubbed `echo'. This section will explore the motivations and problems ahead of
+    and also the choices made and results rendered during the implementation of \emph{echo}.
+    
     \subsection{Scala}
-    Lorem ipsum
+      Scala is a multi-paradigm programming language that runs on the Java Virtual Machine. Scala programs are
+      generally structured in an object oriented programming style like Java but it also incorporates many features of
+      functional languages such as closures, high order functions, lazy initialisation and currying. These features aid
+      implementation of FRP concepts as closures will allow for Behaviour definition and functions such as map on
+      Behaviors and Events to be expressed in a more natural and succinct form. It is
+      important to note that although Scala is thought of as `functional' its functions are not `pure'. This means
+      that object functions and closures can cause side effects and be altered by external states.
+      
+      Scala also possesses a advanced, powerful and feature rich static type system. A few of these provide large
+      advantages when implementing FRP. Firstly, Scala supports generic classes and it can be quite easily seen
+      that both Behaviors and Events will rely on this feature for type safety. Scala additionally provides
+      a rather unique type conversion functionality that allows types to be converted on the fly. This provides
+      incredibly expressive and powerful ways to embed FRP into Scala and will be explored later.
+      
     \subsection{Problems}
-    Lorem ipsum
+      % Impurity - we just have to deal with it (lots of Scala is like this)
+    
     \subsection{Design Choices}
-    Lorem ipsum
+    Throughout its history FRP implementations have generally been carried out in Haskell. Due to the movement
+    in setting and also in an effort to create a efficient implementation without sacrificing FRP's expressive power
+    several design choices were made. 
+    
       \subsubsection{Encapsulation}
       Lorem ipsum
+      
       \subsubsection{Time Travel is Dangerous}
       Lorem ipsum
+      
       \subsubsection{Function Renaming}
       Lorem ipsum
+      
       \subsubsection{Flat Time}
       Lorem ipsum
+      
       \subsubsection{Extendability}
+      It was decided form the initial stages of the project that \emph{echo} should provide
+      a way for users to create their own FRP abstractions. Effort throughout the design and
+      implementation was put into this feature.
+      
+      \subsubsection{Initial Setup Phase}
       Lorem ipsum
+      
     \subsection{Implementation Choices}
       Lorem ipsum
+      
       \subsubsection{Push vs Pull}
       Lorem ipsum
+      
   \section{Additional Work}
-    Lorem ipsum
+    Besides creating a framework for the core FRP concepts additional efforts
+    were put towards creating FRP friendly abstractions for creating non-trivial user facing
+    applications.
+    
     \subsection{UI Framework}
     Lorem ipsum
+    
     \subsection{IO Framework}
     Lorem ipsum
+    
   \section{Uses of FRP}
   Lorem ipsum
+  
     \subsection{Demo Applications}
     Lorem ipsum
+    
     \subsection{Use in the Wild}
     Lorem ipsum
+    
     \subsection{Possible Large Scale Use}
     Lorem ipsum
+    
   \section{Limitations}
     Lorem ipsum
+    
     \subsection{Need for Abstraction}
     Lorem ipsum
+    
     \subsection{Learning Curve}
     Lorem ipsum
+    
     \subsection{Where to Stop}
     Lorem ipsum
+    
   \section{Conclusion}
   Lorem ipsum
-  \section{Acknowledgments}
-  Lorem ipsum
+  
 \end{document}
