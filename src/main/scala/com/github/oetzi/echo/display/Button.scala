@@ -6,7 +6,7 @@ import com.github.oetzi.echo.Echo._
 import java.awt.event.{ActionEvent, ActionListener}
 
 class Button private() extends Canvas {
-  val internal: JButton = new JButton() with EventSource[Unit] {
+  protected[echo] val internal: JButton = new JButton() with EventSource[Unit] {
     this.addActionListener(new ActionListener() {
       def actionPerformed(event: ActionEvent) {
         occur(event.getWhen, ())

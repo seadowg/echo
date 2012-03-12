@@ -6,7 +6,7 @@ package com.github.oetzi.echo.display {
 import java.awt.Component
 
 trait Canvas {
-  val internal: Component
+  protected[echo] val internal: Component
 
   protected var widthBeh: Behavior[Int] = new Behavior(t => this.internal.getWidth)
   protected var heightBeh: Behavior[Int] = new Behavior(t => this.internal.getHeight)

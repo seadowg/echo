@@ -8,7 +8,7 @@ import com.github.oetzi.echo.core.{Behavior, Occurrence}
 class Block private() extends Canvas {
   private var components: List[Canvas] = List[Canvas]()
 
-  val internal: JPanel = new JPanel() {
+  protected[echo] val internal: JPanel = new JPanel() {
     override def repaint() {
       Block.this.update(now())
       super.repaint()

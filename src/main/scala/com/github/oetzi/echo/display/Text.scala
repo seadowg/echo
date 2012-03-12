@@ -5,7 +5,7 @@ import com.github.oetzi.echo.core.{Behavior, Occurrence}
 import com.github.oetzi.echo.Echo._
 
 class Text private(private val textBeh : Behavior[String]) extends Canvas {
-  val internal : JLabel = new JLabel() {
+  protected[echo] val internal : JLabel = new JLabel() {
     override def repaint() {
       Text.this.update(now())
       super.repaint()

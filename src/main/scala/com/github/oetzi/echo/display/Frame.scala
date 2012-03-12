@@ -10,7 +10,7 @@ import com.github.oetzi.echo.core.{Stepper, EventSource, Occurrence, Behavior}
 class Frame private(private val visibleBeh: Behavior[Boolean]) extends Canvas {
   private var components: List[Canvas] = List[Canvas]()
 
-  val internal: JFrame = new JFrame() {
+  protected[echo] val internal: JFrame = new JFrame() {
     setLocationRelativeTo(null)
 
     override def repaint() {
@@ -41,7 +41,7 @@ class Frame private(private val visibleBeh: Behavior[Boolean]) extends Canvas {
   private val mouseBeh: Behavior[Point] = new Stepper(new Point(0, 0), mouseListener)
 
   def mouse(): Behavior[Point] = {
-    if (this.getMouseMotionListeners().length < 1) {
+    if (this.internal.getMouseMotionListeners().length < 1) {
       this.internal.addMouseMotionListener(mouseListener)
     }
 

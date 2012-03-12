@@ -7,7 +7,7 @@ import com.github.oetzi.echo.Echo._
 
 
 class Slider private() extends Canvas {
-  val internal: JSlider = new JSlider() with EventSource[Int] {
+  protected[echo] val internal: JSlider = new JSlider() with EventSource[Int] {
     this.addChangeListener(new ChangeListener() {
       def stateChanged(e: ChangeEvent) {
         occur(internal.getValue)
