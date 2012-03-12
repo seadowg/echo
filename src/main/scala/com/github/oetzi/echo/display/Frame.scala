@@ -31,21 +31,17 @@ class Frame private(private val visibleBeh: Behavior[Boolean]) extends Canvas {
     }, 0, 20)
   }
 
-  private var mouseBeh: Behavior[Point] = null
+  private val mouseListener = new MouseMotionListener with EventSource[Point] {
+    def mouseDragged(event: MouseEvent) { }
+
+    def mouseMoved(event: MouseEvent) {
+      occur(event.getPoint)
+    }
+  }
+  private val mouseBeh: Behavior[Point] = new Stepper(new Point(0, 0), mouseListener)
 
   def mouse(): Behavior[Point] = {
-    if (this.mouseBeh == null) {
-      val mouseListener = new MouseMotionListener with EventSource[Point] {
-        def mouseDragged(event: MouseEvent) {
-          //nothing  
-        }
-
-        def mouseMoved(event: MouseEvent) {
-          occur(event.getPoint)
-        }
-      }
-      
-      this.mouseBeh = new Stepper(new Point(0, 0), mouseListener)
+    if (this.getMouseMotionListeners().length < 1) {
       this.internal.addMouseMotionListener(mouseListener)
     }
 
