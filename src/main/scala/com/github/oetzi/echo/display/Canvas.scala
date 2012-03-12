@@ -1,15 +1,12 @@
+package com.github.oetzi.echo.display
+
 import com.github.oetzi.echo.core.Behavior
 import com.github.oetzi.echo.Echo._
-
-package com.github.oetzi.echo.display {
-
 import java.awt.Component
 
 trait Canvas {
-  protected[echo] val internal: Component
-
-  protected var widthBeh: Behavior[Int] = new Behavior(t => this.internal.getWidth)
-  protected var heightBeh: Behavior[Int] = new Behavior(t => this.internal.getHeight)
+  protected var widthBeh: Behavior[Int] = new Behavior(t => this.swingComponent.getWidth)
+  protected var heightBeh: Behavior[Int] = new Behavior(t => this.swingComponent.getHeight)
 
   def width(): Behavior[Int] = {
     this.widthBeh
@@ -19,9 +16,6 @@ trait Canvas {
     this.heightBeh
   }
 
-  def update(time : Time)
-
-  def draw(time : Time)
-}
-
+	protected[display] def swingComponent() : Component
+  protected[display] def draw()
 }

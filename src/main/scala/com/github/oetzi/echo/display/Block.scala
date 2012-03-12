@@ -3,6 +3,7 @@ package com.github.oetzi.echo.display
 import javax.swing.JPanel
 import com.github.oetzi.echo.Echo._
 import java.awt.Color
+import java.awt.Component
 import com.github.oetzi.echo.core.{Behavior, Occurrence}
 
 class Block private() extends Canvas {
@@ -10,7 +11,6 @@ class Block private() extends Canvas {
 
   protected[echo] val internal: JPanel = new JPanel() {
     override def repaint() {
-      Block.this.update(now())
       super.repaint()
     }
   }
@@ -21,14 +21,7 @@ class Block private() extends Canvas {
     colorBeh
   }
 
-  def update(time: Time) {
-    this.components.foreach {
-      canvas =>
-        canvas.update(time)
-    }
-  }
-
-  def draw(time: Time) {
+  protected[display] def draw() {
     this.internal.setSize(widthBeh.eval(), heightBeh.eval())
     this.internal.setBackground(colorBeh.eval())
 
@@ -36,9 +29,13 @@ class Block private() extends Canvas {
 
     this.components.foreach {
       canvas =>
-        canvas.draw(time)
+        canvas.draw()
     }
   }
+
+	protected[display] def swingComponent() : Component = {
+		internal
+	}
 }
 
 object Block {
@@ -52,7 +49,7 @@ object Block {
 
     components.foreach {
       component =>
-        block.internal.add(component.internal)
+        block.internal.add(component.swingComponent)
         block.components = block.components ++ List(component)
     }
 

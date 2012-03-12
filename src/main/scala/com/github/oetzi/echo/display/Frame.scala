@@ -5,40 +5,32 @@ import java.util.{TimerTask, Timer}
 import javax.swing.{BoxLayout, JFrame}
 import java.awt.event.{MouseEvent, MouseMotionListener}
 import java.awt.Point
+import java.awt.Component
 import com.github.oetzi.echo.core.{Stepper, EventSource, Occurrence, Behavior}
 
 class Frame private(private val visibleBeh: Behavior[Boolean]) extends Canvas {
   private var components: List[Canvas] = List[Canvas]()
+	private var lastVis = false
 
-  protected[echo] val internal: JFrame = new JFrame() {
+  private val internal: JFrame = new JFrame() {
     setLocationRelativeTo(null)
 
     override def repaint() {
-      Frame.this.update(now())
       super.repaint()
     }
   }
 
-  startClock()
-
-  def startClock() {
-    new Timer().schedule(new TimerTask() {
-      override def run() {
-        val time = now()
-        Frame.this.update(time)
-        Frame.this.draw(time)
-      }
-    }, 0, 20)
-  }
-
-  private val mouseListener = new MouseMotionListener with EventSource[Point] {
+	private val mouseListener = new MouseMotionListener with EventSource[Point] {
     def mouseDragged(event: MouseEvent) { }
 
     def mouseMoved(event: MouseEvent) {
       occur(event.getPoint)
     }
   }
+
   private val mouseBeh: Behavior[Point] = new Stepper(new Point(0, 0), mouseListener)
+
+  startClock()
 
   def mouse(): Behavior[Point] = {
     if (this.internal.getMouseMotionListeners().length < 1) {
@@ -52,16 +44,7 @@ class Frame private(private val visibleBeh: Behavior[Boolean]) extends Canvas {
     visibleBeh
   }
 
-  def update(time : Time) {
-    this.components.foreach {
-      canvas =>
-        canvas.update(time)
-    }
-  }
-
-  private var lastVis = false
-
-  def draw(time : Time) {
+  protected[display] def draw() {
     this.internal.setSize(widthBeh.eval(), heightBeh.eval())
 
     val vis = visibleBeh.eval()
@@ -74,8 +57,21 @@ class Frame private(private val visibleBeh: Behavior[Boolean]) extends Canvas {
 
     this.components.foreach {
       canvas =>
-        canvas.draw(time)
+        canvas.draw()
     }
+  }
+
+	protected[display] def swingComponent() : Component = {
+		internal
+	}
+
+	def startClock() {
+    new Timer().schedule(new TimerTask() {
+      override def run() {
+        val time = now()
+        Frame.this.draw()
+      }
+    }, 0, 20)
   }
 }
 
@@ -93,7 +89,7 @@ object Frame {
 
     components.foreach {
       component =>
-        frame.internal.getContentPane.add(component.internal)
+        frame.internal.getContentPane.add(component.swingComponent)
         frame.components = frame.components ++ List(component)
     }
 

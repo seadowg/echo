@@ -1,6 +1,7 @@
 package com.github.oetzi.echo.display
 
 import javax.swing.JButton
+import java.awt.Component
 import com.github.oetzi.echo.core.{Behavior, Event, EventSource}
 import com.github.oetzi.echo.Echo._
 import java.awt.event.{ActionEvent, ActionListener}
@@ -14,7 +15,6 @@ class Button private() extends Canvas {
     })
 
     override def repaint() {
-      Button.this.update(now())
       super.repaint()
     }
   }
@@ -27,16 +27,16 @@ class Button private() extends Canvas {
     this.textBeh
   }
 
-  def update(time: Time) {
-
-  }
-
-  def draw(time: Time) {
+  def draw() {
     this.internal.setSize(widthBeh.eval(), heightBeh.eval())
     this.internal.setText(textBeh.eval())
 
     this.internal.repaint()
   }
+
+	protected[display] def swingComponent() : Component = {
+		internal
+	}
 }
 
 object Button {
