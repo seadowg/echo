@@ -4,8 +4,8 @@ import com.github.oetzi.echo.Echo._
 import com.github.oetzi.echo.Control._
 
 class Behavior[T](private val rule: Time => T) {
-	var last : (Time, T) = null
-	
+  var last: (Time, T) = null
+
   def eval(): T = {
     readLock.acquire()
     val value = this.at(now())
@@ -15,11 +15,11 @@ class Behavior[T](private val rule: Time => T) {
   }
 
   protected[echo] def at(time: Time): T = {
-		if (last == null || time != last._1) {
-    	last = (time, rule(time))
-		}
-		
-		last._2
+    if (last == null || time != last._1) {
+      last = (time, rule(time))
+    }
+
+    last._2
   }
 
   def sample[A](sourceEvent: Event[A]): Event[T] = {

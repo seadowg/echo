@@ -4,7 +4,7 @@ import javax.swing.JPanel
 import com.github.oetzi.echo.Echo._
 import java.awt.Color
 import java.awt.Component
-import com.github.oetzi.echo.core.{Behavior, Occurrence}
+import com.github.oetzi.echo.core.Behavior
 
 class Block private() extends Canvas {
   private var components: List[Canvas] = List[Canvas]()
@@ -33,9 +33,9 @@ class Block private() extends Canvas {
     }
   }
 
-	protected[display] def swingComponent() : Component = {
-		internal
-	}
+  protected[display] def swingComponent(): Component = {
+    internal
+  }
 }
 
 object Block {
@@ -49,7 +49,7 @@ object Block {
 
     components.foreach {
       component =>
-        block.internal.add(component.swingComponent)
+        block.internal.add(component.swingComponent())
         block.components = block.components ++ List(component)
     }
 

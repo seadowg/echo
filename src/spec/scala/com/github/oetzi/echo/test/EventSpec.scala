@@ -36,14 +36,14 @@ object EventSpec extends Specification {
       test.top(now()).get.num mustEqual 1
     }
 
-		"executes hooked blocks when it occurs" in {
-			val event = new TestEvent[Int]
-			var passed : Occurrence[Int] = null
-			event.hook(occ => passed = occ)
-			
-			event.pubOccur(5)
-			passed.value mustEqual 5
-		}
+    "executes hooked blocks when it occurs" in {
+      val event = new TestEvent[Int]
+      var passed: Occurrence[Int] = null
+      event.hook(occ => passed = occ)
+
+      event.pubOccur(5)
+      passed.value mustEqual 5
+    }
 
     "have a map function" >> {
       "returning a mapped version of the Event" in {
@@ -61,15 +61,15 @@ object EventSpec extends Specification {
         map.top(now()).get.value mustEqual 2
       }
 
-			"that executes hooks with a mapped occurrence" in {
-				val event = new TestEvent[Int]
-				val map = event.map(v => v * 5)
-				var passed : Occurrence[Int] = null
-				map.hook(occ => passed = occ)
+      "that executes hooks with a mapped occurrence" in {
+        val event = new TestEvent[Int]
+        val map = event.map(v => v * 5)
+        var passed: Occurrence[Int] = null
+        map.hook(occ => passed = occ)
 
-				event.pubOccur(5)
-				passed.value mustEqual 25
-			}
+        event.pubOccur(5)
+        passed.value mustEqual 25
+      }
     }
 
     "have a merge function" >> {
@@ -139,100 +139,100 @@ object EventSpec extends Specification {
         left.merge(right).top(now()).get.value mustEqual 6
       }
 
-			"that executes hooks when either event occurs" in {
-				val left = new TestEvent[Int]
-				val right = new TestEvent[Int]
-				val merge = left.merge(right)
-				
-				var passed : Occurrence[Int] = null
-				merge.hook(occ => passed = occ)
+      "that executes hooks when either event occurs" in {
+        val left = new TestEvent[Int]
+        val right = new TestEvent[Int]
+        val merge = left.merge(right)
 
-				left.pubOccur(5)
-				passed.value mustEqual 5
-				
-				right.pubOccur(6)
-				passed.value mustEqual 6
-			}
+        var passed: Occurrence[Int] = null
+        merge.hook(occ => passed = occ)
+
+        left.pubOccur(5)
+        passed.value mustEqual 5
+
+        right.pubOccur(6)
+        passed.value mustEqual 6
+      }
     }
 
-		"have an Event.join function that" >> {
-			"returns an empty Event for empty Events" in {
-				val event = Event.join(new TestEvent[Event[Int]])
-				
-				event.top(now()) mustEqual None 
-			}
-			
-			"always has the newest occurrence from any occurred Event" in {
-				val source = new TestEvent[Event[Int]]
-				val event = Event.join(source)
-				
-				val occurSource1 = new TestEvent[Int]
-				val occurSource2 = new TestEvent[Int]
-				source.pubOccur(occurSource1)
-				source.pubOccur(occurSource2)
-				
-				occurSource2.pubOccur(5)
-				occurSource1.pubOccur(6)
-				
-				event.top(now).get.value mustEqual 6
-			}
-			
-			"uses right precedence if two occurrences from seperate events are equal" in {
-				val source = new TestEvent[Event[Int]]
-				val event = Event.join(source)
+    "have an Event.join function that" >> {
+      "returns an empty Event for empty Events" in {
+        val event = Event.join(new TestEvent[Event[Int]])
 
-				val occurSource1 = new TestEvent[Int]
-				val occurSource2 = new TestEvent[Int]
-				source.pubOccur(occurSource1)
-				source.pubOccur(occurSource2)
+        event.top(now()) mustEqual None
+      }
 
-				freezeTime (now()) {
-					() =>
-						occurSource2.pubOccur(7)
-						occurSource1.pubOccur(6)
-				}
+      "always has the newest occurrence from any occurred Event" in {
+        val source = new TestEvent[Event[Int]]
+        val event = Event.join(source)
 
-				event.top(now).get.value mustEqual 7
-			}
+        val occurSource1 = new TestEvent[Int]
+        val occurSource2 = new TestEvent[Int]
+        source.pubOccur(occurSource1)
+        source.pubOccur(occurSource2)
 
-			"it delays old occurrences in occuring Events" in {
-				val source = new TestEvent[Event[Int]]
-				val event = Event.join(source)
+        occurSource2.pubOccur(5)
+        occurSource1.pubOccur(6)
 
-				val occurSource1 = new TestEvent[Int]
+        event.top(now()).get.value mustEqual 6
+      }
 
-				freezeTime(1) {
-					() =>
-						occurSource1.pubOccur(5)
-				}
+      "uses right precedence if two occurrences from seperate events are equal" in {
+        val source = new TestEvent[Event[Int]]
+        val event = Event.join(source)
 
-				freezeTime(2) {
-					() =>
-						source.pubOccur(occurSource1)
-				}
+        val occurSource1 = new TestEvent[Int]
+        val occurSource2 = new TestEvent[Int]
+        source.pubOccur(occurSource1)
+        source.pubOccur(occurSource2)
 
-				event.top(now).get.time mustEqual	2
-			}
-			
-			"it should have correct length" in {
-				val source = new TestEvent[Event[Int]]
-				val event = Event.join(source)
+        freezeTime(now()) {
+          () =>
+            occurSource2.pubOccur(7)
+            occurSource1.pubOccur(6)
+        }
 
-				val occurSource1 = new TestEvent[Int]
-				val occurSource2 = new TestEvent[Int]
+        event.top(now()).get.value mustEqual 7
+      }
 
-				freezeTime(1) {
-					() =>
-						occurSource1.pubOccur(5)
-				}
-				
-				source.pubOccur(occurSource1)
-				source.pubOccur(occurSource2)
-				occurSource2.pubOccur(1)
-				occurSource1.pubOccur(2)
+      "it delays old occurrences in occuring Events" in {
+        val source = new TestEvent[Event[Int]]
+        val event = Event.join(source)
 
-				event.top(now).get.num mustEqual 3
-			}
-		}
+        val occurSource1 = new TestEvent[Int]
+
+        freezeTime(1) {
+          () =>
+            occurSource1.pubOccur(5)
+        }
+
+        freezeTime(2) {
+          () =>
+            source.pubOccur(occurSource1)
+        }
+
+        event.top(now()).get.time mustEqual 2
+      }
+
+      "it should have correct length" in {
+        val source = new TestEvent[Event[Int]]
+        val event = Event.join(source)
+
+        val occurSource1 = new TestEvent[Int]
+        val occurSource2 = new TestEvent[Int]
+
+        freezeTime(1) {
+          () =>
+            occurSource1.pubOccur(5)
+        }
+
+        source.pubOccur(occurSource1)
+        source.pubOccur(occurSource2)
+        occurSource2.pubOccur(1)
+        occurSource1.pubOccur(2)
+
+        event.top(now()).get.num mustEqual 3
+      }
+    }
   }
 }

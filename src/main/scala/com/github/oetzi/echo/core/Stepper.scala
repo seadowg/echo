@@ -1,6 +1,5 @@
 package com.github.oetzi.echo.core
 
-import com.github.oetzi.echo.core._
 import com.github.oetzi.echo.Echo._
 import com.github.oetzi.echo.Control._
 

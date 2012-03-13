@@ -3,7 +3,6 @@ package com.github.oetzi.echo.display
 import javax.swing.JButton
 import java.awt.Component
 import com.github.oetzi.echo.core.{Behavior, Event, EventSource}
-import com.github.oetzi.echo.Echo._
 import java.awt.event.{ActionEvent, ActionListener}
 
 class Button private() extends Canvas {
@@ -34,9 +33,9 @@ class Button private() extends Canvas {
     this.internal.repaint()
   }
 
-	protected[display] def swingComponent() : Component = {
-		internal
-	}
+  protected[display] def swingComponent(): Component = {
+    internal
+  }
 }
 
 object Button {

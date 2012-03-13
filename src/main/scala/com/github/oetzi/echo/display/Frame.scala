@@ -6,11 +6,11 @@ import javax.swing.{BoxLayout, JFrame}
 import java.awt.event.{MouseEvent, MouseMotionListener}
 import java.awt.Point
 import java.awt.Component
-import com.github.oetzi.echo.core.{Stepper, EventSource, Occurrence, Behavior}
+import com.github.oetzi.echo.core.{Stepper, EventSource, Behavior}
 
 class Frame private(private val visibleBeh: Behavior[Boolean]) extends Canvas {
   private var components: List[Canvas] = List[Canvas]()
-	private var lastVis = false
+  private var lastVis = false
 
   private val internal: JFrame = new JFrame() {
     setLocationRelativeTo(null)
@@ -20,8 +20,8 @@ class Frame private(private val visibleBeh: Behavior[Boolean]) extends Canvas {
     }
   }
 
-	private val mouseListener = new MouseMotionListener with EventSource[Point] {
-    def mouseDragged(event: MouseEvent) { }
+  private val mouseListener = new MouseMotionListener with EventSource[Point] {
+    def mouseDragged(event: MouseEvent) {}
 
     def mouseMoved(event: MouseEvent) {
       occur(event.getPoint)
@@ -33,7 +33,7 @@ class Frame private(private val visibleBeh: Behavior[Boolean]) extends Canvas {
   startClock()
 
   def mouse(): Behavior[Point] = {
-    if (this.internal.getMouseMotionListeners().length < 1) {
+    if (this.internal.getMouseMotionListeners.length < 1) {
       this.internal.addMouseMotionListener(mouseListener)
     }
 
@@ -61,11 +61,11 @@ class Frame private(private val visibleBeh: Behavior[Boolean]) extends Canvas {
     }
   }
 
-	protected[display] def swingComponent() : Component = {
-		internal
-	}
+  protected[display] def swingComponent(): Component = {
+    internal
+  }
 
-	def startClock() {
+  def startClock() {
     new Timer().schedule(new TimerTask() {
       override def run() {
         val time = now()
@@ -89,7 +89,7 @@ object Frame {
 
     components.foreach {
       component =>
-        frame.internal.getContentPane.add(component.swingComponent)
+        frame.internal.getContentPane.add(component.swingComponent())
         frame.components = frame.components ++ List(component)
     }
 

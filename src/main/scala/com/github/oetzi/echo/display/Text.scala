@@ -2,11 +2,10 @@ package com.github.oetzi.echo.display
 
 import javax.swing.JLabel
 import java.awt.Component
-import com.github.oetzi.echo.core.{Behavior, Occurrence}
-import com.github.oetzi.echo.Echo._
+import com.github.oetzi.echo.core.Behavior
 
-class Text private(private val textBeh : Behavior[String]) extends Canvas {
-  protected[echo] val internal : JLabel = new JLabel() {
+class Text private(private val textBeh: Behavior[String]) extends Canvas {
+  protected[echo] val internal: JLabel = new JLabel() {
     override def repaint() {
       super.repaint()
     }
@@ -19,13 +18,13 @@ class Text private(private val textBeh : Behavior[String]) extends Canvas {
     this.internal.repaint()
   }
 
-	protected[display] def swingComponent() : Component = {
-		internal
-	}
+  protected[display] def swingComponent(): Component = {
+    internal
+  }
 }
 
 object Text {
-  def apply(text : Behavior[String]) : Text = {
+  def apply(text: Behavior[String]): Text = {
     new Text(text)
   }
 }

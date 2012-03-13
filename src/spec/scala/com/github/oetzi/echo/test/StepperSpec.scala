@@ -7,9 +7,9 @@ import com.github.oetzi.echo.Control._
 import com.github.oetzi.echo.core.Stepper
 
 object StepperSpec extends Specification {
-	
-	devMode()
-	
+
+  devMode()
+
   "Stepper" should {
     "have an at" >> {
       "returning 'initial' if event hasn't occured" in {
@@ -40,7 +40,9 @@ object StepperSpec extends Specification {
       "returning an events value if it has the max before time" in {
         val event = new TestEvent[Int]
 
-				freezeTime(5) { () => event.pubOccur(10) }
+        freezeTime(5) {
+          () => event.pubOccur(10)
+        }
 
         freezeTime(6) {
           () =>

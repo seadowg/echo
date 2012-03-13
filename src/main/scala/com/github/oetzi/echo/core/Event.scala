@@ -2,95 +2,95 @@ package com.github.oetzi.echo.core
 
 import com.github.oetzi.echo.Echo._
 import com.github.oetzi.echo.Control._
-import collection.mutable.Queue
 import collection.mutable.ArrayBuffer
 
 trait Event[T] {
-  protected def occs(time : Time) : Occurrence[T]
-	protected[echo] def hook(block : Occurrence[T] => Unit)
+  protected def occs(time: Time): Occurrence[T]
 
-  def map[U](func : T => U) : Event[U] = {
-		frp {
-			() =>
-    		val mapFun : Time => Occurrence[U] = {
-		      time =>
-		        val occ = occs(time)
-        
-		        if (occ == null) {
-		          null
-		        }
+  protected[echo] def hook(block: Occurrence[T] => Unit)
 
-		        else {
-		          occs(time).map(func)
-		        }
-		    }
-		
-				val jsThisTrick = this
-    
-		    new Event[U] {
-					protected def occs(time : Time) : Occurrence[U] = {
-						mapFun(time)
-					}
-					
-					protected[echo] def hook(block : Occurrence[U] => Unit) {
-						val mapBlock : Occurrence[T] => Unit = {
-							occ => block(occ.map(func))
-						}
-						
-						jsThisTrick.hook(mapBlock)
-					}
-				}
-		}
+  def map[U](func: T => U): Event[U] = {
+    frp {
+      () =>
+        val mapFun: Time => Occurrence[U] = {
+          time =>
+            val occ = occs(time)
+
+            if (occ == null) {
+              null
+            }
+
+            else {
+              occs(time).map(func)
+            }
+        }
+
+        val jsThisTrick = this
+
+        new Event[U] {
+          protected def occs(time: Time): Occurrence[U] = {
+            mapFun(time)
+          }
+
+          protected[echo] def hook(block: Occurrence[U] => Unit) {
+            val mapBlock: Occurrence[T] => Unit = {
+              occ => block(occ.map(func))
+            }
+
+            jsThisTrick.hook(mapBlock)
+          }
+        }
+    }
   }
-  
-  def merge(event : Event[T]) : Event[T] = {
-		frp {
-			() =>
-    		val func : Time => Occurrence[T] = {
-		      time =>
-		        val left = this.occs(time)
-		        val right = event.top(time).getOrElse(null)
 
-		        if (left == null && right == null) {
-		          null
-		        }
+  def merge(event: Event[T]): Event[T] = {
+    frp {
+      () =>
+        val func: Time => Occurrence[T] = {
+          time =>
+            val left = this.occs(time)
+            val right = event.top(time).getOrElse(null)
 
-		        else if (left == null) {
-		          right
-		        }
+            if (left == null && right == null) {
+              null
+            }
 
-		        else if (right == null) {
-		          left
-		        }
+            else if (left == null) {
+              right
+            }
 
-		        else if (left.time <= right.time) {
-		          new Occurrence(right.time, right.value, left.num + right.num)
-		        }
+            else if (right == null) {
+              left
+            }
 
-		        else {
-		          new Occurrence(left.time, left.value, left.num + right.num)
-		        }
-		    }
-		
-				val jsThisTrick = this
-    
-		    new Event[T] {
-					protected def occs(time : Time) : Occurrence[T] = {
-						func(time)
-					}
-					
-					protected[echo] def hook(block : Occurrence[T] => Unit) {
-						jsThisTrick.hook(block)
-						event.hook(block)
-					}
-				}
-		}
+            else if (left.time <= right.time) {
+              new Occurrence(right.time, right.value, left.num + right.num)
+            }
+
+            else {
+              new Occurrence(left.time, left.value, left.num + right.num)
+            }
+        }
+
+        val jsThisTrick = this
+
+        new Event[T] {
+          protected def occs(time: Time): Occurrence[T] = {
+            func(time)
+          }
+
+          protected[echo] def hook(block: Occurrence[T] => Unit) {
+            jsThisTrick.hook(block)
+            event.hook(block)
+          }
+        }
+    }
   }
-  
+
   // echo utility functions
-  def top(time : Time) : Option[Occurrence[T]] = {
+  def top(time: Time): Option[Occurrence[T]] = {
     val top = occs(time)
-    
+
     if (top != null) {
       Some(top)
     }
@@ -102,106 +102,106 @@ trait Event[T] {
 }
 
 trait EventSource[T] extends Event[T] {
-	private val hooks : ArrayBuffer[Occurrence[T] => Unit] = new ArrayBuffer() 
-  private var present : Occurrence[T] = null
-  private var length : BigInt = 0
-  
-  def event() : Event[T] = {
-		val jsThisTrick = this
-		
+  private val hooks: ArrayBuffer[Occurrence[T] => Unit] = new ArrayBuffer()
+  private var present: Occurrence[T] = null
+  private var length: BigInt = 0
+
+  def event(): Event[T] = {
+    val jsThisTrick = this
+
     new Event[T] {
-			protected def occs(time : Time) : Occurrence[T] = {
-				jsThisTrick.occs(time)
-			}
-			
-			protected[echo] def hook(block : Occurrence[T] => Unit) {
-				jsThisTrick.hook(block)
-			}
-		}
+      protected def occs(time: Time): Occurrence[T] = {
+        jsThisTrick.occs(time)
+      }
+
+      protected[echo] def hook(block: Occurrence[T] => Unit) {
+        jsThisTrick.hook(block)
+      }
+    }
   }
-  
-  protected def occs(time : Time) : Occurrence[T] = {
+
+  protected def occs(time: Time): Occurrence[T] = {
     this synchronized {
       present
     }
   }
-  
-  protected def occur(value : T) {
-    this synchronized {
-			writeLock synchronized {
-				while(!createLock.available) {}
-				
-				freezeTime(now()) {
-					() =>
-			  		length += 1
-		   			present = new Occurrence(now(), value, length)
 
-						echo(present)
-				}
-			}
+  protected def occur(value: T) {
+    this synchronized {
+      writeLock synchronized {
+        while (!createLock.available) {}
+
+        freezeTime(now()) {
+          () =>
+            length += 1
+            present = new Occurrence(now(), value, length)
+
+            echo(present)
+        }
+      }
     }
   }
 
-	protected def echo(occurrence : Occurrence[T]) {
-		hooks.foreach {
-			block => block(occurrence)
-		}
-	}
+  protected def echo(occurrence: Occurrence[T]) {
+    hooks.foreach {
+      block => block(occurrence)
+    }
+  }
 
-	protected[echo] def hook(block :	Occurrence[T] => Unit) {
-		hooks += block
-	}
+  protected[echo] def hook(block: Occurrence[T] => Unit) {
+    hooks += block
+  }
 }
 
-class Occurrence[T](val time: Time, val value: T, val num : BigInt) {
-  def map[U](func : T => U) : Occurrence[U] = {
+class Occurrence[T](val time: Time, val value: T, val num: BigInt) {
+  def map[U](func: T => U): Occurrence[U] = {
     new Occurrence(time, func(value), num)
   }
 }
 
 object Event {
-	def join[T](eventEvent : Event[Event[T]]) : Event[T] = {
-		frp {
-			() =>
-				new EventSource[T] {
-					private var priorityCount : BigInt = 0
-					private var lastPriority : BigInt = 0
+  def join[T](eventEvent: Event[Event[T]]): Event[T] = {
+    frp {
+      () =>
+        new EventSource[T] {
+          private var priorityCount: BigInt = 0
+          private var lastPriority: BigInt = 0
 
-					eventEvent.hook {
-						e => 
-							val priority = priorityCount
-							priorityCount += 1
+          eventEvent.hook {
+            e =>
+              val priority = priorityCount
+              priorityCount += 1
 
-							e.value.hook {
-								occ => joinOccur(occ, priority)
-							}
+              e.value.hook {
+                occ => joinOccur(occ, priority)
+              }
 
-							val old = e.value.top(now())
-							if (old != None) joinOccur(old.get, priority)
-					}
+              val old = e.value.top(now())
+              if (old != None) joinOccur(old.get, priority)
+          }
 
-					private def joinOccur(occurrence : Occurrence[T], priority : BigInt) {
-						this synchronized {
-							val lastOcc = this.top(now)
+          private def joinOccur(occurrence: Occurrence[T], priority: BigInt) {
+            this synchronized {
+              val lastOcc = this.top(now())
 
-							if (lastOcc != None && occurrence.time == lastOcc.get.time) {
-								if (priority >= lastPriority) {
-									occur(occurrence.value)
-									lastPriority = priority
-								}
+              if (lastOcc != None && occurrence.time == lastOcc.get.time) {
+                if (priority >= lastPriority) {
+                  occur(occurrence.value)
+                  lastPriority = priority
+                }
 
-								else {
-									echo(occurrence)
-								}
-							}
+                else {
+                  echo(occurrence)
+                }
+              }
 
-							else {
-								occur(occurrence.value)
-								lastPriority = priority
-							}
-						}
-					}
-				}.event()
-		}
-	}
+              else {
+                occur(occurrence.value)
+                lastPriority = priority
+              }
+            }
+          }
+        }.event()
+    }
+  }
 }

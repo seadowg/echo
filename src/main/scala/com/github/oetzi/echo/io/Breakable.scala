@@ -1,12 +1,11 @@
 package com.github.oetzi.echo.io
 
 import com.github.oetzi.echo.core.EventSource
-import com.github.oetzi.echo.Echo._
 
 
 trait Breakable {
   val errors = new EventSource[Exception] {
-    def apply[T](block : () => T) : Option[T] = {
+    def apply[T](block: () => T): Option[T] = {
       try {
         Some(block())
       }

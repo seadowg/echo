@@ -4,7 +4,6 @@ import com.github.oetzi.echo.core._
 import javax.swing.event.{ChangeEvent, ChangeListener}
 import java.awt.Component
 import javax.swing.JSlider
-import com.github.oetzi.echo.Echo._
 
 
 class Slider private() extends Canvas {
@@ -28,9 +27,9 @@ class Slider private() extends Canvas {
     this.internal.repaint()
   }
 
-	protected[display] def swingComponent() : Component = {
-		internal
-	}
+  protected[display] def swingComponent(): Component = {
+    internal
+  }
 }
 
 object Slider {
