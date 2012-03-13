@@ -78,15 +78,18 @@ trait Event[T] {
   }
 
 	def filter(func: T => Boolean) : Event[T] = {
-		val source = this
-		
-		new EventSource[T] {
-			source.hook {
-				occ =>
-					if (func(occ.value)) {
-						occur(occ.value)
+		frp {
+			() =>
+				val source = this
+
+				new EventSource[T] {
+					source.hook {
+						occ =>
+							if (func(occ.value)) {
+								occur(occ.value)
+							}
 					}
-			}
+				}
 		}
 	}
 
