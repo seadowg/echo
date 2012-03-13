@@ -102,7 +102,7 @@ trait Event[T] {
 }
 
 trait EventSource[T] extends Event[T] {
-	val hooks : ArrayBuffer[Occurrence[T] => Unit] = new ArrayBuffer() 
+	private val hooks : ArrayBuffer[Occurrence[T] => Unit] = new ArrayBuffer() 
   private var present : Occurrence[T] = null
   private var length : BigInt = 0
   
@@ -136,13 +136,17 @@ trait EventSource[T] extends Event[T] {
 			  		length += 1
 		   			present = new Occurrence(now(), value, length)
 
-						hooks.foreach {
-							block => block(present)
-						}
+						echo(present)
 				}
 			}
     }
   }
+
+	protected def echo(occurrence : Occurrence[T]) {
+		hooks.foreach {
+			block => block(occurrence)
+		}
+	}
 
 	protected[echo] def hook(block :	Occurrence[T] => Unit) {
 		hooks += block
@@ -153,4 +157,51 @@ class Occurrence[T](val time: Time, val value: T, val num : BigInt) {
   def map[U](func : T => U) : Occurrence[U] = {
     new Occurrence(time, func(value), num)
   }
+}
+
+object Event {
+	def join[T](eventEvent : Event[Event[T]]) : Event[T] = {
+		frp {
+			() =>
+				new EventSource[T] {
+					private var priorityCount : BigInt = 0
+					private var lastPriority : BigInt = 0
+
+					eventEvent.hook {
+						e => 
+							val priority = priorityCount
+							priorityCount += 1
+
+							e.value.hook {
+								occ => joinOccur(occ, priority)
+							}
+
+							val old = e.value.top(now())
+							if (old != None) joinOccur(old.get, priority)
+					}
+
+					private def joinOccur(occurrence : Occurrence[T], priority : BigInt) {
+						this synchronized {
+							val lastOcc = this.top(now)
+
+							if (lastOcc != None && occurrence.time == lastOcc.get.time) {
+								if (priority >= lastPriority) {
+									occur(occurrence.value)
+									lastPriority = priority
+								}
+
+								else {
+									echo(occurrence)
+								}
+							}
+
+							else {
+								occur(occurrence.value)
+								lastPriority = priority
+							}
+						}
+					}
+				}.event()
+		}
+	}
 }

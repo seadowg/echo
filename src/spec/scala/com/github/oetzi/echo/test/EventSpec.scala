@@ -3,7 +3,7 @@ package com.github.oetzi.echo.test
 import help.TestEvent
 import com.github.oetzi.echo.Echo._
 import com.github.oetzi.echo.Control._
-import com.github.oetzi.echo.core.Occurrence
+import com.github.oetzi.echo.core._
 
 import org.specs._
 
@@ -154,5 +154,85 @@ object EventSpec extends Specification {
 				passed.value mustEqual 6
 			}
     }
+
+		"have an Event.join function that" >> {
+			"returns an empty Event for empty Events" in {
+				val event = Event.join(new TestEvent[Event[Int]])
+				
+				event.top(now()) mustEqual None 
+			}
+			
+			"always has the newest occurrence from any occurred Event" in {
+				val source = new TestEvent[Event[Int]]
+				val event = Event.join(source)
+				
+				val occurSource1 = new TestEvent[Int]
+				val occurSource2 = new TestEvent[Int]
+				source.pubOccur(occurSource1)
+				source.pubOccur(occurSource2)
+				
+				occurSource2.pubOccur(5)
+				occurSource1.pubOccur(6)
+				
+				event.top(now).get.value mustEqual 6
+			}
+			
+			"uses right precedence if two occurrences from seperate events are equal" in {
+				val source = new TestEvent[Event[Int]]
+				val event = Event.join(source)
+
+				val occurSource1 = new TestEvent[Int]
+				val occurSource2 = new TestEvent[Int]
+				source.pubOccur(occurSource1)
+				source.pubOccur(occurSource2)
+
+				freezeTime (now()) {
+					() =>
+						occurSource2.pubOccur(7)
+						occurSource1.pubOccur(6)
+				}
+
+				event.top(now).get.value mustEqual 7
+			}
+
+			"it delays old occurrences in occuring Events" in {
+				val source = new TestEvent[Event[Int]]
+				val event = Event.join(source)
+
+				val occurSource1 = new TestEvent[Int]
+
+				freezeTime(1) {
+					() =>
+						occurSource1.pubOccur(5)
+				}
+
+				freezeTime(2) {
+					() =>
+						source.pubOccur(occurSource1)
+				}
+
+				event.top(now).get.time mustEqual	2
+			}
+			
+			"it should have correct length" in {
+				val source = new TestEvent[Event[Int]]
+				val event = Event.join(source)
+
+				val occurSource1 = new TestEvent[Int]
+				val occurSource2 = new TestEvent[Int]
+
+				freezeTime(1) {
+					() =>
+						occurSource1.pubOccur(5)
+				}
+				
+				source.pubOccur(occurSource1)
+				source.pubOccur(occurSource2)
+				occurSource2.pubOccur(1)
+				occurSource1.pubOccur(2)
+
+				event.top(now).get.num mustEqual 3
+			}
+		}
   }
 }
