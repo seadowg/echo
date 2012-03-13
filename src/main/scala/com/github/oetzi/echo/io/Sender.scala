@@ -13,9 +13,11 @@ with Breakable {
 
   private object SenderActor extends Actor {
     def act {
-      receive {
-        case message: String => sendToSocket(message)
-      }
+			loop {
+				receive {
+	        case message: String => sendToSocket(message)
+	      }
+			}
     }
 
     def sendToSocket(message: String) {
