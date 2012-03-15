@@ -3,10 +3,10 @@ package com.github.oetzi.echo.core
 import com.github.oetzi.echo.Echo._
 import com.github.oetzi.echo.Control._
 import collection.mutable.ArrayBuffer
+import collection.mutable.Queue
 
 trait Event[T] {
   protected def occs(time: Time): Occurrence[T]
-
   protected[echo] def hook(block: Occurrence[T] => Unit)
 
 	def times() : Event[Time] = {
@@ -153,6 +153,7 @@ trait Event[T] {
 
 trait EventSource[T] extends Event[T] {
   private val hooks: ArrayBuffer[Occurrence[T] => Unit] = new ArrayBuffer()
+  private val future : Queue[Occurrence[T]] = new Queue[Occurrence[T]]()
   private var present: Occurrence[T] = null
   private var length: BigInt = 0
 
@@ -172,7 +173,16 @@ trait EventSource[T] extends Event[T] {
 
   protected def occs(time: Time): Occurrence[T] = {
     this synchronized {
-      present
+			if (!future.isEmpty) {
+				var head = future.headOption
+
+		  	while (head != None && future.head.time <= time) {
+	      	present = future.dequeue()
+	      	head = future.headOption
+	      }  	
+		  }
+		
+			present
     }
   }
 
@@ -183,10 +193,11 @@ trait EventSource[T] extends Event[T] {
 
         freezeTime(now()) {
           () =>
-            length += 1
-            present = new Occurrence(now(), value, length)
+          	length += 1
+						val occ = new Occurrence(now(), value, length)
+            future += occ
 
-            echo(present)
+            echo(occ)
         }
       }
     }
