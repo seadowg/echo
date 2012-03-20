@@ -38,25 +38,107 @@
       \emph{Behaviors} and \emph{Events}. This paper will deal with the \emph{classic} flavour of
       FRP (that descended directly from FRAN) and so will not deal with \emph{signals} and Arrow FRP
       concepts explored elsewhere. Here the semantics of the FRP explored in this report will be defined.
+      
+      Within this section we will explore a selection of the basic denotational semantics that Elliott
+      and Hudak originally laid down and that we hope to implement in Scala. The semantic definitions will
+      be presented using Scala syntax so as to provide continuity throughout the report.
     
       \subsubsection{Types}
-        \paragraph{Behavior}
-          % Behavior data type
-          % at function
+        \paragraph{Behaviour}
+          Behaviours are essentially values that change over time. Semantically we think of them as
+          a function from Time to some type T:
+
+\begin{verbatim}
+Behaviour[T] : Time => T
+\end{verbatim}
+          
+          We can access some Behaviour's value at some time `t' with the \emph{at} function:
+
+\begin{verbatim}
+at[T](t  : Time, beh : Behaviour[T]) : T
+\end{verbatim}
         
         \paragraph{Event}
-          % Event data type
-          % occs function
+          Events can be thought of as an (infinite) stream of \emph{Time}-value pairs:
+
+\begin{verbatim}
+Event[T] : Stream[(Time, T)]
+\end{verbatim}
+          
+          As with Behaviours, we define a function access an Event's data:
+          
+\begin{verbatim}
+occs[T](ev : Event[T]) : Stream[(Time, T)]
+\end{verbatim}
          
       \subsubsection{Operations}
+        Elliot and Hudak additionally define a set of actions on Behaviours and Events. In the interest of
+        conciseness not all of these operations will be shown here. They will explored later however.
+        
         \paragraph{Behaviors}
-          Lorem ipsum
+          We would like functions defined on static values to also be available to \emph{Behaviours}. Hudak
+          and Elliot define a series functions for accomplishing this:
+          
+\begin{verbatim}
+liftn[T1,..,Tn U](a1 : T1,..,an : Tn => U, 
+  b1 : Behaviour[T1],..., bn : Behaviour[Tn]) : Behaviour[U]
+at(lift(func, b1,...,bn), t) = func (at(b1, t),..., at(bn, t))
+\end{verbatim}
+
+        In the original paper it was noted that this was intended to be used to also lift constants to Behaviours
+        as in `lift0 42' for example. We can't express this as simply in Scala as was done in Haskell due to 
+        the syntax of type signatures. We can define an additional function for this purpose explicitly however.
+
+\begin{verbatim}
+lift0[T](t : T) : Behaviour[T]
+at(lift0(v), t) = v
+\end{verbatim}
+          
+         It also may be useful to evaluate Behaviours in a modified time frame for slowing down or speeding
+         up a Behaviour for example. We define this with the timeTransform function on a \emph{Behaviour[T]}:
+
+\begin{verbatim}
+timeTransform(beh : Behaviour[T], time : Behaviour[Time]) : Behaviour[T]
+at(timeTransform(beh, timeBeh), t) = at(beh, at(timeBeh, t))
+\end{verbatim}
           
         \paragraph{Events}
-          Lorem ipsum
+          It is useful to be able to merge two Events into one. We can do this with the merge function on an \emph{Event[T]}:
+  
+\begin{verbatim}
+merge[T](ev1 : Event[T], ev2 : Event[T]) : Event[T]
+def mergeStr[T](str1 : Stream[Time, T], str1 : Stream[Time, T]) = {
+  if (str1.first.time <= str2.first.time) {
+    new Stream(str1.first, mergeStr(str1.drop(1), str2))
+  } else {
+    new Stream(str2.first, mergeStr(str1, str2.drop(1)))
+  }
+}
+merge(ev1, ev2).occs = mergeStr(occs(ev1), occs(ev2))
+\end{verbatim}            
+
+        It should be noted that if if an occurrence from ev1 and ev2 occur `simultaneously' (have the same time) then
+        the occurrence from ev2 will be placed after in the merged stream.
+         
+         Elliott and Hudak's paper also defined a series of transformer functions for Events. We will define a
+         `map' function for allowing the same functionality:
+ 
+\begin{verbatim}
+map[U](ev : Event[T], func : (Time, T) => U)  : Event[U]
+occs(map(ev, func)) = occs(event).map(func)
+\end{verbatim}         
           
         \paragraph{Reactivity}
-          Lorem ipsum
+          One of the most powerful aspects of FRP is the ability to use Events to punctuate or `switch' Behaviours.
+          The original FRAN paper defined an `untilB' function that was later renamed (more appropriately in the
+          author's mind) to `switcher':
+
+\begin{verbatim}
+switcher[T](ini : Behaviour[T], ev : Event[Behaviour[T]])
+at(switcher(ini, ev), t) = at(occs(ev).filter(
+                                (ti, v) => ti <= t).last), t)
+\end{verbatim}
+          
           
   \section{Problems and Caveats}
     FRP presents some subtle semantic problems and caveats that are not always immediately obvious.
@@ -65,7 +147,7 @@
     \subsection{Events as Monotonic Streams}
     Lorem ipsum
     
-    \subsection{Interactive Behaviors}
+    \subsection{Interactive Behaviours}
     Lorem ipsum
     
   \section{Implementation in Scala}
