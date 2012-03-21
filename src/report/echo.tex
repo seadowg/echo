@@ -35,7 +35,7 @@
       
     \subsection{Semantics}
       The ideas in FRA and in following FRP work are based around two key data types: 
-      \emph{Behaviors} and \emph{Events}. This paper will deal with the \emph{classic} flavour of
+      \emph{Behaviours} and \emph{Events}. This paper will deal with the \emph{classic} flavour of
       FRP (that descended directly from FRAN) and so will not deal with \emph{signals} and Arrow FRP
       concepts explored elsewhere. Here the semantics of the FRP explored in this report will be defined.
       
@@ -75,7 +75,7 @@ occs[T](ev : Event[T]) : Stream[(Time, T)]
         Elliot and Hudak additionally define a set of actions on Behaviours and Events. In the interest of
         conciseness not all of these operations will be shown here. They will explored later however.
         
-        \paragraph{Behaviors}
+        \paragraph{Behaviours}
           We would like functions defined on static values to also be available to \emph{Behaviours}. Hudak
           and Elliot define a series functions for accomplishing this:
           
@@ -160,13 +160,13 @@ at(switcher(ini, ev), t) = at(occs(ev).filter(
       generally structured in an object oriented programming style like Java but it also incorporates many features of
       functional languages such as closures, high order functions, lazy initialisation and currying. These features aid
       implementation of FRP concepts as closures will allow for Behaviour definition and functions such as map on
-      Behaviors and Events to be expressed in a more natural and succinct form. It is
+      Behaviours and Events to be expressed in a more natural and succinct form. It is
       important to note that although Scala is thought of as `functional' its functions are not `pure'. This means
       that object functions and closures can cause side effects and be altered by external states.
       
       Scala also possesses a advanced, powerful and feature rich static type system. A few of these provide large
       advantages when implementing FRP. Firstly, Scala supports generic classes and it can be quite easily seen
-      that both Behaviors and Events will rely on this feature for type safety. Scala additionally provides
+      that both Behaviours and Events will rely on this feature for type safety. Scala additionally provides
       a rather unique type conversion functionality that allows types to be converted on the fly. This provides
       incredibly expressive and powerful ways to embed FRP into Scala and will be explored later.
       
@@ -178,8 +178,43 @@ at(switcher(ini, ev), t) = at(occs(ev).filter(
     in setting and also in an effort to create a efficient implementation without sacrificing FRP's expressive power
     several design choices were made. 
     
-      \subsubsection{Encapsulation}
-      Lorem ipsum
+      \subsubsection{Object Orientation}
+        It would be possible to implement the original FRP operations as standalone functions. However, so
+        as to conform to Scala Object Oriented style the operations will be attached to their respective
+        classes. For instance, the `merge' operation will be used in the following way in echo:
+        
+\begin{verbatim}
+val merged = event1.merge(event2)
+\end{verbatim}
+
+      This allows the FRP code to fit more naturally into Scala. We will also replace the `switcher' function
+      with a type that extends Behaviour rather than a function:
+      
+\begin{verbatim}
+val switch = new Switcher(iniBeh, behEvent)
+\end{verbatim}
+
+      \subsubsection{Implicit Lifting of Constants}
+        As mentioned earlier, one of the most powerful features of Scala is it's ability to convert between
+        types at run time. This is facilitated by the \emph{implicit} key word allowing a function to be defined
+        that is automatically when a corresponding type mismatch occurs. This will be used in echo to allows 
+        static values to be converted to Behaviours \emph{implicitly}.. This is implemented in the following way:  
+
+\begin{verbatim}
+implicit def liftConst[T](value : T) : Behaviour[T] = {
+  new Behaviour(time => value)
+}
+\end{verbatim}              
+        
+        This would allow the following for instance:
+ 
+\begin{verbatim}
+val beh : Behaviour[Int] = 0
+val switcher = new Switcher(false, eventBeh)
+\end{verbatim}       
+
+        It can immediately be seen that this allows the programmer to switch between static and more complex
+        Behaviours in a very naturalistic manor.
       
       \subsubsection{Time Travel is Dangerous}
       Lorem ipsum
