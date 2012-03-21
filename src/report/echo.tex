@@ -292,9 +292,6 @@ beh.until(ev, beh1).at(t) = new Switcher(beh, event.map((t,v) => beh1)).at(t)
 filter(predicate : T => Boolean) : Event[T]
 event.filter(predFunc).occs = event.occs.filter(predFunc)
 \end{verbatim}        
-      
-      \subsubsection{Flat Time}
-        % Time is a flat double value externally due to restrictions
         
       \subsubsection{Extendability}
         It was decided form the initial stages of the project that \emph{echo} should provide
@@ -314,11 +311,33 @@ event.filter(predFunc).occs = event.occs.filter(predFunc)
         % Use pull evaluation for map and merge for simplicity and to not hold up event occurring threads 
     
     \subsection{Correctness of Implementation}
-      Lorem ipsum 
+      Of course, there needs to be some way of verifying that the implementation is correct. By
+      this it is meant that it follows both the semantic rules set forth by the original FRP specification
+      and also the rules and constraints laid out in this report.
       
-      % Use test first development and after the fact testing
-      % Testing laid out in plain english for simplicity
-      % Testing makes sure invariants in semantics are correctly implemented
+      This achieved in echo using formal program testing. More specifically, behaviour driven
+      testing was carried out throughout the development process using the Scala framework `Specs'
+      to verify that implementations were correct. `Specs' and BDD involve series of tests for
+      separate program `invariants' or `behaviours'. For example to test the Behaviour `map' function
+      in `Specs' we can do the following:
+ 
+\begin{verbatim}
+"provide a map function" >> {
+  "returning a Behavior thats value is func(this.at(t))" in {
+    val beh = new Behavior(time => 5)
+    val func: Int => String = {
+      int => int.toString
+    }
+
+    beh.map(func).eval() mustEqual "5"
+  }
+}
+\end{verbatim}      
+
+    These tests were generally written before implementing a feature and then run after every compilation. 
+    This not only allowed the original implementation's correctness to be verified but
+    allowed refactoring to be carried out very quickly andeasily as testing would verify that any changes had not
+    made the implementation incorrect.
       
   \section{Additional Work}
     Besides creating a framework for the core FRP concepts additional efforts
