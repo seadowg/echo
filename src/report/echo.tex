@@ -345,7 +345,39 @@ event.filter(predFunc).occs = event.occs.filter(predFunc)
     applications.
     
     \subsection{UI Framework}
-    Lorem ipsum
+      To enable users to build interactive user facing applications with echo it would be useful to have a simple User 
+      Interface framework in place. Of course echo could interact with standard UI frameworks but the use of \emph{Behaviours} 
+      and \emph{Events} would be very limited and clunky. The goal with the UI framework is to allow the programmer to define 
+      attributes as \emph{Behaviours} and have them kept up to date and to also interact with the user through FRP 
+      \emph{Events}. 
+
+      So far, a small simple framework has been devised and implemented. Every component's attributes are \emph{Behaviours} 
+      (such as width and height) and they will be kept up to date at all times. For instance:
+
+\begin{verbatim}
+val frame = Frame(new Behaviour(time => sin(time)), 200) 
+\end{verbatim}
+
+      This would create a Frame that at a time `t' would have a width of \emph{sin(t)}.
+
+      The implementation of this is based around re-evaluating and redrawing the graphics on a clock tick. Each 
+      \emph{Frame} has its own `clock' that updates all the components attached to the frame at a standard interval (currently 
+      20ms). The actual graphical code was built by simply abstracting over the Java Swing UI Framework. This allows the FRP 
+      components to be built quickly as no actual lower end graphics code has to be implemented.
+
+      The UI framework also allows the programmer to interact with the user via \emph{Events}. Again this is best illustrated 
+      with an example:
+
+\begin{verbatim}
+val button = Button("Click Me!") 
+val hello = new Behaviour(time => "Hello")
+val goodbye = new Behaviour(time => "Goodbye!")
+val someString = hello.until(button.click, goodbye) 
+\end{verbatim}
+
+      Here it can be seen that the \emph{Button} type owns a `click' event. This \emph{Event} occurs every time the 
+      \emph{Button} is clicked by the user. This was made possible by abstracting over Swing's own event framework. Many other 
+      FRP \emph{Events} can be easily generated in this way in Swing.
     
     \subsection{IO Framework}
     Lorem ipsum
