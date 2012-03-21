@@ -138,6 +138,16 @@ switcher[T](ini : Behaviour[T], ev : Event[Behaviour[T]])
 at(switcher(ini, ev), t) = at(occs(ev).filter(
                                 (ti, v) => ti <= t).last), t)
 \end{verbatim}
+
+          Another useful interaction between Behaviours and Events is to be able to sample
+          a Behaviour at the exact moment an Event occurs. This was originally defined in the
+          form of the `snapshot' operation:
+
+\begin{verbatim}
+snapshot[T, U](beh : Behaviour[T], ev : Event[U]) : Event[(T, U)]
+t = occs(ev)(x).time
+occs(snapshot(beh, ev)(x)) = (t, at(beh, t))
+\end{verbatim}          
           
           
   \section{Problems and Caveats}
@@ -217,30 +227,50 @@ val switcher = new Switcher(false, eventBeh)
         Behaviours in a very naturalistic manor.
       
       \subsubsection{Time Travel is Dangerous}
-      Lorem ipsum
+        % Relate back to interactive problems
+        % Set out rules
+        % Describe eval action on Behaviours
+        % Removal of timeTransform
+        
+      \subsubsection{Time Freezing}
+        % Describe instantaneous occurrence problem
+        % Describe dynamic FRP problems and initial setup phase
       
       \subsubsection{Function Renaming}
-      Lorem ipsum
+        % snapshot -> sample
+        
+      \subsubsection{Function Additions}
+        % mapping to replace lifting
+        % toggle
+        % until
+        % filter
       
       \subsubsection{Flat Time}
-      Lorem ipsum
-      
+        % Time is a flat double value externally due to restrictions
+        
       \subsubsection{Extendability}
-      It was decided form the initial stages of the project that \emph{echo} should provide
-      a way for users to create their own FRP abstractions. Effort throughout the design and
-      implementation was put into this feature.
-      
-      \subsubsection{Initial Setup Phase}
-      Lorem ipsum
+        It was decided form the initial stages of the project that \emph{echo} should provide
+        a way for users to create their own FRP abstractions. Effort throughout the design and
+        implementation was put into this feature.
+        
+        % EventSource as a way to add Event abstractions
+        % Breakable to aid these abstractions
       
     \subsection{Implementation Choices}
       Lorem ipsum
       
-      \subsubsection{Push vs Pull}
-      Lorem ipsum
+      \subsubsection{Push vs Pull Events}
+        Lorem ipsum
+        
+        % Use push for sampling and filtering
+        % Use pull evaluation for map and merge for simplicity and to not hold up event occurring threads 
     
     \subsection{Correctness of Implementation}
       Lorem ipsum 
+      
+      % Use test first development and after the fact testing
+      % Testing laid out in plain english for simplicity
+      % Testing makes sure invariants in semantics are correctly implemented
       
   \section{Additional Work}
     Besides creating a framework for the core FRP concepts additional efforts
