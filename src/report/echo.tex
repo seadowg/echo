@@ -237,13 +237,61 @@ val switcher = new Switcher(false, eventBeh)
         % Describe dynamic FRP problems and initial setup phase
       
       \subsubsection{Function Renaming}
-        % snapshot -> sample
+        Although a small change it should also be noted that one of the functions originally defined
+        has be renamed for the echo framework - `snapshot' was renamed to `sample'. This was done as
+        it was felt it added more clarity to the function name was more appropriate given its use.
         
       \subsubsection{Function Additions}
-        % mapping to replace lifting
-        % toggle
-        % until
-        % filter
+        When considering different applications of the framework and also in an attempt to
+        tackle the changes in expressiveness between Haskell and Scala some operations
+        were added to the FRP in echo.
+        
+        Lifting of constants has already been discussed for echo but lifting of operators and
+        functions presents a few problems. This is because function in Scala (as discussed earlier)
+        are usually attached to classes. For instance, there is no `'+' operator in Scala: the numeric
+        types have a plus function defined in their class declarations (how Scala actually performs additions
+        is a topic for discussion elsewhere). This means that we cannot `lift' many of the operations we
+        would want to. To solve this problem we can use a series of map functions. We can define these
+        here for a \emph{Behaviour[T]}:
+
+\begin{verbatim}
+map[U](func : T => U) : Behaviour[U]
+beh.map(func).at(t) = func(beh.at(t))
+
+map2[U, V](beh1 : U)(func : (T, U) => V) : Behaviour[V]
+beh.map2(beh1)(func).at(t) = func(beh.at(t), beh1.at(t))
+\end{verbatim}        
+
+        These functions allow Behaviours to be transformed and combined using functions
+        normally applied to static values.
+        
+        In Hudak and Elliott's original paper an example is constructed to create a Behaviour
+        that toggles back and forth between two given Behaviours whenever an Event occurs. This
+        example took advantage of Haskell's lazy evaluation. While Scala is able to use lazy evaluation
+        it requires extra work and at the time of writing requires some complex syntax. To tackle this
+        a `toggle' function was added to echo to provide the functionality in the example out of the box.
+        This is defined here for a \emph{Behaviour[T]}:
+        
+\begin{verbatim}
+toggle(ev : Event[T], beh1 : Behaviour[T]) : Behaviour[T]
+\end{verbatim}        
+        
+        It was felt that another common use of combining Behaviours and Events would be
+        to switch from one Behaviour to another when an Event occurs (but not back again):
+
+\begin{verbatim}
+until(ev : Event[T], beh1 : Behaviour[T]) : Behaviour[T]
+beh.until(ev, beh1).at(t) = new Switcher(beh, event.map((t,v) => beh1)).at(t)
+\end{verbatim}        
+        
+        It is also useful to be able to to filter Events to produce a new one that only
+        contains occurrences matching a predicate. This allows a Behaviour to only react
+        to some occurrences from an Event. This is defined on an \emph{Event[T]}:
+ 
+\begin{verbatim}
+filter(predicate : T => Boolean) : Event[T]
+event.filter(predFunc).occs = event.occs.filter(predFunc)
+\end{verbatim}        
       
       \subsubsection{Flat Time}
         % Time is a flat double value externally due to restrictions
