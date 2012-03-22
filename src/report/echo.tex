@@ -155,10 +155,26 @@ occs(snapshot(beh, ev)(x)) = (t, at(beh, t))
     They will be explored here in an attempt to aid the reader's understanding.
      
     \subsection{Events as Monotonic Streams}
-    Lorem ipsum
+      Lorem ipsum
+      
+      % Reiterate that events are infinite streams
+      % Occurrence times are monotonic
+      % Occurrences are real-time streaming data
+      % Map time example (genereate occurrence in past)
     
+    \subsection{Events are Infinite}
+    
+      % Event operating carried out on infinite data set
+      % Only needed to know until fixed finite point
+    
+      
     \subsection{Interactive Behaviours}
-    Lorem ipsum
+      Lorem ipsum
+      
+      % Interactivity causes problems
+      % Switcher based on mousePos Event example
+      % Semantic problem with reading future
+      % Unbound memory with reading the past
     
   \section{Implementation in Scala}
     As stated earlier this project dealt with implementing a framework for utilising FRP in the Scala programming
@@ -182,6 +198,8 @@ occs(snapshot(beh, ev)(x)) = (t, at(beh, t))
       
     \subsection{Problems}
       % Impurity - we just have to deal with it (lots of Scala is like this)
+      
+    \subsection{A Brief Introduction to Echo}
     
     \subsection{Design Choices}
     Throughout its history FRP implementations have generally been carried out in Haskell. Due to the movement
@@ -227,10 +245,67 @@ val switcher = new Switcher(false, eventBeh)
         Behaviours in a very naturalistic manor.
       
       \subsubsection{Time Travel is Dangerous}
-        % Relate back to interactive problems
-        % Set out rules
-        % Describe eval action on Behaviours
-        % Removal of timeTransform
+        Relating back to the earlier discussion of interactive Behaviours it can be seen
+        that there are problems when plugging FRP into the real world: the future is uncertain and
+        arbitrary access to the past requires an unbounded level of memory. After much deliberation
+        over different compromises it was decided that echo would follow a set of rules:
+        
+        \begin{itemize}
+          \item If a Behaviour was last evaluated at time \emph{u} then it can only be evaluated at
+          a time \emph{t} if t >= u.
+          \item An Event holds the last time it occurred and the time up to which it hasn't occurred
+          again (the time it is `valid' until).
+          \item An Event is valid up until the time equivalent to `now' (the actual current time).
+          \item If a Behaviour depends on some Event then we can only evaluate the Behaviour up to
+          the time the Event is valid.
+        \end{itemize}
+        
+        With this set of rules in place, it becomes clear that we will only ever use a fixed amount of memory
+        for an Event and that a Behaviour can not be evaluated in the past or the future. Will
+        introduce a new operation on a \emph{Behaviour[T]} for this:
+
+\begin{verbatim}
+eval() : T
+beh.eval() = beh.at(now())
+\end{verbatim}       
+
+        We will also remove the `at' function on Behaviours from the public API (it will still be
+        use within the framework). 
+        
+        Of course, the rules can still be broken if we introduce multi-threading and this is best illustrated
+        with an example:
+        
+\begin{verbatim}
+val beh = new Behaviour(time => 5)
+
+class Runner extends Runnable() {
+  def run() {
+    beh.eval()
+  }
+}
+
+new Thread(new Runner).start()
+new Thread(new Runner).start()
+\end{verbatim}       
+
+        Here we have two threads continuously evaluating one Behaviour. This means that one thread
+        might call \emph{eval()} and then be scheduled out allowing the other to proceed to evaluate
+        at a later time. If the original is then scheduled back in it is possible it will
+        be evaluating the Behaviour at a time less than the time second evaluated it at. This suggests
+        that we desire the \emph{eval} operation to be `atomic'. This can be achieved easily for standalone
+        Behaviours using standard locking tools in Scala.
+        
+        We run into further problems however if the Behaviour is more complex. Suppose, in the above example,
+        the Behaviour was defined as follows:
+
+\begin{verbatim}
+val beh = beh1.until(ev, beh2)
+\end{verbatim}        
+
+        Here, \emph{beh} `depends' on \emph{beh1} and \emph{beh2}: whenever we evaluate \emph{beh}
+        we also need to evaluate \emph{beh1} or \emph{beh2}. This shows that Behaviours can't just
+        be locked on a standalone basis but must share a lock with all their dependencies and other Behaviours
+        that share those dependencies.
         
       \subsubsection{Time Freezing}
         % Describe instantaneous occurrence problem
