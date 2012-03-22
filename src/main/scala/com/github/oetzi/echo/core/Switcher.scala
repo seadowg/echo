@@ -8,6 +8,10 @@ class Switcher[T](behaviour: Behavior[T], val event: Event[Behavior[T]]) extends
 }
 
 object Switcher {
+  def apply[T](initial: Behavior[T], event: Event[Behavior[T]]) : Switcher[T] = {
+    new Switcher(initial, event)
+  }
+  
   private def construct[T](initial: Behavior[T], event: Event[Behavior[T]]): Time => T = {
     frp {
       () => {

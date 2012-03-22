@@ -6,6 +6,10 @@ import com.github.oetzi.echo.Control._
 class Stepper[T](initial: T, val event: Event[T]) extends Behavior[T](Stepper.construct(initial, event)) {}
 
 object Stepper {
+  def apply[T](initial: T, event: Event[T]) : Stepper[T] = {
+    new Stepper(initial, event)
+  }
+  
   private def construct[T](initial: T, event: Event[T]): Time => T = {
     frp {
       () => {
