@@ -8,12 +8,11 @@
   % Title page
   \maketitle
   \paragraph*{Abstract}
-  Lorem ipsum
   
   % Acknowledgments
   \newpage
   \section*{Acknowledgments}
-    Lorem ipsum
+    
   
   % Contents
   \newpage
@@ -23,7 +22,7 @@
   \newpage
   
   \section{Introduction}
-  Lorem ipsum
+  
   \section{Functional Reactive Programming}
     \subsection{Origins}
       Functional Reactive Programming was originally proposed in the 1997 paper \emph{Functional
@@ -184,16 +183,12 @@ val event2 = dangerMap(event1, (t, v) => (t - 1, v))
       \emph{t - 1}. This means occurrences of this Event are happening in the past! We must
       be careful to avoid allowing situations like these to happen when implementing FRP.
       
-    \subsection{Events are Infinite}
-      Lorem ipsum
-      
+    \subsection{Events are Infinite}  
       % Event operating carried out on infinite data set
       % Only needed to know until fixed finite point
     
       
     \subsection{Interactive Behaviours}
-      Lorem ipsum
-      
       % Interactivity causes problems
       % Switcher based on mousePos Event example
       % Semantic problem with reading future
@@ -401,11 +396,8 @@ event.filter(predFunc).occs = event.occs.filter(predFunc)
         % Breakable to aid these abstractions
       
     \subsection{Implementation Choices}
-      Lorem ipsum
       
       \subsubsection{Push vs Pull Events}
-        Lorem ipsum
-        
         % Use push for sampling and filtering
         % Use pull evaluation for map and merge for simplicity and to not hold up event occurring threads 
     
@@ -479,33 +471,73 @@ val someString = hello.until(button.click, goodbye)
       FRP \emph{Events} can be easily generated in this way in Swing.
     
     \subsection{IO Framework}
-    Lorem ipsum
+    
+    As mentioned earlier FRP can ease programming functional I/O as FRP \emph{Events} introduce a declarative way to represent 
+    and interact with external sources. One obvious place to experiment with this is with socket programming. To create socket 
+    in FRP the two core Java socket abstractions \emph{Socket} and \emph{ServerSocket} were abstracted over to produce
+    \emph{Sender} and \emph{Receiver}. 
+
+    \emph{Sender} represents an output socket and is constructed from an IP to connect to, a host port and an 
+    \emph{EventSource[String]}. Any occurrences in the \emph{Event} will be sent to IP and port specified. The \emph{Receiver} 
+    type only requires a port to be constructed but is itself an \emph{EventSource[String]} of received messages. This allows 
+    a programmer to send and receive messages between FRP applications running on different nodes (or in different processes).
+    Here's an example program that sends a "Ping" message every time a Button is pressed:
+
+\begin{verbatim}
+val button = Button("Ping")
+val pinger = button.map((t, v) => "Ping")
+val sender = Sender("localhost", 1997, pinger)
+val receiver = Receiver(1997)
+\end{verbatim}
+    
+    Additional functionality can be added by allowing Receiver to reply to received messages. This can be achieved by
+    having an optional \emph{String => Behaviour[String]} constructor argument. For example, a Receiver that replies
+    ``Pong'' to each incoming message would be created like so:
+ 
+\begin{verbatim}
+val rec = Receiver(1997) {
+  in => "Pong"
+}
+\end{verbatim}    
+
+    One interesting problem encountered while developing the \emph{Socket} abstraction was that of \emph{Exceptions}. 
+    \emph{Sockets} can fail in many ways and in a JVM language this causes an exception which will cause the program to exit. 
+    The simplest way to deal with the problem would of course be to simply catch the exceptions and ignore them (if they 
+    occur) but this would mean any code written with FRP would be intolerant of external failure (disconnection to the 
+    internet etc). An elegant solution was to abstract over \emph{Exceptions} with \emph{Events}. To do this the socket types 
+    have an `errors' \emph{Event} that occurs every time an exception is thrown within their execution. For instance, in this 
+    setup there is nothing for the program to connect to on port \emph{1997}:
+
+\begin{verbatim}
+val socket = Sender("localhost", 1997, Event(0, "Hello")) 
+\end{verbatim}
+
+    Here the Java socket code will fail as it will be refused a connection (causing an exception). After the above line 
+    executes we can then say the following is true:
+
+\begin{verbatim}
+socket.errors.occs.length == 1 
+\end{verbatim}
+
+    This allows exceptions to interact with the FRP paradigm and allows programmers to build failure tolerant systems within 
+    an FRP setting.
     
   \section{Uses of FRP}
-  Lorem ipsum
   
     \subsection{Demo Applications}
-    Lorem ipsum
     
     \subsection{Use in the Wild}
-    Lorem ipsum
     
     \subsection{Possible Large Scale Use}
-    Lorem ipsum
     
   \section{Limitations}
-    Lorem ipsum
     
     \subsection{Need for Abstraction}
-    Lorem ipsum
     
     \subsection{Learning Curve}
-    Lorem ipsum
     
     \subsection{Where to Stop}
-    Lorem ipsum
     
   \section{Conclusion}
-  Lorem ipsum
   
 \end{document}
