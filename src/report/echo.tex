@@ -184,8 +184,10 @@ val event2 = dangerMap(event1, (t, v) => (t - 1, v))
       be careful to avoid allowing situations like these to happen when implementing FRP.
       
     \subsection{Events are Infinite}  
-      % Event operating carried out on infinite data set
-      % Only needed to know until fixed finite point
+      It is also important to highlight that an Event's stream in \emph{infinite}. This means
+      that streams must be evaluated lazily: we can't merge two infinite streams when we actually
+      call `merge' as it would never finish! This also means that there are some things we
+      can't express for an Event such as its `length' or its `last' element.
     
       
     \subsection{Interactive Behaviours}
