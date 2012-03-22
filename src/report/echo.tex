@@ -155,15 +155,38 @@ occs(snapshot(beh, ev)(x)) = (t, at(beh, t))
     They will be explored here in an attempt to aid the reader's understanding.
      
     \subsection{Events as Monotonic Streams}
+      As stated earlier, we think of Events as streams of Time-value pairs. What isn't immediately
+      obvious is that we think of this stream as real-time data: each occurrence is a value that
+      `occurs' at the time stated. This also means that an Event is a `monotonic' stream in terms of
+      occurrence times as the time of each occurrence will be greater than or equal to the last occurrence
+      time.
+      
+      With these observations in mind it it can be seen that Events should not be treated as a
+      standard data structure. Its noticeable that the earlier definition of the `map' operation for
+      Events does not provide a way to modify occurrence times. Here we will show why this is
+      the case using a modified version of this function.
+      
+      First we define the new function:
+      
+\begin{verbatim}
+dangerMap[U](ev : Event[T], func : (Time, T) => (Time, U))  : Event[U]
+occs(map(ev, func)) = occs(event).map(func)
+\end{verbatim}
+
+      Now we can do the following:
+      
+\begin{verbatim}
+val event2 = dangerMap(event1, (t, v) => (t - 1, v))
+\end{verbatim}
+
+      This new Event makes no sense as when there is a new occurrence in \emph{event1} at time 
+      \emph{t} a corresponding occurrence will be generated for \emph{event2} but at time 
+      \emph{t - 1}. This means occurrences of this Event are happening in the past! We must
+      be careful to avoid allowing situations like these to happen when implementing FRP.
+      
+    \subsection{Events are Infinite}
       Lorem ipsum
       
-      % Reiterate that events are infinite streams
-      % Occurrence times are monotonic
-      % Occurrences are real-time streaming data
-      % Map time example (genereate occurrence in past)
-    
-    \subsection{Events are Infinite}
-    
       % Event operating carried out on infinite data set
       % Only needed to know until fixed finite point
     
@@ -305,7 +328,8 @@ val beh = beh1.until(ev, beh2)
         Here, \emph{beh} `depends' on \emph{beh1} and \emph{beh2}: whenever we evaluate \emph{beh}
         we also need to evaluate \emph{beh1} or \emph{beh2}. This shows that Behaviours can't just
         be locked on a standalone basis but must share a lock with all their dependencies and other Behaviours
-        that share those dependencies.
+        that share those dependencies. By this it is meant that a group of dependent Behaviours can
+        only be read by one thread at a time.
         
       \subsubsection{Time Freezing}
         % Describe instantaneous occurrence problem
