@@ -14,7 +14,7 @@ DEFAULT_ARGS = "-shell-escape -interaction=nonstopmode -papersize=a4"
 CLEAN.include(['**/*.aux', '*.log', '*.out', '*.pyg', '*.bak', '*.toc', '*.bbl', '*.blg', '*.toc'])
 CLOBBER.include('*.pdf')
 
-task :default => [:build, :clean]
+task :default => [:build, :clean, :view]
 
 desc "Build the document"
 task :build do
@@ -32,6 +32,10 @@ task :view => [PDF_NAME] do
     command viewer, PDF_NAME
   end or
   puts "Unable to find any pdf viewer."
+end
+
+task :kick do
+  sh "kicker -e 'rake' report.tex sections"
 end
 
 # Load in the other tasks.
