@@ -146,7 +146,9 @@ snapshot[T, U](beh : Behaviour[T], ev : Event[U]) : Event[(T, U)]
 t = occs(ev)(x).time
 occs(snapshot(beh, ev)(x)) = (t, at(beh, t))
 \end{verbatim}          
-          
+
+    \subsection{Developments}      
+      Lorem ipsum
           
   \section{FRP Subtleties}
     FRP presents some subtle semantic problems and caveats that are not always immediately obvious.
@@ -234,9 +236,51 @@ pos.at(5)
     incredibly expressive and powerful ways to embed FRP into Scala and will be explored later.
     
     \subsection{Previous Work}
-      % Mention that there has been some work done previously in Scala
-      % Scala react paper uses Events and develops Signals also
-      % Reactive uses signals instead of Behaviours (combines Events/Behaviours)
+      As one might imagine, there has been previous work in implementing FRP in Scala. 
+      
+      \subsubsection{Reactive}
+        Arguably the most significant of these is the library `reactive' created by `nafg'. This framework was 
+        designed to allow for the creation of functional reactive web applications however here we are concerned with
+        the basic FRP library `reactive-core'. Unfortunately while claiming to be an FRP library `Reactive'
+        has a couple of problems.
+        
+        The framework is based around two types designed to represent Behaviours and Events respectively: \emph{Signals}
+        and \emph{EventStreams}. EventStreams are very close to the original Event definition but lack the
+        useful `merge' operation however it is with Signal that the core differences lie. Signal is defined as follows:
+        
+        \begin{quote}
+          In practical terms, a Signal has a current value, and an EventStream that, whenever the Signal's value changes,     
+          fires the new value.
+        \end{quote}  
+        
+        Although it is claimed that this results in Signals having a continuous value we can see
+        that at any point in time it is really just a static value that changes at discrete point in
+        time. We can see that this doesn't allow us to represent purely continuous values. For instance
+        how would we represent the following basic Behaviour with a Signal:
+        
+\begin{verbatim}
+new Behaviour(time => time)
+\end{verbatim}
+
+        In fact, it can be seen that a Signal[T] can however be represented in terms
+        of the `switcher' function:
+        
+\begin{verbatim}
+def signal[T](v : T, ev : Event[T]) = {
+  switcher(lift(v), map(ev, o => lift(o)))
+}
+\end{verbatim}  
+
+      This functionality was additionally encapsulated within the `stepper' function in Conal Elliott's
+      `Push-Pull' paper:
+
+\begin{verbatim}
+stepper[T](v : T, ev : Event[T]) : Behaviour[T]
+stepper(v, ev) = switcher(lift(v), map(ev, o => lift(o)))
+\end{verbatim} 
+
+      It can be seen here that although Signal provides a useful programming tool it is not an implementation
+      of an FRP Behaviour as it only allows for a subset of a Behaviour's functionality.
     
   \section{Implementation}
     As stated earlier the goal of this project was to implement a framework for utilising FRP in the Scala. 
