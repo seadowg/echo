@@ -190,11 +190,34 @@ val event2 = dangerMap(event1, (t, v) => (t - 1, v))
       can't express for an Event such as its `length' or its `last' element.
     
       
-    \subsection{Interactive Behaviours}
-      % Interactivity causes problems
-      % Switcher based on mousePos Event example
-      % Semantic problem with reading future
-      % Unbound memory with reading the past
+    \subsection{Interactive Behaviour}
+      FRP runs into some of its most significant problems when it is combined with any
+      sort of interactivity. By this it is meant user input, networking etc. This is
+      best explained with an example. For this we will use an \emph{Event[(Int, Int)]} `mousePos'
+      that occurs every time the user's mouse moves with the new position:
+
+\begin{verbatim}
+val pos = switcher(lift((0, 0)), mousePos.map(pos => lift(pos)))
+pos.at(2)
+pos.at(5)
+\end{verbatim}    
+
+      Now, suppose the time when this code executes is \emph{4}. The first problem we can see here
+      is that we are going to be evaluating \emph{pos} at a time greater than `now'. We don't
+      actually know if the mouse will move in the future or not so any result obtained may not
+      be correct. It can be seen here that there is a very large semantic problem with evaluating
+      Behaviours such as this in the future as we are not asking ``what is the value at time t?''
+      but ``what was the last value we know before time t?''. 
+      
+      What about the past? Evaluating \emph{pos} certainly makes sense. However, if arbitrary
+      access is allowed to the past in this way then we would have to store every occurrence
+      of an Event. It may be the case that this is how Events must be implemented but it does
+      mean that any FRP program would use an increasing amount of memory as its run time increased (
+      not a desirable property of any piece of code). This will also result in very large Event data sets which
+      may be impossible to traverse quickly for performing operations such as \emph{at}.
+      
+      These examples shows that implementing FRP without some restriction might either involve modifying the
+      semantics or sacrificing efficiency.
     
   \section{Implementation in Scala}
     As stated earlier this project dealt with implementing a framework for utilising FRP in the Scala programming
@@ -220,14 +243,15 @@ val event2 = dangerMap(event1, (t, v) => (t - 1, v))
       % Impurity - we just have to deal with it (lots of Scala is like this)
       
     \subsection{Previous Work}
-      
-    \subsection{A Brief Introduction to Echo}
+      % Mention that there has been some work done previously in Scala
+      % Scala react paper uses Events and develops Signals also
+      % Reactive uses signals instead of Behaviours (combines Events/Behaviours)
     
     \subsection{Design Choices}
     Throughout its history FRP implementations have generally been carried out in Haskell. Due to the movement
     in setting and also in an effort to create a efficient implementation without sacrificing FRP's expressive power
-    several design choices were made. 
-    
+    several design choices were made for echo. They will be explored here.
+        
       \subsubsection{Object Orientation}
         It would be possible to implement the original FRP operations as standalone functions. However, so
         as to conform to Scala Object Oriented style the operations will be attached to their respective
@@ -399,11 +423,12 @@ event.filter(predFunc).occs = event.occs.filter(predFunc)
         % EventSource as a way to add Event abstractions
         % Breakable to aid these abstractions
       
-    \subsection{Implementation Choices}
-      
-      \subsubsection{Push vs Pull Events}
-        % Use push for sampling and filtering
-        % Use pull evaluation for map and merge for simplicity and to not hold up event occurring threads 
+    \subsection{Implementation}
+    
+      \subsubsection{Behaviours} 
+        
+      \subsubsection{Events}
+        
     
     \subsection{Correctness of Implementation}
       Of course, there needs to be some way of verifying that the implementation is correct. By
@@ -431,7 +456,7 @@ event.filter(predFunc).occs = event.occs.filter(predFunc)
 
     These tests were generally written before implementing a feature and then run after every compilation. 
     This not only allowed the original implementation's correctness to be verified but
-    allowed refactoring to be carried out very quickly andeasily as testing would verify that any changes had not
+    allowed refactoring to be carried out very quickly and easily as testing would verify that any changes had not
     made the implementation incorrect.
       
   \section{Additional Work}
@@ -529,19 +554,35 @@ socket.errors.occs.length == 1
   \section{Uses of FRP}
   
     \subsection{Demo Applications}
+      % Music player
+      % Network game
+      % Answer machine
     
     \subsection{Use in the Wild}
+      % Flapjax
     
-    \subsection{Possible Large Scale Use}
+    \subsection{Possible Wide Spread Use}
+      % Ease of distribution
+      % Very useful for web browsers (JS)
+      % Allows building small apps very fast (phones?)
     
   \section{Limitations}
     
     \subsection{Need for Abstraction}
-    
+      % Operations need abstracted over (outputs)
+      % Need to build Event abstraction for input
+      % Promotes clean code once this is done
+      
     \subsection{Learning Curve}
+      % Initially hard to understand
+      % Some subtle semantics (hard to just teach basics)
+      % Distracting subjects on the way to it
+      % Hopefully this can help?
     
     \subsection{Where to Stop}
-    
+      % Should all code be FRP
+      % Can it abstract over anything?
+      
   \section{Conclusion}
   
 \end{document}
