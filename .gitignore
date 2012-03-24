@@ -7,3 +7,4 @@ echo.ipr
 echo.iws
 *.pyg
 *.log
+.DS_Store

@@ -1,0 +1,123 @@
+<html>
+  <head>
+    <title>echo</title>
+    <link href="public/bootstrap.min.css" rel="stylesheet">
+    <link href="public/master.css" rel="stylesheet">
+  </head>
+  <body>
+    <div class="container">
+      <div class="span9 offset1">
+        <div class="title step">
+          <h1>echo</h1>
+            <h6>A Functional Reactive Programming framework for Scala</h6>
+        </div>
+      
+        <div class="step">
+          <h3>1. Get It</h3>
+          <p>
+            You can download the latest jar of the framework 
+            <a href="https://github.com/downloads/oetzi/echo/echo.jar">here</a>. Just
+            stick it in your project folder. I'd personally recommend <a href="http://buildr.apache.org/">buildr</a> 
+            for building and compiling Scala projects.
+          </p>
+        </div>
+      
+        <div class="step">
+          <h3>2. FRP</h3>
+          <p>
+            Functional Reactive Programming is concerned with programming with two new types: Behaviours
+            and Events. Behaviours are continuous values that change over time and Events are infinite
+            streams of values that 'occur' at a discrete point in time - we can think of them as
+            as a stream of time and value pairs. Mental eh?
+          </p>
+        
+          <p>
+            Lets see some examples. Here we're going to make a simple Behaviour:
+          </p>
+          <pre>
+  val beh = Behaviour(time => time * 2)</pre>
+        
+          <p>
+            This Behaviour will, at a given time <code>t</code> have the value <code>t * 2</code>. So how do we actually
+            get at that value? We use the <code>eval</code> function:
+          </p>
+          
+          <pre>
+  val value = beh.eval()
+  println(value)</pre>
+  
+          <p>
+            The above code would evaluate the Behaviour at the current time and then print the calculated
+            value out.
+          </p>
+          
+          <p>
+            So what about Events? Well here's something. Imagine we have an Event <code>mouseEv</code>
+            that occurs every time the left mouse button is pressed. We could construct a Behaviour like this:
+          </p>
+          
+          <pre>
+  val false = new Behaviour(time => false)
+  val true = new Behaviour(time => true)
+  val beh = false.until(mouseEv, true)</pre>
+  
+          <p>
+            This creates a Behaviour that has the value <code>false</code> until the left mouse button is
+            pressed, at which point its value is <code>true</code>. Cool? How about this:
+          </p>
+          
+          <pre>
+  val beh = false.toggle(mouseEv, true)</pre>  
+  
+         <p>
+           Guess what this does? Thats right. It produced a Behaviour that toggles between <code>false</code>
+           and <code>true</code> whenever that crazy left mouse button is pressed.
+         </p> 
+         
+         <p>
+           Getting the hang of this? Lets jump in at the deep end:
+          </p>
+         
+          <pre>
+   val mouseTimes = mouseEv.map((t, v) => t)
+   val lastTime = new Stepper(-1, mouseTimes)</pre>
+   
+          <p>
+            Ok. Here we map the mouse button Event to return a new Event who's values are that of the times
+            of each occurrence. We then use a Stepper. A Stepper is a Behaviour that has an initial value
+            and an Event: at any point in time its value will be the Event's last occurrence's value (or the initial
+            value if the Event hasn't occurred). With all that put together you will see that we've created a Behaviour
+            that's value will always be the last time the mouse button was pressed (or <code>-1</code> to specify it 
+            was never pressed).
+          </p>
+          
+          <p>
+            That should all have hopefully got you into the right frame of mind. Lets move on to writing
+            some code in echo...
+          </p>
+    
+        </div>
+        <div class="step">
+          <h3>3. Writing Echo Code</h3>
+          <p>
+            Lorem ipsum
+          </p>
+        </div>
+      
+        <div class="step">
+          <h3>4. Adding Graphics</h3>
+          <p>
+            Lorem ipsum
+          </p>
+        </div>
+      
+        <div class="step">
+          <h3>5. Over the Interwebs...</h3>
+          <p>
+            Lorem ipsum
+          </p>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
