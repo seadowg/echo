@@ -1,5 +1,4 @@
 \documentclass[12pt]{article}
-\usepackage{minted}
 
 \title{Implementing Functional Reactive Programming in Scala}
 \author{Callum Stott - 0832894}
@@ -149,7 +148,7 @@ occs(snapshot(beh, ev)(x)) = (t, at(beh, t))
 \end{verbatim}          
           
           
-  \section{Problems and Caveats}
+  \section{FRP Subtleties}
     FRP presents some subtle semantic problems and caveats that are not always immediately obvious.
     They will be explored here in an attempt to aid the reader's understanding.
      
@@ -218,34 +217,34 @@ pos.at(5)
       
       These examples shows that implementing FRP without some restriction might either involve modifying the
       semantics or sacrificing efficiency.
+ 
+  \section{Scala}
+    Scala is a multi-paradigm programming language developed to run on the Java Virtual Machine. Scala programs are
+    generally structured in an object oriented programming style like Java but it also incorporates many features of
+    functional languages such as closures, high order functions, lazy initialisation and currying. These features aid
+    implementation of FRP concepts as closures will allow for Behaviour definition and functions such as map on
+    Behaviours and Events to be expressed in a more natural and succinct form. It is
+    important to note that although Scala is thought of as `functional' its functions are not `pure'. This means
+    that object functions and closures can cause side effects and be altered by external states.
+
+    Scala also possesses a advanced, powerful and feature rich static type system. A few of these provide large
+    advantages when implementing FRP. Firstly, Scala supports generic classes and it can be quite easily seen
+    that both Behaviours and Events will rely on this feature for type safety. Scala additionally provides
+    a rather unique type conversion functionality that allows types to be converted on the fly. This provides
+    incredibly expressive and powerful ways to embed FRP into Scala and will be explored later.
     
-  \section{Implementation in Scala}
-    As stated earlier this project dealt with implementing a framework for utilising FRP in the Scala programming
-    language. This framework was dubbed `echo'. This section will explore the motivations and problems ahead of
-    and also the choices made and results rendered during the implementation of \emph{echo}.
-    
-    \subsection{Scala}
-      Scala is a multi-paradigm programming language developed to run on the Java Virtual Machine. Scala programs are
-      generally structured in an object oriented programming style like Java but it also incorporates many features of
-      functional languages such as closures, high order functions, lazy initialisation and currying. These features aid
-      implementation of FRP concepts as closures will allow for Behaviour definition and functions such as map on
-      Behaviours and Events to be expressed in a more natural and succinct form. It is
-      important to note that although Scala is thought of as `functional' its functions are not `pure'. This means
-      that object functions and closures can cause side effects and be altered by external states.
-      
-      Scala also possesses a advanced, powerful and feature rich static type system. A few of these provide large
-      advantages when implementing FRP. Firstly, Scala supports generic classes and it can be quite easily seen
-      that both Behaviours and Events will rely on this feature for type safety. Scala additionally provides
-      a rather unique type conversion functionality that allows types to be converted on the fly. This provides
-      incredibly expressive and powerful ways to embed FRP into Scala and will be explored later.
-      
-    \subsection{Problems}
-      % Impurity - we just have to deal with it (lots of Scala is like this)
-      
     \subsection{Previous Work}
       % Mention that there has been some work done previously in Scala
       % Scala react paper uses Events and develops Signals also
       % Reactive uses signals instead of Behaviours (combines Events/Behaviours)
+    
+  \section{Implementation}
+    As stated earlier the goal of this project was to implement a framework for utilising FRP in the Scala. 
+    This framework was dubbed `echo'. This section will explore the motivations and problems ahead of
+    and also the choices made and results rendered during the implementation of \emph{echo}.
+      
+    \subsection{Problems}
+      % Impurity - we just have to deal with it (lots of Scala is like this)
     
     \subsection{Design Choices}
     Throughout its history FRP implementations have generally been carried out in Haskell. Due to the movement
@@ -422,13 +421,6 @@ event.filter(predFunc).occs = event.occs.filter(predFunc)
         
         % EventSource as a way to add Event abstractions
         % Breakable to aid these abstractions
-      
-    \subsection{Implementation}
-    
-      \subsubsection{Behaviours} 
-        
-      \subsubsection{Events}
-        
     
     \subsection{Correctness of Implementation}
       Of course, there needs to be some way of verifying that the implementation is correct. By
