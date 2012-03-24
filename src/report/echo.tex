@@ -239,7 +239,7 @@ pos.at(5)
       As one might imagine, there has been previous work in implementing FRP in Scala. 
       
       \subsubsection{Reactive}
-        Arguably the most significant of these is the library `reactive' created by `nafg'. This framework was 
+        Arguably the most significant of FRP work in Scala is the library `reactive' created by `nafg'. This framework was 
         designed to allow for the creation of functional reactive web applications however here we are concerned with
         the basic FRP library `reactive-core'. Unfortunately while claiming to be an FRP library `Reactive'
         has a couple of problems.
@@ -262,8 +262,8 @@ pos.at(5)
 new Behaviour(time => time)
 \end{verbatim}
 
-        In fact, it can be seen that a Signal[T] can however be represented in terms
-        of the `switcher' function:
+        It can be seen that a Signal[T] can however be represented in terms
+        of the `switcher' function meaning that it does have some relevance to Behaviours:
         
 \begin{verbatim}
 def signal[T](v : T, ev : Event[T]) = {
@@ -271,16 +271,35 @@ def signal[T](v : T, ev : Event[T]) = {
 }
 \end{verbatim}  
 
-      This functionality was additionally encapsulated within the `stepper' function in Conal Elliott's
-      `Push-Pull' paper:
+        This functionality was additionally encapsulated within the `stepper' function in Conal Elliott's
+        `Push-Pull' paper:
 
 \begin{verbatim}
 stepper[T](v : T, ev : Event[T]) : Behaviour[T]
 stepper(v, ev) = switcher(lift(v), map(ev, o => lift(o)))
 \end{verbatim} 
 
-      It can be seen here that although Signal provides a useful programming tool it is not an implementation
-      of an FRP Behaviour as it only allows for a subset of a Behaviour's functionality.
+        It can be seen here that although Signal provides a useful programming tool it is not an implementation
+        of an FRP Behaviour as it only allows for a subset of a Behaviour's functionality meaning that `Reactive'
+        does not successfully implement FRPs semantics.
+      
+      \subsection{React}
+        While not claiming to be an implementation of FRP the `React' framework proposed in the 
+        paper `Deprecating the Observer Pattern' does utilise a notion of Events that, as cited in the paper,
+        has its routes in FRP.
+        
+        The Event's in React are very similar to the Events in FRAN: they are conceptually infinite
+        and have the `merge' and `map' operations defined on them. One slight difference is that React
+        Events expose an operation to allow them to `occur' with an `emit' function. This functionality
+        is actually never discussed in the original FRP papers and so it should be assumed that this
+        functionality should be hidden publicly (it will be shown later how to internalise this action
+        effectively). Interestingly, React also contains a notion of Signals, just as Reactive does, however
+        it doesn't claim that these are an implementation of Behaviours (although the word `continuous' is
+        used loosely in their description). 
+        
+    It can be seen from these examples that while many of the concepts from FRP are popular
+    in the Scala community there has been little attempt to implement FRP within Scala while honouring
+    the original denotational semantics.
     
   \section{Implementation}
     As stated earlier the goal of this project was to implement a framework for utilising FRP in the Scala. 
