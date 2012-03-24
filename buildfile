@@ -47,18 +47,6 @@ define "echo" do
   package :jar
   test.using :specs
   
-  task :typeset do
-    FileUtils.makedirs('target/pdfs') unless File.exists?('target/pdfs')
-    system 'xelatex -output-directory=target/pdfs -shell-escape src/report/echo.tex'
-    system 'xelatex -output-directory=target/pdfs -shell-escape src/report/echo.tex'
-    system 'open target/pdfs/echo.pdf'
-  end
-  
-  task :tcc => :typeset do
-    FileUtils.makedirs('target/pdfs') unless File.exists?('target/pdfs')
-    system 'kicker -e "xelatex -output-directory=target/pdfs -shell-escape src/report/echo.tex" src/report/echo.tex'
-  end
-  
   task :console => :compile do
     system 'scala -classpath target:target/classes'
   end

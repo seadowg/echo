@@ -1,0 +1,48 @@
+\documentclass[12pt,twoside,abbrevs,bsc,logo,notimes]{styles/infthesis}
+
+% Project Details
+% Change these!
+\title{Implementing Functional Reactive Programming in Scala}
+\author{Callum Stott}
+\course{Computer Science}
+\project{4th Year Project Report}
+
+\submityear{2012}
+%\graduationdate{July 2012}
+\date{\today}
+
+\include{sections/misc/abstract}
+
+% Extra Package Commands
+
+\begin{document}
+  \begin{preliminary}
+    % Title Page
+    \maketitle
+  
+    % Preamble
+    \include{sections/misc/acknowledgements}
+    \standarddeclaration
+    \include{sections/misc/dedication}
+    \tableofcontents
+  \end{preliminary}
+
+  % Chapters
+  \include{sections/intro}
+  \include{sections/frp}
+  \include{sections/scala}
+  \include{sections/implementation}
+  \include{sections/additional}
+  \include{sections/uses}
+  \include{sections/limitations}
+  \include{sections/conclusion}
+  
+  % Appendix
+  \appendix
+  
+  %\include...
+  
+  % Bibliography
+  \bibliographystyle{apalike}
+  \bibliography{refs/bibliography}
+\end{document}

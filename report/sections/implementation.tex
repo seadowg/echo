@@ -1,0 +1,212 @@
+\chapter{Implementation}
+  As stated earlier the goal of this project was to implement a framework for utilising FRP in the Scala. 
+  This framework was dubbed `echo'. This section will explore the motivations and problems ahead of
+  and also the choices made and results rendered during the implementation of \emph{echo}.
+    
+  \section{Problems}
+    % Impurity - we just have to deal with it (lots of Scala is like this)
+  
+  \section{Design Choices}
+  Throughout its history FRP implementations have generally been carried out in Haskell. Due to the movement
+  in setting and also in an effort to create a efficient implementation without sacrificing FRP's expressive power
+  several design choices were made for echo. They will be explored here.
+      
+    \subsection{Object Orientation}
+      It would be possible to implement the original FRP operations as standalone functions. However, so
+      as to conform to Scala Object Oriented style the operations will be attached to their respective
+      classes. For instance, the `merge' operation will be used in the following way in echo:
+      
+\begin{verbatim}
+val merged = event1.merge(event2)
+\end{verbatim}
+
+    This allows the FRP code to fit more naturally into Scala. We will also replace the `switcher' function
+    with a type that extends Behaviour rather than a function:
+    
+\begin{verbatim}
+val switch = new Switcher(iniBeh, behEvent)
+\end{verbatim}
+
+    \subsection{Implicit Lifting of Constants}
+      As mentioned earlier, one of the most powerful features of Scala is it's ability to convert between
+      types at run time. This is facilitated by the \emph{implicit} key word allowing a function to be defined
+      that is automatically when a corresponding type mismatch occurs. This will be used in echo to allows 
+      static values to be converted to Behaviours \emph{implicitly}.. This is implemented in the following way:  
+
+\begin{verbatim}
+implicit def liftConst[T](value : T) : Behaviour[T] = {
+new Behaviour(time => value)
+}
+\end{verbatim}              
+      
+      This would allow the following for instance:
+
+\begin{verbatim}
+val beh : Behaviour[Int] = 0
+val switcher = new Switcher(false, eventBeh)
+\end{verbatim}       
+
+      It can immediately be seen that this allows the programmer to switch between static and more complex
+      Behaviours in a very naturalistic manor.
+    
+    \subsection{Time Travel is Dangerous}
+      Relating back to the earlier discussion of interactive Behaviours it can be seen
+      that there are problems when plugging FRP into the real world: the future is uncertain and
+      arbitrary access to the past requires an unbounded level of memory. After much deliberation
+      over different compromises it was decided that echo would follow a set of rules:
+      
+      \begin{itemize}
+        \item If a Behaviour was last evaluated at time \emph{u} then it can only be evaluated at
+        a time \emph{t} if \emph{t} $\geq$ \emph{u}.
+        \item An Event holds the last time it occurred and the time up to which it hasn't occurred
+        again (the time it is `valid' until).
+        \item An Event is valid up until the time equivalent to `now' (the actual current time).
+        \item If a Behaviour depends on some Event then we can only evaluate the Behaviour up to
+        the time the Event is valid.
+      \end{itemize}
+      
+      With this set of rules in place, it becomes clear that we will only ever use a fixed amount of memory
+      for an Event and that a Behaviour can not be evaluated in the past or the future. Will
+      introduce a new operation on a \emph{Behaviour[T]} for this:
+
+\begin{verbatim}
+eval() : T
+beh.eval() = beh.at(now())
+\end{verbatim}       
+
+      We will also remove the `at' function on Behaviours from the public API (it will still be
+      use within the framework). 
+      
+      Of course, the rules can still be broken if we introduce multi-threading and this is best illustrated
+      with an example:
+      
+\begin{verbatim}
+val beh = new Behaviour(time => 5)
+
+class Runner extends Runnable() {
+def run() {
+  beh.eval()
+}
+}
+
+new Thread(new Runner).start()
+new Thread(new Runner).start()
+\end{verbatim}       
+
+      Here we have two threads continuously evaluating one Behaviour. This means that one thread
+      might call \emph{eval()} and then be scheduled out allowing the other to proceed to evaluate
+      at a later time. If the original is then scheduled back in it is possible it will
+      be evaluating the Behaviour at a time less than the time second evaluated it at. This suggests
+      that we desire the \emph{eval} operation to be `atomic'. This can be achieved easily for standalone
+      Behaviours using standard locking tools in Scala.
+      
+      We run into further problems however if the Behaviour is more complex. Suppose, in the above example,
+      the Behaviour was defined as follows:
+
+\begin{verbatim}
+val beh = beh1.until(ev, beh2)
+\end{verbatim}        
+
+      Here, \emph{beh} `depends' on \emph{beh1} and \emph{beh2}: whenever we evaluate \emph{beh}
+      we also need to evaluate \emph{beh1} or \emph{beh2}. This shows that Behaviours can't just
+      be locked on a standalone basis but must share a lock with all their dependencies and other Behaviours
+      that share those dependencies. By this it is meant that a group of dependent Behaviours can
+      only be read by one thread at a time.
+      
+    \subsection{Time Freezing}
+      % Describe instantaneous occurrence problem
+      % Describe dynamic FRP problems and initial setup phase
+    
+    \subsection{Function Renaming}
+      Although a small change it should also be noted that one of the functions originally defined
+      has be renamed for the echo framework - `snapshot' was renamed to `sample'. This was done as
+      it was felt it added more clarity to the function name was more appropriate given its use.
+      
+    \subsection{Function Additions}
+      When considering different applications of the framework and also in an attempt to
+      tackle the changes in expressiveness between Haskell and Scala some operations
+      were added to the FRP in echo.
+      
+      Lifting of constants has already been discussed for echo but lifting of operators and
+      functions presents a few problems. This is because function in Scala (as discussed earlier)
+      are usually attached to classes. For instance, there is no `'+' operator in Scala: the numeric
+      types have a plus function defined in their class declarations (how Scala actually performs additions
+      is a topic for discussion elsewhere). This means that we cannot `lift' many of the operations we
+      would want to. To solve this problem we can use a series of map functions. We can define these
+      here for a \emph{Behaviour[T]}:
+
+\begin{verbatim}
+map[U](func : T => U) : Behaviour[U]
+beh.map(func).at(t) = func(beh.at(t))
+
+map2[U, V](beh1 : U)(func : (T, U) => V) : Behaviour[V]
+beh.map2(beh1)(func).at(t) = func(beh.at(t), beh1.at(t))
+\end{verbatim}        
+
+      These functions allow Behaviours to be transformed and combined using functions
+      normally applied to static values.
+      
+      In Hudak and Elliott's original paper an example is constructed to create a Behaviour
+      that toggles back and forth between two given Behaviours whenever an Event occurs. This
+      example took advantage of Haskell's lazy evaluation. While Scala is able to use lazy evaluation
+      it requires extra work and at the time of writing requires some complex syntax. To tackle this
+      a `toggle' function was added to echo to provide the functionality in the example out of the box.
+      This is defined here for a \emph{Behaviour[T]}:
+      
+\begin{verbatim}
+toggle(ev : Event[T], beh1 : Behaviour[T]) : Behaviour[T]
+\end{verbatim}        
+      
+      It was felt that another common use of combining Behaviours and Events would be
+      to switch from one Behaviour to another when an Event occurs (but not back again):
+
+\begin{verbatim}
+until(ev : Event[T], beh1 : Behaviour[T]) : Behaviour[T]
+beh.until(ev, beh1).at(t) = new Switcher(beh, event.map((t,v) => beh1)).at(t)
+\end{verbatim}        
+      
+      It is also useful to be able to to filter Events to produce a new one that only
+      contains occurrences matching a predicate. This allows a Behaviour to only react
+      to some occurrences from an Event. This is defined on an \emph{Event[T]}:
+
+\begin{verbatim}
+filter(predicate : T => Boolean) : Event[T]
+event.filter(predFunc).occs = event.occs.filter(predFunc)
+\end{verbatim}        
+      
+    \subsection{Extendability}
+      It was decided form the initial stages of the project that \emph{echo} should provide
+      a way for users to create their own FRP abstractions. Effort throughout the design and
+      implementation was put into this feature.
+      
+      % EventSource as a way to add Event abstractions
+      % Breakable to aid these abstractions
+  
+  \section{Correctness of Implementation}
+    Of course, there needs to be some way of verifying that the implementation is correct. By
+    this it is meant that it follows both the semantic rules set forth by the original FRP specification
+    and also the rules and constraints laid out in this report.
+    
+    This achieved in echo using formal program testing. More specifically, Behaviour Driven
+    testing was carried out throughout the development process using the Scala framework `Specs'
+    to verify that implementations were correct. `Specs' and BDT involve series of tests for
+    separate program `invariants' or `behaviours'. For example to test the Behaviour `map' function
+    in `Specs' we can do the following:
+
+\begin{verbatim}
+"provide a map function" >> {
+"returning a Behavior thats value is func(this.at(t))" in {
+  val beh = new Behavior(time => 5)
+  val func: Int => String = {
+    int => int.toString
+  }
+
+  beh.map(func).eval() mustEqual "5"
+}
+}
+\end{verbatim}      
+
+  These tests were generally written before implementing a feature and then run after every compilation. 
+  This not only allowed the original implementation's correctness to be verified but
+  allowed refactoring to be carried out very quickly and easily as testing would verify that any changes had not
+  made the implementation incorrect.
