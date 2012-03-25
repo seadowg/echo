@@ -9,9 +9,9 @@
     
   \section{Semantics}
     The ideas in FRA and in following FRP work are based around two key data types: 
-    \emph{Behaviours} and \emph{Events}. This paper will deal with the \emph{classic} flavour of
-    FRP (that descended directly from FRAN) and so will not deal with \emph{signals} and Arrow FRP
-    concepts explored elsewhere. Here the semantics of the FRP explored in this report will be defined.
+    \emph{Behaviours} and \emph{Events}. Here the semantics of `classic' \footnote{Several
+    flavours of FRP have emerged over the years and the term `classic' is often used to describe
+    the FRP described by and directly descended from FRAN.} FRP explored in this report will be defined.
     
     Within this section we will explore a selection of the basic denotational semantics that Elliott
     and Hudak originally laid down and that we hope to implement in Scala. The semantic definitions will
@@ -46,8 +46,7 @@ occs[T](ev : Event[T]) : Stream[(Time, T)]
 \end{verbatim}
        
     \subsection{Operations}
-      Elliot and Hudak additionally define a set of actions on Behaviours and Events. In the interest of
-      conciseness not all of these operations will be shown here. They will explored later however.
+      Elliot and Hudak additionally define a set of actions on Behaviours and Events.
       
       \subsubsection{Behaviours}
         We would like functions defined on static values to also be available to \emph{Behaviours}. Hudak
@@ -59,17 +58,17 @@ b1 : Behaviour[T1],..., bn : Behaviour[Tn]) : Behaviour[U]
 at(lift(func, b1,...,bn), t) = func (at(b1, t),..., at(bn, t))
 \end{verbatim}
 
-      In the original paper it was noted that this was intended to be used to also lift constants to Behaviours
-      as in `lift0 42' for example. We can't express this as simply in Scala as was done in Haskell due to 
-      the syntax of type signatures. We can define an additional function for this purpose explicitly however.
+      In the original paper it was noted that this was intended to also lift constants to Behaviours
+      as in `lift0 42' for example. This functionality is not captured in the above function \footnote{It would
+      be in Haskell}. We can just simply define an additional function for lifting constants however:
 
 \begin{verbatim}
 lift0[T](t : T) : Behaviour[T]
 at(lift0(v), t) = v
 \end{verbatim}
         
-       It also may be useful to evaluate Behaviours in a modified time frame for slowing down or speeding
-       up a Behaviour for example. We define this with the timeTransform function on a \emph{Behaviour[T]}:
+       It also may be useful to evaluate Behaviours in a modified time frame. For example, this allows
+       slowing down or speeding up a Behaviour. We define this with the timeTransform function on a \emph{Behaviour[T]}:
 
 \begin{verbatim}
 timeTransform(beh : Behaviour[T], time : Behaviour[Time]) : Behaviour[T]
@@ -77,16 +76,16 @@ at(timeTransform(beh, timeBeh), t) = at(beh, at(timeBeh, t))
 \end{verbatim}
         
       \subsubsection{Events}
-        It is useful to be able to merge two Events into one. We can do this with the merge function on an \emph{Event[T]}:
+        It is useful to be able to merge two Events into one. We can achieve this with the merge function on an \emph{Event[T]}:
 
 \begin{verbatim}
 merge[T](ev1 : Event[T], ev2 : Event[T]) : Event[T]
 def mergeStr[T](str1 : Stream[Time, T], str1 : Stream[Time, T]) = {
-if (str1.first.time <= str2.first.time) {
-  new Stream(str1.first, mergeStr(str1.drop(1), str2))
-} else {
-  new Stream(str2.first, mergeStr(str1, str2.drop(1)))
-}
+  if (str1.first.time <= str2.first.time) {
+    new Stream(str1.first, mergeStr(str1.drop(1), str2))
+  } else {
+    new Stream(str2.first, mergeStr(str1, str2.drop(1)))
+  }
 }
 merge(ev1, ev2).occs = mergeStr(occs(ev1), occs(ev2))
 \end{verbatim}            
@@ -114,7 +113,7 @@ at(switcher(ini, ev), t) = at(occs(ev).filter(
 \end{verbatim}
 
         Another useful interaction between Behaviours and Events is to be able to sample
-        a Behaviour at the exact moment an Event occurs. This was originally defined in the
+        a Behaviour at the exact moment an Event occurs. This functionality was originally defined in the
         form of the `snapshot' operation:
 
 \begin{verbatim}
@@ -130,11 +129,11 @@ occs(snapshot(beh, ev)(x)) = (t, at(beh, t))
     \subsection{Events as Monotonic Streams}
       As stated earlier, we think of Events as streams of Time-value pairs. What isn't immediately
       obvious is that we think of this stream as real-time data: each occurrence is a value that
-      `occurs' at the time stated. This also means that an Event is a `monotonic' stream in terms of
+      `occurs' at the time stated. This rationale also means that an Event is a `monotonic' stream in terms of
       occurrence times as the time of each occurrence will be greater than or equal to the last occurrence
       time.
       
-      With these observations in mind it it can be seen that Events should not be treated as a
+      With the previous observations in mind it it can be seen that Events should not be treated as a
       standard data structure. Its noticeable that the earlier definition of the `map' operation for
       Events does not provide a way to modify occurrence times. Here we will show why this is
       the case using a modified version of this function.
@@ -152,13 +151,13 @@ occs(map(ev, func)) = occs(event).map(func)
 val event2 = dangerMap(event1, (t, v) => (t - 1, v))
 \end{verbatim}
 
-      This new Event makes no sense as when there is a new occurrence in \emph{event1} at time 
+      \emph{event2} makes no sense as when there is a new occurrence in \emph{event1} at time 
       \emph{t} a corresponding occurrence will be generated for \emph{event2} but at time 
       \emph{t - 1}. This means occurrences of this Event are happening in the past! We must
       be careful to avoid allowing situations like these to happen when implementing FRP.
       
     \subsection{Events are Infinite}  
-      It is also important to highlight that an Event's stream in \emph{infinite}. This means
+      It is also important to highlight that an Event's stream is \emph{infinite}. This means
       that streams must be evaluated lazily: we can't merge two infinite streams when we actually
       call `merge' as it would never finish! This also means that there are some things we
       can't express for an Event such as its `length' or its `last' element.
@@ -166,9 +165,9 @@ val event2 = dangerMap(event1, (t, v) => (t - 1, v))
       
     \subsection{Interactive Behaviour}
       FRP runs into some of its most significant problems when it is combined with any
-      sort of interactivity. By this it is meant user input, networking etc. This is
-      best explained with an example. For this we will use an \emph{Event[(Int, Int)]} `mousePos'
-      that occurs every time the user's mouse moves with the new position:
+      sort of interactivity - unfortunately an area of programming it initially seems
+      well equipped for. This is best explained with an example. For this example we will use an 
+      \emph{Event[(Int, Int)]} `mousePos' that occurs every time the user's mouse moves with the new position:
 
 \begin{verbatim}
 val pos = switcher(lift((0, 0)), mousePos.map(pos => lift(pos)))
@@ -183,7 +182,7 @@ pos.at(5)
       Behaviours such as this in the future as we are not asking ``what is the value at time t?''
       but ``what was the last value we know before time t?''. 
       
-      What about the past? Evaluating \emph{pos} certainly makes sense. However, if arbitrary
+      What about the past? Evaluating \emph{pos} at times before `now' certainly makes sense. However, if arbitrary
       access is allowed to the past in this way then we would have to store every occurrence
       of an Event. It may be the case that this is how Events must be implemented but it does
       mean that any FRP program would use an increasing amount of memory as its run time increased (
@@ -194,4 +193,5 @@ pos.at(5)
       semantics or sacrificing efficiency.
 
   \section{Developments}      
-    Lorem ipsum 
+    % Arrow FRP
+    % Push-pull
