@@ -1,5 +1,6 @@
 \chapter{Scala}
-  Scala is a multi-paradigm programming language developed to run on the Java Virtual Machine. Scala programs are
+  Scala is a multi-paradigm programming language developed to run on the Java Virtual Machine \cite{Odersky2004}. Scala 
+  programs are
   generally structured in an object oriented programming style like Java but it also incorporates many features of
   functional languages such as closures, high order functions, lazy initialisation and currying. These features aid
   implementation of FRP concepts as closures will allow for Behaviour definition and functions such as map on
@@ -12,6 +13,16 @@
   that both Behaviours and Events will rely on this feature for type safety. Scala additionally provides
   a rather unique type conversion functionality that allows types to be converted on the fly. This provides
   incredibly expressive and powerful ways to embed FRP into Scala and will be explored later.
+  
+  \section{Problems}
+    One quite significant problem with implementing FRP in Scala is that, unlike Haskell, it is an `impure'
+    language. In terms of functional programming, `purity' refers to a languages ability to write functions
+    thats results are affected by some external estate or in turn effect some external state. For instance,
+    this means that a function that defines a Behaviour could in fact cause side effects meaning that
+    every time the Behaviour was evaluated it would execute this side effect. There has been some work into
+    pure function verification in Scala and this may be useful for implementing FRP. However, enforcing
+    purity in Scala can cause serious problems due to high level library code that is executed for
+    what might seem like self contained systems.
   
   \section{Previous Work}
     As one might imagine, there has been previous work in implementing FRP in Scala. 
@@ -63,7 +74,7 @@ stepper(v, ev) = switcher(lift(v), map(ev, o => lift(o)))
     
     \section{React}
       While not claiming to be an implementation of FRP the `React' framework proposed in the 
-      paper `Deprecating the Observer Pattern' does utilise a notion of Events that, as cited in the paper,
+      paper `Deprecating the Observer Pattern' \cite{Maier2010} does utilise a notion of Events that, as cited in the paper,
       has its routes in FRP.
       
       The Event's in React are very similar to the Events in FRAN: they are conceptually infinite

@@ -208,7 +208,7 @@ filter(predicate : T => Boolean) : Event[T]
 event.filter(predFunc).occs = event.occs.filter(predFunc)
 \end{verbatim}        
       
-  \section{Correctness of Implementation}
+  \section{Verifying Correctness}
     Of course, there needs to be some way of verifying that the implementation is correct. By
     this it is meant that it follows both the semantic rules set forth by the original FRP specification
     and also the rules and constraints laid out in this report.
