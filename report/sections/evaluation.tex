@@ -1,19 +1,54 @@
 \chapter{Evaluation}
   
-  \section{Original Semantics}
-    It is important that the FRP implemented in `echo' is a correct model of the denotational semantics
-    set out in the original Fran paper \cite{Elliott1997} as this was one of the primary motivations for
-    the project. Earlier, it was mentioned that formal program testing was used to verify
-    this somewhat (the test cases can be viewed the `echo' source). Earlier sections of this report
-    that discuss modifications to the rules and restrictions additionally verify that these choices meet the original 
-    specification. However, although restrictions such as real-time evaluation on Behaviours do not
-    alter their original semantic definition they do remove some of FRP's functionality.
+  \section{Verifying Correctness}
+    Of course, there needs to be some way of verifying that the implementation is correct. By
+    this it is meant that it follows both the semantic rules set forth by the original FRP specification
+    and also the rules and constraints laid out in this report.
+  
+    This achieved in echo using formal program testing. More specifically, Behaviour Driven
+    testing was carried out throughout the development process using the Scala framework `Specs'
+    to verify that implementations were correct. `Specs' and BDT involve series of tests for
+    separate program `invariants' or `behaviours'. For example to test the Behaviour `map' function
+    in `Specs' we can do the following:
+
+\begin{verbatim}
+"provide a map function" >> {
+  "returning a Behavior thats value is func(this.at(t))" in {
+    val beh = new Behavior(time => 5)
+    val func: Int => String = {
+      int => int.toString
+    }
+
+    beh.map(func).eval() mustEqual "5"
+  }
+}
+\end{verbatim}      
+
+    These tests were generally written before implementing a feature and then run after every compilation. 
+    This not only allowed the original implementation's correctness to be verified but
+    allowed refactoring to be carried out very quickly and easily as testing would verify that any changes had not
+    made the implementation incorrect.
     
   \section{Limitations}
     % No predicate function
     % Removes ability to evaluate Behaviours at any time
   
   \section{Impurity}
+    It is important to note that `echo' does not attempt to deal with the problem that
+    users are able to create impure functions to define Behaviours. For instance, a programmer could
+    create a Behaviour that reads from some external source:
+
+\begin{verbatim}
+val imp = new Behaviour(time => Console.readLine)
+\end{verbatim}    
+
+    This Behaviour would actually block on evaluation until a user wrote a line to the program console. A
+    Behaviour can additionally cause side effects:
+
+\begin{verbatim}    
+val imp = new Behaviour(time => println("Hello, world!"))
+\end{verbatim}
+    
     % Behaviour functions can read external sources
     % As reading is done in real time its kind of ok
     % Behaviour functions can cause side effects - not good
@@ -21,7 +56,18 @@
     % Good documentation is needed
   
   \section{Demo Applications}
-    % Demo applications provide test of development process
-    % Music application easy to develop logic (very intuitive)
-    % Needed abstraction for Song but produces resuable component
-    % Password application easy to develop
+    So as to gain experience with using `echo' and also for the purposes of evaluation, demonstration
+    applications were developed. 
+    
+    The first of these was a small music player application. The application
+    can load in a `.wav' audio file and then play it back to the user. Pause and volume changing functionality
+    is also available and the user is presented with a simple animation of the current volume level. One of the
+    first points to cover is that an abstraction had to be built to enable the audio playback. This was in the form
+    of a `Song' component. For this component playback is controlled by a Behaviour[Boolean] of whether the audio
+    should be playing or not and the volume is dictated by a Behaviour[Int] that represents the current percentage
+    volume. Once the abstraction was in place programming the FRP logic for the application using the 
+    graphics framework was very simple and, quite importantly, took very little time. It can be seen from
+    the development of this application that abstractions over input and outputs would have to frequently be
+    created to produce non-trivial FRP applications. However, any abstractions built would hopefully be
+    reusable in nature due to FRPs high level approach to control. These findings also verify that it
+    is important that `echo' is as extendable as possible.

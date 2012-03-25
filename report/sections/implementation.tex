@@ -3,12 +3,25 @@
   This framework was dubbed `echo'. This section will explore the motivations and problems ahead of
   and also the choices made and results rendered during the implementation of \emph{echo}.
   
-  \section{Design Choices}
+  \section{Design \& Implementation Choices}
   Throughout its history FRP implementations have generally been carried out in Haskell. Due to the movement
   in setting and also in an effort to create a efficient implementation without sacrificing FRP's expressive power
-  several design choices were made for echo. They will be explored here.
+  several design and implementation choices were made for echo. Choices were also made
+  to provide to provide programmers with simpler experiences and to hopefully allow `echo' to be
+  as powerful as possible. They will all be explored here.
       
     \subsection{Object Orientation}
+      Although it may seem obvious it is worth noting that both Behaviours and Events are implemented in
+      `echo' using Scala's object oriented definitions. For instance, a Behaviour is simply
+      implemented as a generic class with a Time =$>$ T function parameter. An example Behaviour
+      could be instantiated as follows:
+ 
+\begin{verbatim}
+val beh = new Behaviour(time => sin(time))
+\end{verbatim}  
+
+      A discussion of Event's implementation will feature later.
+      
       It would be possible to implement the original FRP operations as standalone functions. However, so
       as to conform to Scala Object Oriented style the operations will be attached to their respective
       classes. For instance, the `merge' operation will be used in the following way in echo:
@@ -207,32 +220,3 @@ beh.until(ev, beh1).at(t) = new Switcher(beh, event.map((t,v) => beh1)).at(t)
 filter(predicate : T => Boolean) : Event[T]
 event.filter(predFunc).occs = event.occs.filter(predFunc)
 \end{verbatim}        
-      
-  \section{Verifying Correctness}
-    Of course, there needs to be some way of verifying that the implementation is correct. By
-    this it is meant that it follows both the semantic rules set forth by the original FRP specification
-    and also the rules and constraints laid out in this report.
-    
-    This achieved in echo using formal program testing. More specifically, Behaviour Driven
-    testing was carried out throughout the development process using the Scala framework `Specs'
-    to verify that implementations were correct. `Specs' and BDT involve series of tests for
-    separate program `invariants' or `behaviours'. For example to test the Behaviour `map' function
-    in `Specs' we can do the following:
-
-\begin{verbatim}
-"provide a map function" >> {
-  "returning a Behavior thats value is func(this.at(t))" in {
-    val beh = new Behavior(time => 5)
-    val func: Int => String = {
-      int => int.toString
-    }
-
-    beh.map(func).eval() mustEqual "5"
-  }
-}
-\end{verbatim}      
-
-  These tests were generally written before implementing a feature and then run after every compilation. 
-  This not only allowed the original implementation's correctness to be verified but
-  allowed refactoring to be carried out very quickly and easily as testing would verify that any changes had not
-  made the implementation incorrect.
