@@ -66,12 +66,35 @@ val switcher = new Switcher(false, eventBeh)
       Behaviours in a very naturalistic manor.
       
     \subsection{Extendable Events}
-      % Events are often used to model external stimuli
-      % Events need to actually be able to occur
-      % EventSource allows extension for occurable Events
-      % Other Events modeled as Event - simply lazy views of some EventSource
-      % Graph like structure
-    
+      FRP Events provide a very useful abstraction for external stimuli such as I/O and user input. Of course
+      to allow for this and also so that Events can be useful in anyway they must be allowed to `occur' in some way.
+      It is noticeable that the original denotational semantics \cite{Elliott1997} do not explore how to achieve
+      this and it is assumed that this is because the actual occurring of Events is really just an implementation
+      issue. As discussed earlier, previous implementations of Events in Scala add an operation to Event's
+      public API to allow it to occur. Here we will show an alternative approach.
+      
+      When observing how Events are composed (using merge and map operations) it can be seen that
+      only a subset of Events actually `occur' while others are simply views and combinations of these.
+      In `echo' this is modelled directly. FRP Events are represented by two traits: Event[T] and EventSource[T].
+      Event has concrete implementations of `map', `merge' and `filter' operations that
+      all return concrete Event[T] instantiations. EventSource[T] extends
+      from Event[T] a protected level concrete function `occur':
+      
+\begin{verbatim}
+occur(value : T) : Unit
+\end{verbatim}  
+
+      This function causes the EventSource[T] to `occur' with the given value. This allows programmers
+      to easily build FRP Event abstractions for any form of input without exposing the occur action itself.
+      As an example, Here is a simple implementation for an Event that occurs once with the value `5' when it 
+      is created:
+      
+\begin{verbatim}
+class Five extends EventSource[Int] {
+  occur(5)
+}
+\end{verbatim}
+
     \subsection{Time Travel is Dangerous}
       Relating back to the earlier discussion of interactive Behaviours it can be seen
       that there are problems when plugging FRP into the real world: the future is uncertain and
