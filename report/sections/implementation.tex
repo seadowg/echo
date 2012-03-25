@@ -9,15 +9,21 @@
   several design and implementation choices were made for echo. Choices were also made
   to provide to provide programmers with simpler experiences and to hopefully allow `echo' to be
   as powerful as possible. They will all be explored here.
+  
+    \subsection{Flat Time}
+      % Many implementations use non flat time
+      % Scala currently doesn't provide value from non-flat types
+      % No non-flat features needed externally to the framework
+      % Time implemented as Double allows switching between them implicitly
       
     \subsection{Object Orientation}
       Although it may seem obvious it is worth noting that both Behaviours and Events are implemented in
-      `echo' using Scala's object oriented definitions. For instance, a Behaviour is simply
+      `echo' using Scala's object oriented definitions. For instance, a Behaviour[T] is simply
       implemented as a generic class with a Time =$>$ T function parameter. An example Behaviour
       could be instantiated as follows:
  
 \begin{verbatim}
-val beh = new Behaviour(time => sin(time))
+val beh = new Behaviour[Double](time => sin(time))
 \end{verbatim}  
 
       A discussion of Event's implementation will feature later.
@@ -58,6 +64,13 @@ val switcher = new Switcher(false, eventBeh)
 
       It can immediately be seen that this allows the programmer to switch between static and more complex
       Behaviours in a very naturalistic manor.
+      
+    \subsection{Extendable Events}
+      % Events are often used to model external stimuli
+      % Events need to actually be able to occur
+      % EventSource allows extension for occurable Events
+      % Other Events modeled as Event - simply lazy views of some EventSource
+      % Graph like structure
     
     \subsection{Time Travel is Dangerous}
       Relating back to the earlier discussion of interactive Behaviours it can be seen
