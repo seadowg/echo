@@ -1,8 +1,17 @@
 \chapter{Evaluation}
   
   \section{Original Semantics}
-    % With massive restrictions it works
-    % Removes functionality
+    It is important that the FRP implemented in `echo' is a correct model of the denotational semantics
+    set out in the original Fran paper \cite{Elliott1997} as this was one of the primary motivations for
+    the project. Earlier, it was mentioned that formal program testing was used to verify
+    this somewhat (the test cases can be viewed the `echo' source). Earlier sections of this report
+    that discuss modifications to the rules and restrictions additionally verify that these choices meet the original 
+    specification. However, although restrictions such as real-time evaluation on Behaviours do not
+    alter their original semantic definition they do remove some of FRP's functionality.
+    
+  \section{Limitations}
+    % No predicate function
+    % Removes ability to evaluate Behaviours at any time
   
   \section{Impurity}
     % Behaviour functions can read external sources
@@ -16,7 +25,3 @@
     % Music application easy to develop logic (very intuitive)
     % Needed abstraction for Song but produces resuable component
     % Password application easy to develop
-  
-  \section{Limitations}
-    % No predicate function
-    % Removes ability to evaluate Behaviours at any time
