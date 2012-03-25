@@ -95,6 +95,11 @@ class Five extends EventSource[Int] {
 }
 \end{verbatim}
 
+      It should also be noted that the `occs' function on Events is not actually available in `echo'. This
+      choice was made because an Event does not retain all its Events so anything returned from this 
+      function would be incorrect and there accessing a Event's past data does not really
+      provide any useful functionality.
+
     \subsection{Time Travel is Dangerous}
       Relating back to the earlier discussion of interactive Behaviours it can be seen
       that there are problems when plugging FRP into the real world: the future is uncertain and
