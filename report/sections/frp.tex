@@ -18,6 +18,24 @@
     be presented using Scala syntax so as to provide continuity throughout the report.
   
     \subsection{Types}
+      \subsubsection{Time}
+        Although Behaviours and Events are the two key types in FRP we will often describe them
+        in terms of Time so defining what is meant by this here is necessary. We often think of
+        Time as a continuous value and so in in numerical terms this is best modelled by a the
+        Scala type Double and this is the definition we will use throughout this report:
+
+\begin{verbatim}
+type Time = Double
+\end{verbatim}    
+
+        However there are some interesting properties of Time that we can utilise in FRP. For instance,
+        conceptually a there is no minimum Double value but with Time we can say that a given Time is `at least'
+        some value. For instance, imagine we are recording the times at which a person claps: even though we
+        may not know the time of the next clap we can always say that it is greater than `now'. This
+        general assumption will be used internally within `echo'. This idea is explored in great detail
+        within two of Conal Elliott's papers \cite{Elliott1997}, \cite{Elliott2009} but will not feature
+        heavily in this report for the sake of simplicity.
+   
       \subsubsection{Behaviour}
         Behaviours are essentially values that change over time. Semantically we think of them as
         a function from Time to some type T:
@@ -91,7 +109,12 @@ merge(ev1, ev2).occs = mergeStr(occs(ev1), occs(ev2))
 \end{verbatim}            
 
       It should be noted that if if an occurrence from ev1 and ev2 occur `simultaneously' (have the same time) then
-      the occurrence from ev2 will be placed after in the merged stream.
+      the occurrence from ev2 will be placed after in the merged stream. Another interesting point to explore
+      here is that often we can't evaluate which Event occurred first. Imagine one Event has one occurrence in
+      the future but the other has no occurrence: the second still might occur before the first, we just don't know it
+      yet. In this situation we take advantage of the fact that the compared values are values in Time. Assuming
+      Events cannot occur in the past we know that the second one will not occur until after the time `now' (the
+      present time). Again, this concept is discussed at length by Conal Elliott \cite{Elliott2009}.
        
        Elliott and Hudak's paper also defined a series of transformer functions for Events. We will define a
        `map' function for allowing the same functionality:

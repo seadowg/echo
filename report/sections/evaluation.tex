@@ -42,7 +42,8 @@
 val imp = new Behaviour(time => Console.readLine)
 \end{verbatim}    
 
-    This Behaviour would actually block on evaluation until a user wrote a line to the program console. A
+    This Behaviour would actually block on evaluation until a user wrote a line to the program console. 
+    Additionally evaluating this Behaviour at a past time will return the `current' value. A
     Behaviour can additionally cause side effects:
 
 \begin{verbatim}    
@@ -51,13 +52,7 @@ val imp = new Behaviour(time => println("Hello, world!"))
 
     Unfortunately, without modifications to the Scala compiler there is little that can be done
     to verify that the functions used to define a Behaviour are pure (the actual function scope would
-    have to be limited). 
-    
-    % Behaviour functions can read external sources
-    % As reading is done in real time its kind of ok
-    % Behaviour functions can cause side effects - not good
-    % Must assume programmers know what they are doing
-    % Good documentation is needed
+    have to be limited).
   
   \section{Demo Applications}
     So as to gain experience with using `echo' and also for the purposes of evaluation, demonstration
