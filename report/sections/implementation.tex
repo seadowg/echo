@@ -221,14 +221,14 @@ event.filter(predFunc).occs = event.occs.filter(predFunc)
 
 \begin{verbatim}
 "provide a map function" >> {
-"returning a Behavior thats value is func(this.at(t))" in {
-  val beh = new Behavior(time => 5)
-  val func: Int => String = {
-    int => int.toString
-  }
+  "returning a Behavior thats value is func(this.at(t))" in {
+    val beh = new Behavior(time => 5)
+    val func: Int => String = {
+      int => int.toString
+    }
 
-  beh.map(func).eval() mustEqual "5"
-}
+    beh.map(func).eval() mustEqual "5"
+  }
 }
 \end{verbatim}      
 
