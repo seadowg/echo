@@ -8,3 +8,15 @@ is a programming paradigm that aims to provide programmers with the tools to cre
 declarative abstractions of these kinds of tasks. This report is concerned with a project to
 implement Functional Reactive Programming as a framework dubbed `echo' for the multi-paradigm programming language
 Scala.
+
+For various reasons, implementations of FRP have had various problems in the past: many have have problems
+with efficiency or had to sacrifice original semantics or functionality is some way. One of the goals
+of this project was to try and implement FRP in way that avoid these problems as much as possible. FRP
+has also commonly been implemented in Haskell. Implementing FRP in a more industrial language such as Scala allows
+further exploration of the paradigm in a different setting. Scala's portability and interoperability with
+languages such as Java, JRuby, Closure and and Groovy should allow for easy wide spread use across many platforms and languages. 
+
+This report will first deal with an introduction to the formal semantics of FRP and current research in that area.
+There will also be a discussion of Scala as a choice for this project and previous work carried out using FRP and Scala.
+Finally, an exploration of the implementation of `echo' itself and its surrounding work will be carried out with an
+evaluation of its current functionality and adherence to the project goals.
