@@ -49,10 +49,8 @@
     it would have no effect on anything whatsoever and would effectively redundant. However, any documentation
     of `echo' should make note of this problem.
     
-    % Events use unbounded memory if not observed
-    % Could be corrected with internal garbage collection
-    % Must be documented
-    % Behaviours cache values
+    As mentioned earlier Behaviour value caching is also used to prevent redundant reevaluation of Behaviours
+    and this further leads to a more optimised implementation of FRP.
   
   \section{Impurity}
     It is important to note that `echo' does not attempt to deal with the problem that

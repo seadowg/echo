@@ -301,4 +301,16 @@ beh.until(ev, beh1).at(t) = new Switcher(beh, event.map((t,v) => beh1)).at(t)
 \begin{verbatim}
 filter(predicate : T => Boolean) : Event[T]
 event.filter(predFunc).occs = event.occs.filter(predFunc)
-\end{verbatim}        
+\end{verbatim}  
+
+    \subsection{Behaviour Caching}
+      Behaviours possess quite a major inefficiency in the form of redundant evaluation:
+
+\begin{verbatim}
+beh.at(t)
+beh.at(t)
+\end{verbatim}  
+
+      Here \emph{beh} is evaluated at \emph{t} twice. It can be seen that we could simply cache the last
+      computed value so we could return this value instantly if the Behaviour was sampled at that time again.
+      We take this approach internally in `echo' so as to avoid redundantly recomputing values. 
