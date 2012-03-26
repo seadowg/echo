@@ -5,10 +5,10 @@
     this it is meant that it follows both the semantic rules set forth by the original FRP specification
     and also the rules and constraints laid out in this report.
   
-    This achieved in echo using formal program testing. More specifically, Behaviour Driven
+    This was achieved in echo using formal program testing. More specifically, Behaviour Driven
     testing was carried out throughout the development process using the Scala framework `Specs' \cite{EricTorreborre}
     to verify that implementations were correct. `Specs' and BDT involve series of tests for
-    separate program `invariants' or `behaviours'. For example to test the Behaviour `map' function
+    separate program `invariants' or `behaviours'. For example to test the Behaviour \emph{map} function
     in `Specs' we can do the following:
 
 \begin{verbatim}
@@ -37,8 +37,8 @@
     Time input functions but Behaviours could have provided a nice abstraction for these.
     
     The ability to transform Behaviours into different time frames is also lost due to the restriction on Behaviour
-    evaluation. However, this many of the use cases of this functionality can still be accomplished using the
-    `map' operation on Behaviours (such as slowing down or speeding up an animation Behaviour).
+    evaluation. However, many of the use cases of this functionality can still be accomplished using the
+    \emph{map} operation on Behaviours (such as slowing down or speeding up an animation Behaviour).
     
   \section{Efficiency}
     As stated earlier one of the goals of this project was to create an efficient implementation
@@ -46,7 +46,7 @@
     needing to buffer `future' occurrences. As noted earlier this does mean however that it is still
     possible to create a memory leak with Events by instantiating an Event that occurs but is never 
     evaluated by a Behaviour. Of course, there is no practical use for an Event such as this as
-    it would have no effect on anything whatsoever and would effectively redundant. However, any documentation
+    it would have no effect on anything whatsoever and would be effectively redundant. However, any documentation
     of `echo' should make note of this problem.
     
     As mentioned earlier Behaviour value caching is also used to prevent redundant reevaluation of Behaviours
@@ -62,8 +62,8 @@ val imp = new Behaviour(time => Console.readLine)
 \end{verbatim}    
 
     This Behaviour would actually block on evaluation until a user wrote a line to the program console. 
-    Additionally evaluating this Behaviour at a past time will return the `current' value. A
-    Behaviour can additionally cause side effects:
+    Additionally, evaluating this Behaviour at a past time will return the `current' value. A
+    Behaviour can also cause side effects:
 
 \begin{verbatim}    
 val imp = new Behaviour(time => println("Hello, world!"))

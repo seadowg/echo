@@ -41,7 +41,7 @@ val someString = hello.until(button.click, goodbye)
   \section{IO Framework}
   
   As mentioned earlier FRP can ease programming functional I/O as FRP Events introduce a declarative way to represent 
-  and interact with external sources. One obvious place to experiment with this is with socket programming. To create socket 
+  and interact with external sources. One obvious place to experiment with this is with socket programming. To create sockets 
   in FRP the two core Java socket abstractions Socket and ServerSocket were abstracted over to produce
   Sender and Receiver. 
 
@@ -53,13 +53,13 @@ val someString = hello.until(button.click, goodbye)
 
 \begin{verbatim}
 val button = Button("Ping")
-val pinger = button.map((t, v) => "Ping")
+val pinger = button.click.map((t, v) => "Ping")
 val sender = Sender("localhost", 1997, pinger)
 val receiver = Receiver(1997)
 \end{verbatim}
   
   Additional functionality can be added by allowing Receiver to reply to received messages. This can be achieved by
-  having an optional String => Behaviour[String] constructor argument. For example, a Receiver that replies
+  having an optional String =$>$ Behaviour[String] constructor argument. For example, a Receiver that replies
   ``Pong'' to each incoming message would be created like so:
 
 \begin{verbatim}
@@ -69,7 +69,7 @@ val rec = Receiver(1997) {
 \end{verbatim}    
 
   One interesting problem encountered while developing the Socket abstraction was that of Exceptions. 
-  Sockets can fail in many ways and in a JVM language this causes an exception which will cause the program to exit. 
+  Sockets can fail in many ways and in a JVM language this causes an Exception which will cause the program to exit. 
   The simplest way to deal with the problem would of course be to simply catch the exceptions and ignore them (if they 
   occur) but this would mean any code written with FRP would be intolerant of external failure (disconnection to the 
   internet etc). An elegant solution was to abstract over Exceptions with Events}. To do this the socket types 
@@ -80,12 +80,6 @@ val rec = Receiver(1997) {
 val socket = Sender("localhost", 1997, Event(0, "Hello")) 
 \end{verbatim}
 
-  Here the Java socket code will fail as it will be refused a connection (causing an Exception). After the above line 
-  executes we can then say the following is true:
-
-\begin{verbatim}
-socket.errors.occs.length == 1 
-\end{verbatim}
-
-  This allows exceptions to interact with the FRP paradigm and allows programmers to build failure tolerant systems within 
-  an FRP setting.
+  Here the Java socket code will fail as it will be refused a connection (causing an Exception). The errors Event
+  will then occur with the Exception. This allows exceptions to interact with the FRP paradigm and allows programmers to 
+  build failure tolerant systems within an FRP setting.
