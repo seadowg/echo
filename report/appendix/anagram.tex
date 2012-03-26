@@ -1,0 +1,28 @@
+\chapter{Anagram Code}
+
+AnagramServer.scala
+
+\begin{verbatim}
+object AnagramServer extends EchoApp {
+	val WORD = "PASSWORD"
+	val ANAGRAM = "WRSSPAOD"
+	
+	def setup(args : Array[String]) {	
+	  val word = Receiver(1996) {
+	    in =>
+	      ANAGRAM
+	  }
+	  
+	  val answers = Receiver(1997) {
+      in =>
+        if (in == WORD) {
+          "That's correct!"
+        }
+
+        else {
+          "Wrong! Try again..."
+        }
+    }
+  }
+}
+\end{verbatim}
