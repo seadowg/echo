@@ -118,7 +118,7 @@ class Five extends EventSource[Int] {
       Relating back to the earlier discussion of interactive Behaviours it can be seen
       that there are problems when plugging FRP into the real world: the future is uncertain and
       arbitrary access to the past requires an unbounded level of memory. After much deliberation
-      over different compromises it was decided that echo would follow a set of rules:
+      over different compromises it was decided that `echo' would follow a set of rules:
       
       \begin{itemize}
         \item If a Behaviour was last evaluated at time \emph{u} then it can only be evaluated at
@@ -127,23 +127,45 @@ class Five extends EventSource[Int] {
         again (the time it is `valid' until).
         \item An Event is valid up until the time equivalent to `now' (the actual current time).
         \item If a Behaviour depends on some Event then we can only evaluate the Behaviour up to
-        the time the Event is valid.
+        the time the Event is valid. We additionally can only evaluate it at a time greater than
+        or equal to the Event's last occurrence.
       \end{itemize}
       
-      With this set of rules in place, it becomes clear that we will only ever use a fixed amount of memory
-      for an Event and that a Behaviour can not be evaluated in the past or the future as an Event
-      only needs to keep the last Event that occurred and Behaviour evaluation is completely restricted. We Will
-      introduce a new operation on a \emph{Behaviour[T]} for this:
+      These rules restrict Behaviours to what we will refer to as `real-time' evaluation as the times
+      we evaluate a Behaviour at become monotonic in nature. Additionally, as Event occurrences will
+      be happening in real time we will see that lower bound that we can evaluate a Behaviour at will
+      constantly be pushed up to the present (leaving only `now' as an possible evaluation time). Although
+      other times will be available for evaluated at times (there will often be a gap between `now' and
+      the last Event occurrence) it would be monotonous to expose these bounds to the programmer so
+      in `echo' explicit evaluation of a Behaviour is entirely removed from the public API (the
+      `at' operation) and replaced with a real-time evaluation function:
 
 \begin{verbatim}
 eval() : T
 beh.eval() = beh.at(now())
-\end{verbatim}       
+\end{verbatim}  
 
-      We will also remove the `at' function on Behaviours from the public API (it will still be
-      use within the framework). 
+      It can be seen here that `at' will still be used internally. The Events also use explicit time
+      evaluation internally. This is because when Events occur they are buffered until the Event is
+      evaluated at a given time by a Behaviour. The present occurrence is then returned and stored and past occurrences
+      are thrown away. This allows for the fact that although the evaluation is referred to as real time the
+      actual evaluation will execute slightly behind the current time. This feature being the
+      case means we can't simply just store one occurrence for each Event. Interestingly this also
+      means that each group of dependent Behaviours and Events will have their own view of the `current' time:
+      the last time they were evaluated.
+
+      This restriction may seem like a significant loss of expressivity. However as we wish to be able to treat
+      Behaviours and Events as first class values we would actually like to avoid ever explicitly evaluating
+      them: this would ideally be carried out with abstractions for graphics or other kinds of output. For instance
+      if we wanted to set some colour in a UI equal to a Behaviour then explicitly evaluating the Behaviour
+      periodically and setting the colour using a static value would defeat the point of using FRP. We will see in later
+      discussion that we can easily create abstraction to hide this type of logic.
       
-      Of course, the rules can still be broken if we introduce multi-threading and this is best illustrated
+      It should also be noted that Events are still able to use an unbounded level of memory: we only throw away
+      past occurrences when evaluating a Behaviour so an Event that is never evaluated would collect occurrences
+      infinitely.
+      
+      Of course, the new rules can still be broken if we introduce multi-threading and this is best illustrated
       with an example:
       
 \begin{verbatim}
@@ -191,7 +213,7 @@ val beh = beh1.until(ev, beh2)
 val ev = beh.snapshot(someEvent)
 \end{verbatim}
 
-      This is fine if \emph{someEvent} has not occurred at \emph{t}. If it has however at some time
+      This is fine if \emph{someEvent} has not occurred at \emph{t}. If it has occurred however at some time
       before \emph{t} then in whatever way this is implemented we are forced to evaluate \emph{beh}
       at a time in the past. If \emph{beh} depends on any Events this time might be before their
       last occurrence and so we would effectively be returning an incorrect result. Dealing with this
