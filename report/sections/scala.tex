@@ -2,13 +2,13 @@
   Scala is a multi-paradigm programming language developed to run on the Java Virtual Machine \cite{Odersky2004}. Scala 
   programs are
   generally structured in an object oriented programming style like Java but it also incorporates many features of
-  functional languages such as closures, high order functions, lazy initialisation and currying. These features aid
-  implementation of FRP concepts as closures will allow for Behaviour definition and functions such as map on
-  Behaviours and Events to be expressed in a more natural and succinct form. It is
+  functional languages such as closures, high order functions, lazy evaluation, immutable state and currying. These features aid
+  implementation of FRP concepts as closures will allow for Behaviour definition. Also, functions such as \emph{map} on
+  Behaviours and Events to be expressed in a more natural and succinct form in a functional language. It is
   important to note that although Scala is thought of as `functional' its functions are not `pure'. This means
-  that object functions and closures can cause side effects and be altered by external states.
+  that object functions and closures can cause side effects and can be affected by external states.
 
-  Scala also possesses a advanced, powerful and feature rich static type system. A few of these provide large
+  Scala also possesses an advanced, powerful and feature rich static type system. This provides large
   advantages when implementing FRP. Firstly, Scala supports generic classes and it can be quite easily seen
   that both Behaviours and Events will rely on this feature for type safety. Scala additionally provides
   a rather unique type conversion functionality that allows types to be converted on the fly. This provides
@@ -21,21 +21,19 @@
     this means that a function that defines a Behaviour could in fact cause side effects meaning that
     every time the Behaviour was evaluated it would execute this side effect. There has been some work into
     pure function verification in Scala but it has not materialised into an implementation \cite{Nordenberg}. 
-    However, enforcing purity in Scala can cause serious problems due to high level library code that is 
-    executed for what might seem like self contained systems.
   
   \section{Previous Work}
     As one might imagine, there has been previous work in implementing FRP in Scala. 
     
     \subsection{Reactive}
-      Arguably the most significant of FRP work in Scala is the library `reactive' created by `nafg \cite{Nafg}'. This    
+      Arguably the most significant of the FRP work in Scala is the library `reactive' created by `nafg \cite{Nafg}'. This    
       framework was designed to allow for the creation of functional reactive web applications however here we are concerned 
       with the basic FRP library `reactive-core'. Unfortunately while claiming to be an FRP library `Reactive'
       has a couple of problems.
       
       The framework is based around two types designed to represent Behaviours and Events respectively: Signals
       and EventStreams. EventStreams are very close to the original Event definition but lack the
-      useful `merge' operation however it is with Signal that the core differences lie. Signal is defined as follows:
+      useful \emph{merge} operation however it is with Signal that the core differences lie. Signal is defined as follows:
       
       \begin{quote}
         In practical terms, a Signal has a current value, and an EventStream that, whenever the Signal's value changes,     
@@ -45,7 +43,7 @@
       Although it is claimed that this results in Signals having a continuous value we can see
       that at any point in time it is really just a static value that changes at discrete point in
       time. We can see that this doesn't allow us to represent purely continuous values. For instance
-      how would we represent the following basic Behaviour with a Signal:
+      we could not represent the following basic Behaviour with a Signal:
       
 \begin{verbatim}
 new Behaviour(time => time)
@@ -56,7 +54,7 @@ new Behaviour(time => time)
       
 \begin{verbatim}
 def signal[T](v : T, ev : Event[T]) = {
-switcher(lift(v), map(ev, o => lift(o)))
+  switcher(lift0(v), map(ev, o => lift0(o)))
 }
 \end{verbatim}  
 
@@ -69,7 +67,7 @@ stepper(v, ev) = switcher(lift(v), map(ev, o => lift(o)))
 \end{verbatim} 
 
       It can be seen here that although Signal provides a useful programming tool it is not an implementation
-      of an FRP Behaviour as it only allows for a subset of a Behaviour's functionality meaning that `Reactive'
+      of an FRP Behaviour and only allows for a subset of a Behaviour's functionality meaning that `Reactive'
       does not successfully implement FRPs semantics.
     
     \section{React}
@@ -77,9 +75,9 @@ stepper(v, ev) = switcher(lift(v), map(ev, o => lift(o)))
       paper `Deprecating the Observer Pattern' \cite{Maier2010} does utilise a notion of Events that, as cited in the paper,
       has its routes in FRP.
       
-      The Event's in React are very similar to the Events in FRAN: they are conceptually infinite
-      and have the `merge' and `map' operations defined on them. One slight difference is that React
-      Events expose an operation to allow them to `occur' with an `emit' function. This functionality
+      The Event's in React are very similar to the Events in Fran \cite{Elliott1997}: they are conceptually infinite
+      and have the \emph{merge} and \emph{map} operations defined on them. One slight difference is that React's
+      Events expose an operation to allow them to `occur' with an \emph{emit} function. This functionality
       is actually never discussed in the original FRP papers and so it should be assumed that this
       functionality should be hidden publicly (it will be shown later how to internalise this action
       effectively). Interestingly, React also contains a notion of Signals, just as Reactive does, however
