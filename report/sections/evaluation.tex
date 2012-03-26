@@ -89,3 +89,13 @@ val imp = new Behaviour(time => println("Hello, world!"))
     created to produce non-trivial FRP applications. However, any abstractions built would hopefully be
     reusable in nature due to FRPs high level approach to control. These findings also verify that it
     is important that `echo' is as extendable as possible.
+    
+    Additional work was carried out on a small network anagram guessing game. This involved a server that provided
+    an anagram and a client application that would present the anagram and allow the user to guess the original
+    word. The user's answers would be reported to the server and the server would reply with whether
+    the guess was correct or not. This application took advantage of the socket abstraction mentioned earlier
+    and was actually very easy to develop with the Sender and Receiver types. Again, due to the functional and
+    declarative nature of FRP the code for this application (both the server and the client) was very simple
+    and intuitive to both create and read.
+    
+    Code excerpts from both demo applications can be seen in Appendix A. 
