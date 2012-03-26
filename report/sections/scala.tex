@@ -20,17 +20,17 @@
     thats results are affected by some external estate or in turn effect some external state. For instance,
     this means that a function that defines a Behaviour could in fact cause side effects meaning that
     every time the Behaviour was evaluated it would execute this side effect. There has been some work into
-    pure function verification in Scala and this may be useful for implementing FRP. However, enforcing
-    purity in Scala can cause serious problems due to high level library code that is executed for
-    what might seem like self contained systems.
+    pure function verification in Scala but it has not materialised into an implementation \cite{Nordenberg}. 
+    However, enforcing purity in Scala can cause serious problems due to high level library code that is 
+    executed for what might seem like self contained systems.
   
   \section{Previous Work}
     As one might imagine, there has been previous work in implementing FRP in Scala. 
     
     \subsection{Reactive}
-      Arguably the most significant of FRP work in Scala is the library `reactive' created by `nafg'. This framework was 
-      designed to allow for the creation of functional reactive web applications however here we are concerned with
-      the basic FRP library `reactive-core'. Unfortunately while claiming to be an FRP library `Reactive'
+      Arguably the most significant of FRP work in Scala is the library `reactive' created by `nafg \cite{Nafg}'. This    
+      framework was designed to allow for the creation of functional reactive web applications however here we are concerned 
+      with the basic FRP library `reactive-core'. Unfortunately while claiming to be an FRP library `Reactive'
       has a couple of problems.
       
       The framework is based around two types designed to represent Behaviours and Events respectively: Signals
@@ -61,7 +61,7 @@ switcher(lift(v), map(ev, o => lift(o)))
 \end{verbatim}  
 
       This functionality was additionally encapsulated within the `stepper' function in Conal Elliott's
-      `Push-Pull' paper:
+      `Push-Pull' paper \cite{Elliott2009}:
 
 \begin{verbatim}
 stepper[T](v : T, ev : Event[T]) : Behaviour[T]
