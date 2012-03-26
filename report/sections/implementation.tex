@@ -11,10 +11,24 @@
   as powerful as possible. They will all be explored here.
   
     \subsection{Flat Time}
-      % Many implementations use non flat time
-      % Scala currently doesn't provide value from non-flat types
-      % No non-flat features needed externally to the framework
-      % Time implemented as Double allows switching between them implicitly
+      Time in `echo' is implemented as a flat value type defined exactly as it is in the earlier
+      section of this report (as an alias of Double). The internal implementation does take advantage
+      of general assumptions about Time however. For instance, the merge function for Events takes advantage
+      of the fact that an Event without occurrences still has a has a lower bound of when it can occur (described
+      earlier). 
+      
+      Additionally a function is defined in `echo' to return the current time:
+      
+\begin{verbatim}
+def now() : Time = System.nanoTime() - startTime
+\end{verbatim}      
+
+      Here `startTime' refers to the time the current `echo' program started executing and this is
+      set by the framework at run time. It should be noted that `nanoTime()' (returning current time in
+      nano seconds) is the most accurate value available for the current time. However due the restrictions
+      of Java Virtual Machine implementations this function will start to return incorrect results 
+      after running for around 292 years due to an overflow in the calculation (thought to be an allowable
+      problem).
       
     \subsection{Object Orientation}
       Although it may seem obvious it is worth noting that both Behaviours and Events are implemented in
@@ -109,7 +123,7 @@ class Five extends EventSource[Int] {
       \begin{itemize}
         \item If a Behaviour was last evaluated at time \emph{u} then it can only be evaluated at
         a time \emph{t} if \emph{t} $\geq$ \emph{u}.
-        \item An Event holds the last time it occurred and the time up to which it hasn't occurred
+        \item An Event holds the last time it occurred and the time up to which we know it hasn't occurred
         again (the time it is `valid' until).
         \item An Event is valid up until the time equivalent to `now' (the actual current time).
         \item If a Behaviour depends on some Event then we can only evaluate the Behaviour up to
@@ -117,7 +131,8 @@ class Five extends EventSource[Int] {
       \end{itemize}
       
       With this set of rules in place, it becomes clear that we will only ever use a fixed amount of memory
-      for an Event and that a Behaviour can not be evaluated in the past or the future. Will
+      for an Event and that a Behaviour can not be evaluated in the past or the future as an Event
+      only needs to keep the last Event that occurred and Behaviour evaluation is completely restricted. We Will
       introduce a new operation on a \emph{Behaviour[T]} for this:
 
 \begin{verbatim}
