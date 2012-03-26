@@ -5,26 +5,26 @@
   
   \section{UI Framework}
     To enable users to build interactive user facing applications with echo it would be useful to have a simple User 
-    Interface framework in place. Of course echo could interact with standard UI frameworks but the use of \emph{Behaviours} 
-    and \emph{Events} would be very limited and clunky. The goal with the UI framework is to allow the programmer to define 
-    attributes as \emph{Behaviours} and have them kept up to date and to also interact with the user through FRP 
-    \emph{Events}. 
+    Interface framework in place. Of course echo could interact with standard UI frameworks but the use of Behaviours 
+    and Events would be very limited and clunky. The goal with the UI framework is to allow the programmer to define 
+    attributes as Behaviours and have them kept up to date and to also interact with the user through FRP 
+    Events. 
 
-    So far, a small simple framework has been devised and implemented. Every component's attributes are \emph{Behaviours} 
+    So far, a small simple framework has been devised and implemented. Every component's attributes are Behaviours
     (such as width and height) and they will be kept up to date at all times. For instance:
 
 \begin{verbatim}
 val frame = Frame(new Behaviour(time => sin(time)), 200) 
 \end{verbatim}
 
-    This would create a Frame that at a time `t' would have a width of \emph{sin(t)}.
+    This would create a Frame that at a time \emph{t} would have a width of \emph{sin(t)}.
 
     The implementation of this is based around re-evaluating and redrawing the graphics on a clock tick. Each 
-    \emph{Frame} has its own `clock' that updates all the components attached to the frame at a standard interval (currently 
+    Frame has its own `clock' that updates all the components attached to the Frame at a standard interval (currently 
     20ms). The actual graphical code was built by simply abstracting over the Java Swing UI Framework. This allows the FRP 
     components to be built quickly as no actual lower end graphics code has to be implemented.
 
-    The UI framework also allows the programmer to interact with the user via \emph{Events}. Again this is best illustrated 
+    The UI framework also allows the programmer to interact with the user via Events. Again this is best illustrated 
     with an example:
 
 \begin{verbatim}
@@ -34,20 +34,20 @@ val goodbye = new Behaviour(time => "Goodbye!")
 val someString = hello.until(button.click, goodbye) 
 \end{verbatim}
 
-    Here it can be seen that the \emph{Button} type owns a `click' event. This \emph{Event} occurs every time the 
-    \emph{Button} is clicked by the user. This was made possible by abstracting over Swing's own event framework. Many other 
-    FRP \emph{Events} can be easily generated in this way in Swing.
+    Here it can be seen that the Button type owns a `click' event. This Event occurs every time the 
+    Button is clicked by the user. This was made possible by abstracting over Swing's own event framework. Many other 
+    FRP Events can be easily generated in this way in Swing.
   
   \section{IO Framework}
   
-  As mentioned earlier FRP can ease programming functional I/O as FRP \emph{Events} introduce a declarative way to represent 
+  As mentioned earlier FRP can ease programming functional I/O as FRP Events introduce a declarative way to represent 
   and interact with external sources. One obvious place to experiment with this is with socket programming. To create socket 
-  in FRP the two core Java socket abstractions \emph{Socket} and \emph{ServerSocket} were abstracted over to produce
-  \emph{Sender} and \emph{Receiver}. 
+  in FRP the two core Java socket abstractions Socket and ServerSocket were abstracted over to produce
+  Sender and Receiver. 
 
-  \emph{Sender} represents an output socket and is constructed from an IP to connect to, a host port and an 
-  \emph{EventSource[String]}. Any occurrences in the \emph{Event} will be sent to IP and port specified. The \emph{Receiver} 
-  type only requires a port to be constructed but is itself an \emph{EventSource[String]} of received messages. This allows 
+  Sender represents an output socket and is constructed from an IP to connect to, a host port and an 
+  EventSource[String]. Any occurrences in the Event will be sent to IP and port specified. The Receiver
+  type only requires a port to be constructed but is itself an EventSource[String] of received messages. This allows 
   a programmer to send and receive messages between FRP applications running on different nodes (or in different processes).
   Here's an example program that sends a ``Ping" message every time a Button is pressed:
 
@@ -59,28 +59,28 @@ val receiver = Receiver(1997)
 \end{verbatim}
   
   Additional functionality can be added by allowing Receiver to reply to received messages. This can be achieved by
-  having an optional \emph{String => Behaviour[String]} constructor argument. For example, a Receiver that replies
+  having an optional String => Behaviour[String] constructor argument. For example, a Receiver that replies
   ``Pong'' to each incoming message would be created like so:
 
 \begin{verbatim}
 val rec = Receiver(1997) {
-in => "Pong"
+  in => "Pong"
 }
 \end{verbatim}    
 
-  One interesting problem encountered while developing the \emph{Socket} abstraction was that of \emph{Exceptions}. 
-  \emph{Sockets} can fail in many ways and in a JVM language this causes an exception which will cause the program to exit. 
+  One interesting problem encountered while developing the Socket abstraction was that of Exceptions. 
+  Sockets can fail in many ways and in a JVM language this causes an exception which will cause the program to exit. 
   The simplest way to deal with the problem would of course be to simply catch the exceptions and ignore them (if they 
   occur) but this would mean any code written with FRP would be intolerant of external failure (disconnection to the 
-  internet etc). An elegant solution was to abstract over \emph{Exceptions} with \emph{Events}. To do this the socket types 
-  have an `errors' \emph{Event} that occurs every time an exception is thrown within their execution. For instance, in this 
+  internet etc). An elegant solution was to abstract over Exceptions with Events}. To do this the socket types 
+  have an `errors' Event that occurs every time an exception is thrown within their execution. For instance, in this 
   setup there is nothing for the program to connect to on port \emph{1997}:
 
 \begin{verbatim}
 val socket = Sender("localhost", 1997, Event(0, "Hello")) 
 \end{verbatim}
 
-  Here the Java socket code will fail as it will be refused a connection (causing an exception). After the above line 
+  Here the Java socket code will fail as it will be refused a connection (causing an Exception). After the above line 
   executes we can then say the following is true:
 
 \begin{verbatim}

@@ -9,7 +9,7 @@
     
   \section{Semantics}
     The ideas in in the the Fran paper and in following FRP work are based around two key data types: 
-    \emph{Behaviours} and \emph{Events}. Here the semantics of `classic' \footnote{Several
+    Behaviours and Events. Here the semantics of `classic' \footnote{Several
     flavours of FRP have emerged over the years and the term `classic' is often used to describe
     the FRP described by and directly descended from Fran.} FRP explored in this report will be defined.
     
@@ -67,7 +67,7 @@ occs[T](ev : Event[T]) : Stream[(Time, T)]
       Elliot and Hudak additionally define a set of actions on Behaviours and Events.
       
       \subsubsection{Behaviours}
-        We would like functions defined on static values to also be available to \emph{Behaviours}. Hudak
+        We would like functions defined on static values to also be available to Behaviours. Hudak
         and Elliot define a series functions for accomplishing this:
         
 \begin{verbatim}
@@ -86,10 +86,10 @@ at(lift0(v), t) = v
 \end{verbatim}
         
        It also may be useful to evaluate Behaviours in a modified time frame. For example, this allows
-       slowing down or speeding up a Behaviour. We define this with the timeTransform function on a \emph{Behaviour[T]}:
+       slowing down or speeding up a Behaviour. We define this with the timeTransform as such:
 
 \begin{verbatim}
-timeTransform(beh : Behaviour[T], time : Behaviour[Time]) : Behaviour[T]
+timeTransform[T](beh : Behaviour[T], time : Behaviour[Time]) : Behaviour[T]
 at(timeTransform(beh, timeBeh), t) = at(beh, at(timeBeh, t))
 \end{verbatim}
         
@@ -120,7 +120,7 @@ merge(ev1, ev2).occs = mergeStr(occs(ev1), occs(ev2))
        `map' function for allowing the same functionality:
 
 \begin{verbatim}
-map[U](ev : Event[T], func : (Time, T) => U)  : Event[U]
+map[T, U](ev : Event[T], func : (Time, T) => U)  : Event[U]
 occs(map(ev, func)) = occs(event).map(func)
 \end{verbatim}         
         
@@ -164,7 +164,7 @@ occs(snapshot(beh, ev)(x)) = (t, at(beh, t))
       First we define the new function:
       
 \begin{verbatim}
-dangerMap[U](ev : Event[T], func : (Time, T) => (Time, U))  : Event[U]
+dangerMap[T, U](ev : Event[T], func : (Time, T) => (Time, U))  : Event[U]
 occs(map(ev, func)) = occs(event).map(func)
 \end{verbatim}
 

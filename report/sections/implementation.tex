@@ -1,7 +1,7 @@
 \chapter{Implementation}
   As stated earlier the goal of this project was to implement a framework for utilising FRP in the Scala. 
   This framework was dubbed `echo'. This section will explore the motivations and problems ahead of
-  and also the choices made and results rendered during the implementation of \emph{echo}.
+  and also the choices made and results rendered during the implementation of `echo'.
   
   \section{Design \& Implementation Choices}
   Throughout its history FRP implementations have generally been carried out in Haskell. Due to the movement
@@ -182,7 +182,7 @@ new Thread(new Runner).start()
 \end{verbatim}       
 
       Here we have two threads continuously evaluating one Behaviour. This means that one thread
-      might call \emph{eval()} and then be scheduled out allowing the other to proceed to evaluate
+      might call \emph{eval} and then be scheduled out allowing the other to proceed to evaluate
       at a later time. If the original is then scheduled back in it is possible it will
       be evaluating the Behaviour at a time less than the time second evaluated it at. This suggests
       that we desire the \emph{eval} operation to be `atomic'. This can be achieved easily for standalone
@@ -280,7 +280,7 @@ beh.map2(beh1)(func).at(t) = func(beh.at(t), beh1.at(t))
       example took advantage of Haskell's lazy evaluation. While Scala is able to use lazy evaluation
       it requires extra work and at the time of writing requires some complex syntax. To tackle this
       a `toggle' function was added to echo to provide the functionality in the example out of the box.
-      This is defined here for a \emph{Behaviour[T]}:
+      This is defined here for a Behaviour[T]:
       
 \begin{verbatim}
 toggle(ev : Event[T], beh1 : Behaviour[T]) : Behaviour[T]
@@ -296,7 +296,7 @@ beh.until(ev, beh1).at(t) = new Switcher(beh, event.map((t,v) => beh1)).at(t)
       
       It is also useful to be able to to filter Events to produce a new one that only
       contains occurrences matching a predicate. This allows a Behaviour to only react
-      to some occurrences from an Event. This is defined on an \emph{Event[T]}:
+      to some occurrences from an Event. This is defined on an Event[T]:
 
 \begin{verbatim}
 filter(predicate : T => Boolean) : Event[T]
