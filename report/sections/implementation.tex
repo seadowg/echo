@@ -179,6 +179,10 @@ val beh = beh1.until(ev, beh2)
       that share those dependencies. By this it is meant that a group of dependent Behaviours can
       only be read by one thread at a time.
       
+      It should also be noted that restricting evaluation times for Behaviours forces us
+      to remove the timeTransform operation for Behaviours (as this allows programmers to explicitly
+      evaluate Behaviours in the past or future).
+      
       There was one further problem presented due this restriction and that was concerned with
       implementing the `snapshot' operation. For instance, imagine we execute the following code
       at time \emph{t}:
