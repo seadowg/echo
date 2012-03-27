@@ -3,9 +3,13 @@ package com.github.oetzi.echo.core
 import com.github.oetzi.echo.Echo._
 import com.github.oetzi.echo.Control._
 
+/** `Behaviour` provides an implementation of FRP Behaviours.
+ */
+
 class Behavior[T](private val rule: Time => T) {
   var last: (Time, T) = null
 
+  
   def eval(): T = {
     readLock.acquire()
     val value = this.at(now())

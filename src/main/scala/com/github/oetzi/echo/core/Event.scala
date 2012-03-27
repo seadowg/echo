@@ -180,7 +180,7 @@ trait EventSource[T] extends Event[T] {
   }
 }
 
-class Occurrence[T](val time: Time, val value: T, val num: BigInt) {
+protected class Occurrence[T](val time: Time, val value: T, val num: BigInt) {
   def map[U](func: (Time, T) => U): Occurrence[U] = {
     new Occurrence(time, func(time, value), num)
   }
