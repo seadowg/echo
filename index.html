@@ -16,9 +16,10 @@
           <h3>1. Get It</h3>
           <p>
             You can download the latest jar of the framework 
-            <a href="https://github.com/downloads/oetzi/echo/echo.jar">here</a>. Just
+            <a href="http://github.com/downloads/oetzi/echo/echo.jar">here</a>. Just
             stick it in your project folder. I'd personally recommend <a href="http://buildr.apache.org/">buildr</a> 
-            for building and compiling Scala projects.
+            for building and compiling Scala projects. If you're wanting to hack on the source you can get that
+            <a href="http://github.com/oetzi/echo">here</a>.
           </p>
         </div>
       
@@ -57,8 +58,8 @@
           </p>
           
           <pre>
-  val false = new Behaviour(time => false)
-  val true = new Behaviour(time => true)
+  val false = Behaviour(time => false)
+  val true = Behaviour(time => true)
   val beh = false.until(mouseEv, true)</pre>
   
           <p>
@@ -80,7 +81,7 @@
          
           <pre>
    val mouseTimes = mouseEv.map((t, v) => t)
-   val lastTime = new Stepper(-1, mouseTimes)</pre>
+   val lastTime = Stepper(-1, mouseTimes)</pre>
    
           <p>
             Ok. Here we map the mouse button Event to return a new Event who's values are that of the times
@@ -100,19 +101,71 @@
         <div class="step">
           <h3>3. Writing Echo Code</h3>
           <p>
-            Lorem ipsum
+            To write echo applications you simply extend the <code>EchoApp</code> class with your
+            code's main object. This class already has a defined <code>main</code> function
+            that takes care of some stuff for you so all you need to do is write
+            your code in the <code>setup</code> function like so:
+          </p>
+          
+          <pre>
+  object App extends EchoApp {
+     def setup(args : Array[String]) {
+       val beh = Behaviour(time => time * 2)
+       val value = beh.eval()
+       println(value)
+     }
+   }</pre>
+   
+          <p>
+            Unfortunately in order to avoid the FRP semantics going bonkers you can only write echo code
+            inside this <code>setup</code> function. This may seem restrictive but you'll find in FRP
+            you generally write a small amount of code in an upfront declarative manner to define
+            an entire applications run-time behaviour.
+          </p>
+          
+          <p>
+            There are a couple of cool things that we can do in echo.
+            For instance, you might notice that a lot of the time we
+            the Behaviours we create are 'constant'. So,
+            we can express this easily we can just write constant 
+            Behaviours as their static values:
+          </p>
+          <pre>
+ val beh = 5.until(event, 5)
+          </pre>     
+        </div>
+        
+        <div class="step">
+          <h3>4. Custom Events</h3> 
+          
+          <p>
+            You are not restricted to only using the Events provided
+            in echo as you can simply extend the EventSource class
+            to create your own:
+          </p>
+          
+          <pre>
+  class CustomEvent extends EventSource[Int] {
+    occur(5)
+  }</pre>   
+  
+          <p>
+            This creates an Event that when instantiated occurs
+            with a value of <code>5</code>. The <code>occur</code>
+            function used here is only available to classes that
+            extends EventSource.
           </p>
         </div>
       
         <div class="step">
-          <h3>4. Adding Graphics</h3>
+          <h3>5. Adding Graphics</h3>
           <p>
             Lorem ipsum
           </p>
         </div>
       
         <div class="step">
-          <h3>5. Over the Interwebs...</h3>
+          <h3>6. Over the Interwebs...</h3>
           <p>
             Lorem ipsum
           </p>
