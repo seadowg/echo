@@ -50,12 +50,12 @@ object EventSpec extends Specification {
         val event = new TestEvent[Int]
         event.pubOccur(1)
 
-        event.map(v => v + 1).top(now()).get.value mustEqual 2
+        event.map((t, v) => v + 1).top(now()).get.value mustEqual 2
       }
 
       "that is kept to date with the original" in {
         val event = new TestEvent[Int]
-        val map = event.map(v => v + 1)
+        val map = event.map((t, v) => v + 1)
         event.pubOccur(1)
 
         map.top(now()).get.value mustEqual 2
@@ -63,7 +63,7 @@ object EventSpec extends Specification {
 
       "that executes hooks with a mapped occurrence" in {
         val event = new TestEvent[Int]
-        val map = event.map(v => v * 5)
+        val map = event.map((t, v) => v * 5)
         var passed: Occurrence[Int] = null
         map.hook(occ => passed = occ)
 
@@ -105,45 +105,6 @@ object EventSpec extends Specification {
 			}
 		}
 
-		"have a times function" >> {
-			"returning the occurrence times inplace of values" in {
-				val event = new TestEvent[Int]
-				
-				freezeTime(1) {
-					() =>
-					  event.pubOccur(5)
-				}
-				
-				event.times.top(now()).get.value mustEqual 1
-			}
-			
-			"that is kept to date with the original" in {
-        val event = new TestEvent[Int]
-        val map = event.times
-
-				freezeTime(1) {
-					() =>
-						event.pubOccur(5)
-				}
-        
-
-        map.top(now()).get.value mustEqual 1
-      }
-
-			"that executes hooks with a mapped occurrence" in {
-        val event = new TestEvent[Int]
-        val map = event.times
-        var passed: Occurrence[Time] = null
-        map.hook(occ => passed = occ)
-
-				freezeTime(1) {
-					() =>
-						event.pubOccur(5)
-				}
-
-        passed.value mustEqual 1
-      }
-		}
 
     "have a merge function" >> {
       "that returns an Event that is empty for empty sources" in {

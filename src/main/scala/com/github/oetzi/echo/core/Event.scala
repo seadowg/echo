@@ -9,41 +9,7 @@ trait Event[T] {
   protected def occs(time: Time): Occurrence[T]
   protected[echo] def hook(block: Occurrence[T] => Unit)
 
-	def times() : Event[Time] = {
-		frp {
-			() =>
-				val timeFun: Time => Occurrence[Time] = {
-					time =>
-						val occ = occs(time)
-						
-						if (occ == null) {
-							null
-						}
-						
-						else {
-							occ.timePair
-						}
-				}
-				
-				val jsThisTrick = this
-				
-				new Event[Time] {
-					protected def occs(time: Time): Occurrence[Time] = {
-						timeFun(time)
-					}
-					
-					protected[echo] def hook(block: Occurrence[Time] => Unit) {
-						val timeBlock: Occurrence[T] => Unit = {
-              occ => block(occ.timePair)
-            }
-
-            jsThisTrick.hook(timeBlock)
-					}
-				}
-		}
-	}
-
-  def map[U](func: T => U): Event[U] = {
+  def map[U](func: (Time, T) => U): Event[U] = {
     frp {
       () =>
         val mapFun: Time => Occurrence[U] = {
@@ -215,8 +181,8 @@ trait EventSource[T] extends Event[T] {
 }
 
 class Occurrence[T](val time: Time, val value: T, val num: BigInt) {
-  def map[U](func: T => U): Occurrence[U] = {
-    new Occurrence(time, func(value), num)
+  def map[U](func: (Time, T) => U): Occurrence[U] = {
+    new Occurrence(time, func(time, value), num)
   }
 
 	def timePair() : Occurrence[Time] = {
