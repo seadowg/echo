@@ -41,7 +41,7 @@
     \emph{map} operation on Behaviours (such as slowing down or speeding up an animation Behaviour).
     
   \section{Efficiency}
-    As stated earlier one of the goals of this project was to create an efficient implementation
+    As stated at the beginning of this report one of the goals of this project was to create an efficient implementation
     of FRP. It was seen that Events in Echo are able to only use a small amount of memory by only
     needing to buffer `future' occurrences. As noted earlier this does mean however that it is still
     possible to create a memory leak with Events by instantiating an Event that occurs but is never 
@@ -49,7 +49,7 @@
     it would have no effect on anything whatsoever and would be effectively redundant. However, any documentation
     of Echo should make note of this problem.
     
-    As mentioned earlier Behaviour value caching is also used to prevent redundant reevaluation of Behaviours
+    As mentioned in section 4 Behaviour value caching is also used to prevent redundant reevaluation of Behaviours
     and this further leads to a more optimised implementation of FRP.
   
   \section{Demo Applications}
@@ -72,7 +72,7 @@
     Additional work was carried out on a small network anagram guessing game. This involved a server that provided
     an anagram and a client application that would present the anagram and allow the user to guess the original
     word. The user's answers would be reported to the server and the server would reply with whether
-    the guess was correct or not. This application took advantage of the socket abstraction mentioned earlier
+    the guess was correct or not. This application took advantage of the socket abstraction discussed in section 5
     and was actually very easy to develop with the Sender and Receiver types. Again, due to the functional and
     declarative nature of FRP the code for this application (both the server and the client) was very simple
     and intuitive to both create and read.

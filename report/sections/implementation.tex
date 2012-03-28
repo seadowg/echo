@@ -6,11 +6,11 @@
   as powerful as possible. They will all be explored here.
 
   \section{Flat Time}
-    Time in Echo is implemented as a flat value type defined exactly as it is in the earlier
-    section of this report (as an alias of Double). The internal implementation does take advantage
+    Time in Echo is implemented as a flat value type defined exactly as it is in 
+    section 2 of this report (as an alias of Double). The internal implementation does take advantage
     of general assumptions about Time. For instance, the \emph{merge} function for Events takes advantage
-    of the fact that an Event without occurrences still has a has a lower bound of when it can occur (described
-    earlier). 
+    of the fact that an Event without occurrences still has a has a lower bound of when it can occur (again described
+    in section 2). 
     
     Additionally a function is defined in Echo to return the current time:
     
@@ -53,7 +53,7 @@ val switch = new Switcher(iniBeh, behEvent)
 \end{verbatim}
 
   \section{Implicit Lifting of Constants}
-    As mentioned earlier, one of the most powerful features of Scala is it's ability to convert between
+    As mentioned earlier (in section 3), one of the most powerful features of Scala is it's ability to convert between
     types at run time. This is facilitated by the \emph{implicit} key word allowing a function to be defined
     that is automatically executed when a corresponding type mismatch occurs. This will be used in Echo to allow 
     static values to be converted to Behaviours \emph{implicitly}.. This is implemented in the following way:  
@@ -79,7 +79,7 @@ val switcher = new Switcher(false, eventBeh)
     to allow for this and also so that Events can be useful in anyway they must be allowed to actually `occur'.
     It is noticeable that the original denotational semantics \cite{Elliott1997} do not explore how to achieve
     this and it is assumed that this is because the actual occurring of Events is really just an implementation
-    issue. As discussed earlier, previous implementations of Events in Scala add an operation to Event's
+    issue. As discussed earlier (section 3), previous implementations of Events in Scala add an operation to Event's
     public API to allow it to occur. Here we will show an alternative approach.
     
     When observing how Events are composed (using \emph{merge} and \emph{map} operations) it can be seen that
@@ -111,7 +111,7 @@ occur(5)
     provide any useful functionality.
 
   \section{Time Travel is Dangerous}
-    Relating back to the earlier discussion of interactive Behaviours it can be seen
+    Relating back to the discussion of interactive Behaviours in section 2 it can be seen
     that there are problems when plugging FRP into the real world: the future is uncertain and
     arbitrary access to the past requires an unbounded level of memory. After much deliberation
     over different compromises it was decided that Echo would follow a set of rules:
@@ -253,7 +253,7 @@ def setup(args : Array[String]) {
     were added to the FRP in Echo.
     
     Lifting of constants has already been discussed for Echo but lifting of operators and
-    functions presents a few problems. This is because function in Scala (as discussed earlier)
+    functions presents a few problems. This is because functions in Scala (as discussed earlier)
     are usually attached to classes. For instance, there is no `+' operator in Scala: the numeric
     types have a \emph{+} function defined in their class declarations (how Scala actually performs additions
     is a topic for discussion elsewhere). This means that we cannot `lift' many of the operations we
