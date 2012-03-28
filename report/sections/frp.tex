@@ -193,7 +193,7 @@ val event2 = dangerMap(event1, (t, v) => (t - 1, v))
       Event[(Int, Int)] \emph{mousePos} that occurs every time the user's mouse moves with the new position:
 
 \begin{verbatim}
-val pos = switcher(lift0((0, 0)), mousePos.map(pos => lift0(pos)))
+val pos = switcher(lift0((0, 0)), map(mousePos, (t, pos) => lift0(t, pos)))
 pos.at(2)
 pos.at(5)
 \end{verbatim}    

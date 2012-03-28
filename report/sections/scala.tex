@@ -56,7 +56,7 @@ new Behaviour(time => time)
       
 \begin{verbatim}
 def signal[T](v : T, ev : Event[T]) = {
-  switcher(lift0(v), map(ev, o => lift0(o)))
+  switcher(lift0(v), map(ev, (t, o) => lift0(o)))
 }
 \end{verbatim}  
 
@@ -65,7 +65,7 @@ def signal[T](v : T, ev : Event[T]) = {
 
 \begin{verbatim}
 stepper[T](v : T, ev : Event[T]) : Behaviour[T]
-stepper(v, ev) = switcher(lift(v), map(ev, o => lift(o)))
+stepper(v, ev) = switcher(lift(v), map(ev, (t, o) => lift(o)))
 \end{verbatim} 
 
       It can be seen here that although Signal provides a useful programming tool it is not an implementation
