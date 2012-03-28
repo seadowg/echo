@@ -31,10 +31,9 @@ object SwitcherSpec extends Specification {
         val event = new TestEvent[Behavior[Int]]
 
         freezeTime(5) {
-          () =>
-            event.pubOccur(10)
-            val switcher = new Switcher(0, event)
-            switcher.eval()
+          event.pubOccur(10)
+          val switcher = new Switcher(0, event)
+          switcher.eval()
         }.mustBe(10)
       }
 
@@ -42,13 +41,12 @@ object SwitcherSpec extends Specification {
         val event = new TestEvent[Behavior[Int]]
 
         freezeTime(5) {
-          () => event.pubOccur(10)
+          event.pubOccur(10)
         }
 
         freezeTime(6) {
-          () =>
-            val switcher = new Switcher(0, event)
-            switcher.eval()
+          val switcher = new Switcher(0, event)
+          switcher.eval()
         }.mustBe(10)
       }
     }

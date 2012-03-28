@@ -40,9 +40,8 @@ object BehaviorSpec extends Specification {
         beh = beh.until(event, new Behavior(time => 10))
 
         freezeTime(1) {
-          () =>
-            event.pubOccur(5)
-            beh.eval()
+          event.pubOccur(5)
+          beh.eval()
         }.mustEqual(10)
       }
     }
@@ -58,8 +57,7 @@ object BehaviorSpec extends Specification {
         val beh = new Behavior(time => 5)
 
         freezeTime(1) {
-          () =>
-            beh.until(0L, new TestEvent[Int], new Behavior(time => 10)).eval()
+          beh.until(0L, new TestEvent[Int], new Behavior(time => 10)).eval()
         }.mustEqual(5)
       }
 
@@ -68,13 +66,11 @@ object BehaviorSpec extends Specification {
         val event = new TestEvent[Int]
 
         freezeTime(0) {
-          () =>
-            event.pubOccur(0)
+          event.pubOccur(0)
         }
 
         freezeTime(1) {
-          () =>
-            beh.until(1L, event, new Behavior(time => 10)).eval()
+          beh.until(1L, event, new Behavior(time => 10)).eval()
         }.mustBe(5)
       }
 
@@ -84,9 +80,8 @@ object BehaviorSpec extends Specification {
         val untilBeh = beh.until(1L, event, new Behavior(time => 10))
 
         freezeTime(1) {
-          () =>
-            event.pubOccur(0)
-            untilBeh.eval()
+          event.pubOccur(0)
+          untilBeh.eval()
         }.mustBe(10)
       }
     }
@@ -99,8 +94,7 @@ object BehaviorSpec extends Specification {
         }
 
         freezeTime(1) {
-          () =>
-            beh.map(func).eval()
+          beh.map(func).eval()
         }.mustEqual("5")
       }
     }
@@ -113,8 +107,7 @@ object BehaviorSpec extends Specification {
         }
 
         freezeTime(5) {
-          () =>
-            beh.map2(new Behavior(time => time.toString))(func).eval()
+          beh.map2(new Behavior(time => time.toString))(func).eval()
         }.mustEqual("55.0")
       }
     }
@@ -128,8 +121,7 @@ object BehaviorSpec extends Specification {
         }
 
         freezeTime(5) {
-          () =>
-            beh.map3(beh1, beh1)(func).eval()
+          beh.map3(beh1, beh1)(func).eval()
         }.mustEqual("55.05.0")
       }
     }
@@ -139,8 +131,7 @@ object BehaviorSpec extends Specification {
         val beh = new Behavior(time => 5)
 
         freezeTime(0) {
-          () =>
-            beh.toggle(new TestEvent[Unit], new Behavior(time => 10)).eval()
+          beh.toggle(new TestEvent[Unit], new Behavior(time => 10)).eval()
         }.mustBe(5)
       }
 
@@ -148,10 +139,9 @@ object BehaviorSpec extends Specification {
         val beh = new Behavior(time => 5)
 
         val value = freezeTime(0) {
-          () =>
-            val event = new TestEvent[Unit]
-            event.pubOccur(())
-            beh.toggle(event, new Behavior(time => 10)).eval()
+          val event = new TestEvent[Unit]
+          event.pubOccur(())
+          beh.toggle(event, new Behavior(time => 10)).eval()
         }
 
         value mustBe 10
@@ -162,10 +152,9 @@ object BehaviorSpec extends Specification {
         val event = new TestEvent[Unit]
 
         freezeTime(3) {
-          () =>
-            event.pubOccur(())
-            event.pubOccur(())
-            beh.toggle(event, new Behavior(time => 10)).eval()
+          event.pubOccur(())
+          event.pubOccur(())
+          beh.toggle(event, new Behavior(time => 10)).eval()
         }.mustBe(5)
       }
     }
@@ -184,8 +173,7 @@ object BehaviorSpec extends Specification {
         val sampler = beh.sample(event)
 
         freezeTime(1) {
-          () =>
-            event.pubOccur(())
+          event.pubOccur(())
         }
 
         sampler.top(now()).get.time mustEqual 1

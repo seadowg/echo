@@ -20,8 +20,7 @@ object EchoSpec extends Specification {
         var done = false
 
         freezeTime(0) {
-          () =>
-            done = true
+          done = true
         }
 
         done mustBe true
@@ -29,8 +28,7 @@ object EchoSpec extends Specification {
 
       "that freezes time during execution of its block" in {
         val value = freezeTime(0) {
-          () =>
-            now()
+          now()
         }
 
         value mustEqual 0
@@ -38,11 +36,9 @@ object EchoSpec extends Specification {
 
       "that allows nesting" in {
         val value = freezeTime(0) {
-          () =>
-            freezeTime(0) {
-              () =>
-                now()
-            }
+          freezeTime(0) {
+            now()
+          }
         }
 
         value mustEqual 0

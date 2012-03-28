@@ -11,7 +11,7 @@ abstract class EchoApp {
       createLock.acquire()
 
       freezeTime(0) {
-        () => setup(args)
+        setup(args)
       }
 
       createLock.release()

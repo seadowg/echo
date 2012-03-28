@@ -44,6 +44,16 @@ object EventSpec extends Specification {
       event.pubOccur(5)
       passed.value mustEqual 5
     }
+    
+    "allows constant events to occur when they are created" in {
+      var event : Event[Int] = null
+      
+      freezeTime(1) {
+        event = Event(5)
+      }
+      
+      Stepper(0D, event.map((t, v) => t)).eval() mustEqual 1
+    }
 
     "have a map function" >> {
       "returning a mapped version of the Event" in {
@@ -138,23 +148,22 @@ object EventSpec extends Specification {
         val right = new TestEvent[Int]
 
         freezeTime(0) {
-          () => left.pubOccur(5)
+          left.pubOccur(5)
         }
         freezeTime(1) {
-          () => right.pubOccur(6)
+          right.pubOccur(6)
         }
 
         left.merge(right).top(now()).get.value mustEqual 6
         left.merge(right).top(now()).get.num mustEqual 2
 
         freezeTime(2) {
-          () => left.pubOccur(4)
+          left.pubOccur(4)
         }
 
         val tuple = freezeTime(3) {
-          () =>
-            (left.merge(right).top(now()).get.value,
-              left.merge(right).top(now()).get.num)
+          (left.merge(right).top(now()).get.value,
+            left.merge(right).top(now()).get.num)
         }
 
         tuple mustEqual(4, 3)
@@ -165,9 +174,8 @@ object EventSpec extends Specification {
         val right = new TestEvent[Int]
 
         freezeTime(0) {
-          () =>
-            left.pubOccur(5)
-            right.pubOccur(6)
+          left.pubOccur(5)
+          right.pubOccur(6)
         }
 
         left.merge(right).top(now()).get.value mustEqual 6
@@ -221,9 +229,8 @@ object EventSpec extends Specification {
         source.pubOccur(occurSource2)
 
         freezeTime(now()) {
-          () =>
-            occurSource2.pubOccur(7)
-            occurSource1.pubOccur(6)
+          occurSource2.pubOccur(7)
+          occurSource1.pubOccur(6)
         }
 
         event.top(now()).get.value mustEqual 7
@@ -236,13 +243,11 @@ object EventSpec extends Specification {
         val occurSource1 = new TestEvent[Int]
 
         freezeTime(1) {
-          () =>
-            occurSource1.pubOccur(5)
+          occurSource1.pubOccur(5)
         }
 
         freezeTime(2) {
-          () =>
-            source.pubOccur(occurSource1)
+          source.pubOccur(occurSource1)
         }
 
         event.top(now()).get.time mustEqual 2
@@ -256,8 +261,7 @@ object EventSpec extends Specification {
         val occurSource2 = new TestEvent[Int]
 
         freezeTime(1) {
-          () =>
-            occurSource1.pubOccur(5)
+          occurSource1.pubOccur(5)
         }
 
         source.pubOccur(occurSource1)

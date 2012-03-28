@@ -30,10 +30,9 @@ object StepperSpec extends Specification {
         val event = new TestEvent[Int]
 
         freezeTime(5) {
-          () =>
-            event.pubOccur(10)
-            val stepper = new Stepper(0, event)
-            stepper.eval()
+          event.pubOccur(10)
+          val stepper = new Stepper(0, event)
+          stepper.eval()
         }.mustBe(10)
       }
 
@@ -41,13 +40,12 @@ object StepperSpec extends Specification {
         val event = new TestEvent[Int]
 
         freezeTime(5) {
-          () => event.pubOccur(10)
+          event.pubOccur(10)
         }
 
         freezeTime(6) {
-          () =>
-            val stepper = new Stepper(0, event)
-            stepper.eval()
+          val stepper = new Stepper(0, event)
+          stepper.eval()
         }.mustBe(10)
       }
     }

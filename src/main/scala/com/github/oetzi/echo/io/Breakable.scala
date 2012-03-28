@@ -5,9 +5,9 @@ import com.github.oetzi.echo.core.EventSource
 
 trait Breakable {
   val errors = new EventSource[Exception] {
-    def apply[T](block: () => T): Option[T] = {
+    def apply[T](block: => T): Option[T] = {
       try {
-        Some(block())
+        Some(block)
       }
 
       catch {
@@ -19,7 +19,7 @@ trait Breakable {
     }
   }
 
-  protected def dangerous[T](block: () => T): Option[T] = {
+  protected def dangerous[T](block: => T): Option[T] = {
     errors(block)
   }
 }

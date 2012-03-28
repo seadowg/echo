@@ -36,9 +36,9 @@ object Echo {
     this.fakeTime = time
   }
 
-  private[echo] def freezeTime[T](time: Time)(block: () => T): T = {
+  private[echo] def freezeTime[T](time: Time)(block: => T): T = {
     this.setTime(time)
-    val returnValue = block()
+    val returnValue = block
     this.useRealTime()
 
     returnValue
@@ -55,13 +55,13 @@ private[echo] object Control {
     devModeOn = true
   }
 
-  def frp[T](block: () => T): T = {
+  def frp[T](block: => T): T = {
     if (createLock.available && !devModeOn) {
       throw new IllegalAccessException("You can't do that...")
     }
 
     else {
-      block()
+      block
     }
   }
 }

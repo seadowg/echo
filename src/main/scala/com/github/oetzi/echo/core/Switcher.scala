@@ -14,17 +14,17 @@ object Switcher {
   
   private def construct[T](initial: Behavior[T], event: Event[Behavior[T]]): Time => T = {
     frp {
-      () => {
-        time =>
-          val occ = event.top(time)
+      {
+       time =>
+        val occ = event.top(time)
 
-          if (occ == None) {
-            initial.at(time)
-          }
+        if (occ == None) {
+          initial.at(time)
+        }
 
-          else {
-            occ.get.value.at(time)
-          }
+        else {
+          occ.get.value.at(time)
+        }
       }
     }
   }
