@@ -1,27 +1,29 @@
 \chapter{Scala}
-  Scala is a multi-paradigm programming language developed to run on the Java Virtual Machine \cite{Odersky2004}. Scala 
-  programs are
-  generally structured in an object oriented programming style like Java but it also incorporates many features of
-  functional languages such as closures, high order functions, lazy evaluation, immutable state and currying. These features aid
-  implementation of FRP concepts as closures will allow for Behaviour definition. Also, functions such as \emph{map} on
-  Behaviours and Events to be expressed in a more natural and succinct form in a functional language. It is
-  important to note that although Scala is thought of as `functional' its functions are not `pure'. This means
-  that object functions and closures can cause side effects and can be affected by external states.
-
-  Scala also possesses an advanced, powerful and feature rich static type system. This provides large
-  advantages when implementing FRP. Firstly, Scala supports generic classes and it can be quite easily seen
-  that both Behaviours and Events will rely on this feature for type safety. Scala additionally provides
-  a rather unique type conversion functionality that allows types to be converted on the fly. This provides
-  incredibly expressive and powerful ways to embed FRP into Scala and will be explored later.
   
-  \section{Problems}
-    One quite significant problem with implementing FRP in Scala is that, unlike Haskell, it is an `impure'
+  \section{Overview}
+    Scala is a multi-paradigm programming language developed to run on the Java Virtual Machine \cite{Odersky2004}. Scala 
+    programs are
+    generally structured in an object oriented programming style like Java but it also incorporates many features of
+    functional languages such as closures, high order functions, lazy evaluation, immutable state and currying. These features 
+    aid
+    implementation of FRP concepts as closures will allow for Behaviour definition. Also, functions such as \emph{map} on
+    Behaviours and Events to be expressed in a more natural and succinct form in a functional language. It is
+    important to note that although Scala is thought of as `functional' its functions are not `pure'. This means
+    that object functions and closures can cause side effects and can be affected by external states.
+
+    Scala also possesses an advanced, powerful and feature rich static type system. This provides large
+    advantages when implementing FRP. Firstly, Scala supports generic classes and it can be quite easily seen
+    that both Behaviours and Events will rely on this feature for type safety. Scala additionally provides
+    a rather unique type conversion functionality that allows types to be converted on the fly. This provides
+    incredibly expressive and powerful ways to embed FRP into Scala and will be explored later.
+    
+    One slight problem with implementing FRP in Scala is that, unlike Haskell, it is an `impure'
     language. In terms of functional programming, `purity' refers to a languages ability to write functions
     thats results are affected by some external estate or in turn effect some external state. For instance,
-    this means that a function that defines a Behaviour could in fact cause side effects meaning that
-    every time the Behaviour was evaluated it would execute this side effect. There has been some work into
-    pure function verification in Scala but it has not materialised into an implementation \cite{Nordenberg}. 
-  
+    this means that a function that defines a Behaviour could be impure and could therefore cause side effects
+    whenever the Behaviour was evaluated. There has been some work into pure function verification in Scala but it has not materialised into an  
+    implementation \cite{Nordenberg}. Due to this, we will only deal with Behaviours defined using pure Behaviours in echo.
+     
   \section{Previous Work}
     As one might imagine, there has been previous work in implementing FRP in Scala. 
     
@@ -70,7 +72,7 @@ stepper(v, ev) = switcher(lift(v), map(ev, o => lift(o)))
       of an FRP Behaviour and only allows for a subset of a Behaviour's functionality meaning that `Reactive'
       does not successfully implement FRPs semantics.
     
-    \section{React}
+    \subsection{React}
       While not claiming to be an implementation of FRP the `React' framework proposed in the 
       paper `Deprecating the Observer Pattern' \cite{Maier2010} does utilise a notion of Events that, as cited in the paper,
       has its routes in FRP.

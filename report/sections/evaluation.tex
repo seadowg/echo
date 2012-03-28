@@ -52,27 +52,6 @@
     As mentioned earlier Behaviour value caching is also used to prevent redundant reevaluation of Behaviours
     and this further leads to a more optimised implementation of FRP.
   
-  \section{Impurity}
-    It is important to note that `echo' does not attempt to deal with the problem that
-    users are able to create impure functions to define Behaviours. For instance, a programmer could
-    create a Behaviour that reads from some external source:
-
-\begin{verbatim}
-val imp = new Behaviour(time => Console.readLine)
-\end{verbatim}    
-
-    This Behaviour would actually block on evaluation until a user wrote a line to the program console. 
-    Additionally, evaluating this Behaviour at a past time will return the `current' value. A
-    Behaviour can also cause side effects:
-
-\begin{verbatim}    
-val imp = new Behaviour(time => println("Hello, world!"))
-\end{verbatim}
-
-    Unfortunately, without modifications to the Scala compiler there is little that can be done
-    to verify that the functions used to define a Behaviour are pure (the actual function scope would
-    have to be limited).
-  
   \section{Demo Applications}
     So as to gain experience with using `echo' and also for the purposes of evaluation, demonstration
     applications were developed. 
