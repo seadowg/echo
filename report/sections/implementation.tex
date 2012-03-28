@@ -1,269 +1,264 @@
 \chapter{Implementation}
-  As stated earlier the goal of this project was to implement a framework for utilising FRP in Scala. 
-  This framework was dubbed Echo. This section will explore the motivations and problems ahead of
-  and also the choices made and results rendered during the implementation of Echo.
-  
-  \section{Design \& Implementation Choices}
   Throughout its history FRP implementations have generally been carried out in Haskell. Due to the movement
   in setting and also in an effort to create a efficient implementation without sacrificing FRP's expressive power
   several design and implementation choices were made for Echo. Choices were also made
   to provide to provide programmers with simpler experiences and to hopefully allow Echo to be
   as powerful as possible. They will all be explored here.
-  
-    \subsection{Flat Time}
-      Time in Echo is implemented as a flat value type defined exactly as it is in the earlier
-      section of this report (as an alias of Double). The internal implementation does take advantage
-      of general assumptions about Time. For instance, the \emph{merge} function for Events takes advantage
-      of the fact that an Event without occurrences still has a has a lower bound of when it can occur (described
-      earlier). 
-      
-      Additionally a function is defined in Echo to return the current time:
-      
+
+  \section{Flat Time}
+    Time in Echo is implemented as a flat value type defined exactly as it is in the earlier
+    section of this report (as an alias of Double). The internal implementation does take advantage
+    of general assumptions about Time. For instance, the \emph{merge} function for Events takes advantage
+    of the fact that an Event without occurrences still has a has a lower bound of when it can occur (described
+    earlier). 
+    
+    Additionally a function is defined in Echo to return the current time:
+    
 \begin{verbatim}
 def now() : Time = System.nanoTime() - startTime
 \end{verbatim}      
 
-      Here \emph{startTime} refers to the time the current Echo program started executing and this is
-      set by the framework at run time. It should be noted that \emph{nanoTime} (returning current time in
-      nano seconds) is the most accurate value available for the current time in Scala. However due the restrictions
-      of Java Virtual Machine implementations of this function will start to return incorrect results 
-      after running for around 292 years due to an overflow in the calculation (thought to be an allowable
-      problem).
-      
-    \subsection{Object Orientation}
-      Although it may seem obvious it is worth noting that both Behaviours and Events are implemented in
-      Echo using Scala's object oriented definitions. For instance, a Behaviour[T] is simply
-      implemented as a generic class with a Time =$>$ T function parameter. An example Behaviour
-      could be instantiated as follows:
- 
+    Here \emph{startTime} refers to the time the current Echo program started executing and this is
+    set by the framework at run time. It should be noted that \emph{nanoTime} (returning current time in
+    nano seconds) is the most accurate value available for the current time in Scala. However due the restrictions
+    of Java Virtual Machine implementations of this function will start to return incorrect results 
+    after running for around 292 years due to an overflow in the calculation (thought to be an allowable
+    problem).
+    
+  \section{Object Orientation}
+    Although it may seem obvious it is worth noting that both Behaviours and Events are implemented in
+    Echo using Scala's object oriented definitions. For instance, a Behaviour[T] is simply
+    implemented as a generic class with a Time =$>$ T function parameter. An example Behaviour
+    could be instantiated as follows:
+
 \begin{verbatim}
 val beh = new Behaviour[Double](time => sin(time))
 \end{verbatim}  
 
-      A discussion of Event's implementation will feature later.
-      
-      It would be possible to implement the original FRP operations as standalone functions. However, so
-      as to conform to Scala's object oriented style the operations will be attached to their respective
-      classes. For instance, the \emph{merge} operation will be used in the following way in Echo:
-      
+    A discussion of Event's implementation will feature later.
+    
+    It would be possible to implement the original FRP operations as standalone functions. However, so
+    as to conform to Scala's object oriented style the operations will be attached to their respective
+    classes. For instance, the \emph{merge} operation will be used in the following way in Echo:
+    
 \begin{verbatim}
 val merged = event1.merge(event2)
 \end{verbatim}
 
-    This allows the FRP code to fit more naturally into Scala. We will also replace the \emph{switcher} function
-    with a type that extends Behaviour rather than a function:
-    
+  This allows the FRP code to fit more naturally into Scala. We will also replace the \emph{switcher} function
+  with a type that extends Behaviour rather than a function:
+  
 \begin{verbatim}
 val switch = new Switcher(iniBeh, behEvent)
 \end{verbatim}
 
-    \subsection{Implicit Lifting of Constants}
-      As mentioned earlier, one of the most powerful features of Scala is it's ability to convert between
-      types at run time. This is facilitated by the \emph{implicit} key word allowing a function to be defined
-      that is automatically executed when a corresponding type mismatch occurs. This will be used in Echo to allow 
-      static values to be converted to Behaviours \emph{implicitly}.. This is implemented in the following way:  
+  \section{Implicit Lifting of Constants}
+    As mentioned earlier, one of the most powerful features of Scala is it's ability to convert between
+    types at run time. This is facilitated by the \emph{implicit} key word allowing a function to be defined
+    that is automatically executed when a corresponding type mismatch occurs. This will be used in Echo to allow 
+    static values to be converted to Behaviours \emph{implicitly}.. This is implemented in the following way:  
 
 \begin{verbatim}
 implicit def liftConst[T](value : T) : Behaviour[T] = {
-  new Behaviour(time => value)
+new Behaviour(time => value)
 }
 \end{verbatim}              
-      
-      This would allow the following for instance:
+    
+    This would allow the following for instance:
 
 \begin{verbatim}
 val beh : Behaviour[Int] = 0
 val switcher = new Switcher(false, eventBeh)
 \end{verbatim}       
 
-      It can immediately be seen that this allows the programmer to switch between static and more complex
-      Behaviours in a very naturalistic manor.
-      
-    \subsection{Extendable Events}
-      FRP Events provide a very useful abstraction for external stimuli such as I/O and user input. Of course
-      to allow for this and also so that Events can be useful in anyway they must be allowed to actually `occur'.
-      It is noticeable that the original denotational semantics \cite{Elliott1997} do not explore how to achieve
-      this and it is assumed that this is because the actual occurring of Events is really just an implementation
-      issue. As discussed earlier, previous implementations of Events in Scala add an operation to Event's
-      public API to allow it to occur. Here we will show an alternative approach.
-      
-      When observing how Events are composed (using \emph{merge} and \emph{map} operations) it can be seen that
-      only a subset of Events actually `occur' while others are simply views and combinations of these.
-      In `echo' this is modelled directly. FRP Events are represented by two traits: Event[T] and EventSource[T].
-      Event has concrete implementations of \emph{map} and \emph{merge} operations that
-      return concrete Event[T] instantiations. EventSource[T] extends
-      from Event[T] and additionally has a protected level concrete function `occur':
-      
+    It can immediately be seen that this allows the programmer to switch between static and more complex
+    Behaviours in a very naturalistic manor.
+    
+  \section{Extendable Events}
+    FRP Events provide a very useful abstraction for external stimuli such as I/O and user input. Of course
+    to allow for this and also so that Events can be useful in anyway they must be allowed to actually `occur'.
+    It is noticeable that the original denotational semantics \cite{Elliott1997} do not explore how to achieve
+    this and it is assumed that this is because the actual occurring of Events is really just an implementation
+    issue. As discussed earlier, previous implementations of Events in Scala add an operation to Event's
+    public API to allow it to occur. Here we will show an alternative approach.
+    
+    When observing how Events are composed (using \emph{merge} and \emph{map} operations) it can be seen that
+    only a subset of Events actually `occur' while others are simply views and combinations of these.
+    In `echo' this is modelled directly. FRP Events are represented by two traits: Event[T] and EventSource[T].
+    Event has concrete implementations of \emph{map} and \emph{merge} operations that
+    return concrete Event[T] instantiations. EventSource[T] extends
+    from Event[T] and additionally has a protected level concrete function `occur':
+    
 \begin{verbatim}
 occur(value : T) : Unit
 \end{verbatim}  
 
-      This function causes the EventSource[T] to `occur' with the given value (with the time the call was made). This allows 
-      programmers
-      to easily build FRP Event abstractions for any form of input without exposing the \emph{occur} action itself.
-      As an example, Here is a simple implementation for an Event that occurs once with the value `5' when it 
-      is created:
-      
+    This function causes the EventSource[T] to `occur' with the given value (with the time the call was made). This allows 
+    programmers
+    to easily build FRP Event abstractions for any form of input without exposing the \emph{occur} action itself.
+    As an example, Here is a simple implementation for an Event that occurs once with the value `5' when it 
+    is created:
+    
 \begin{verbatim}
 class Five extends EventSource[Int] {
-  occur(5)
+occur(5)
 }
 \end{verbatim}
 
-      It should also be noted that the \emph{occs} function on Events is not actually available in Echo. This
-      choice was made because an Event does not retain all its Events so anything returned from this 
-      function would be incorrect and accessing a Event's past data does not really
-      provide any useful functionality.
+    It should also be noted that the \emph{occs} function on Events is not actually available in Echo. This
+    choice was made because an Event does not retain all its Events so anything returned from this 
+    function would be incorrect and accessing a Event's past data does not really
+    provide any useful functionality.
 
-    \subsection{Time Travel is Dangerous}
-      Relating back to the earlier discussion of interactive Behaviours it can be seen
-      that there are problems when plugging FRP into the real world: the future is uncertain and
-      arbitrary access to the past requires an unbounded level of memory. After much deliberation
-      over different compromises it was decided that Echo would follow a set of rules:
-      
-      \begin{itemize}
-        \item If a Behaviour was last evaluated at time \emph{u} then it can only be evaluated at
-        a time \emph{t} if \emph{t} $\geq$ \emph{u}.
-        \item An Event holds the last time it occurred and the time up to which we know it hasn't occurred
-        again (the time it is `valid' until).
-        \item An Event is valid up until the time equivalent to `now' (the actual current time).
-        \item If a Behaviour depends on some Event then we can only evaluate the Behaviour up to
-        the time the Event is valid. We additionally can only evaluate it at a time greater than
-        or equal to the Event's last occurrence.
-      \end{itemize}
-      
-      These rules restrict Behaviours to what we will refer to as `real-time' evaluation as the times
-      we evaluate a Behaviour at become monotonic in nature. Additionally, as Event occurrences will
-      be happening in real time we will see that the lower bound that we can evaluate a Behaviour at will
-      constantly be pushed up to the present (leaving only `now' as a possible evaluation time). Although
-      other times will be available for evaluation at times (there will often be a gap between `now' and
-      the last Event occurrence) it would be monotonous to expose these bounds to the programmer so
-      in Echo explicit evaluation of a Behaviour is entirely removed from the public API (the
-      `at' operation) and replaced with a real-time evaluation function:
+  \section{Time Travel is Dangerous}
+    Relating back to the earlier discussion of interactive Behaviours it can be seen
+    that there are problems when plugging FRP into the real world: the future is uncertain and
+    arbitrary access to the past requires an unbounded level of memory. After much deliberation
+    over different compromises it was decided that Echo would follow a set of rules:
+    
+    \begin{itemize}
+      \item If a Behaviour was last evaluated at time \emph{u} then it can only be evaluated at
+      a time \emph{t} if \emph{t} $\geq$ \emph{u}.
+      \item An Event holds the last time it occurred and the time up to which we know it hasn't occurred
+      again (the time it is `valid' until).
+      \item An Event is valid up until the time equivalent to `now' (the actual current time).
+      \item If a Behaviour depends on some Event then we can only evaluate the Behaviour up to
+      the time the Event is valid. We additionally can only evaluate it at a time greater than
+      or equal to the Event's last occurrence.
+    \end{itemize}
+    
+    These rules restrict Behaviours to what we will refer to as `real-time' evaluation as the times
+    we evaluate a Behaviour at become monotonic in nature. Additionally, as Event occurrences will
+    be happening in real time we will see that the lower bound that we can evaluate a Behaviour at will
+    constantly be pushed up to the present (leaving only `now' as a possible evaluation time). Although
+    other times will be available for evaluation at times (there will often be a gap between `now' and
+    the last Event occurrence) it would be monotonous to expose these bounds to the programmer so
+    in Echo explicit evaluation of a Behaviour is entirely removed from the public API (the
+    `at' operation) and replaced with a real-time evaluation function:
 
 \begin{verbatim}
 eval() : T
 beh.eval() = beh.at(now())
 \end{verbatim}  
 
-      It can be seen here that \emph{at} will still be used internally. The Events also use explicit time
-      evaluation internally. This is because when Events occur they are buffered until the Event is
-      evaluated at a given time by a Behaviour. The present occurrence is then returned and stored and past occurrences
-      are thrown away. This allows for the fact that although the evaluation is referred to as real time the
-      actual evaluation will execute slightly behind the current time. This feature being the
-      case means we can't simply just store the last occurrence for each Event. Interestingly this also
-      means that each group of dependent Behaviours and Events will have their own view of the `current' time:
-      the last time they were evaluated.
+    It can be seen here that \emph{at} will still be used internally. The Events also use explicit time
+    evaluation internally. This is because when Events occur they are buffered until the Event is
+    evaluated at a given time by a Behaviour. The present occurrence is then returned and stored and past occurrences
+    are thrown away. This allows for the fact that although the evaluation is referred to as real time the
+    actual evaluation will execute slightly behind the current time. This feature being the
+    case means we can't simply just store the last occurrence for each Event. Interestingly this also
+    means that each group of dependent Behaviours and Events will have their own view of the `current' time:
+    the last time they were evaluated.
 
-      This restriction may seem like a significant loss of expressivity. However as we wish to be able to treat
-      Behaviours and Events as first class values we would actually like to avoid ever explicitly evaluating
-      them: this would ideally be carried out by abstractions for graphics or other kinds of output. For instance
-      if we wanted to set some colour in a user interface equal to a Behaviour then explicitly evaluating the Behaviour
-      periodically and setting the colour using a static value would defeat the point of using FRP. We will see in later
-      discussion that we can easily create abstractions to hide this type of logic.
-      
-      It should also be noted that Events are still able to use an unbounded level of memory: we only throw away
-      past occurrences when evaluating a Behaviour so an Event that is never evaluated would collect occurrences
-      infinitely.
-      
-      Of course, the new rules can still be broken if we introduce multi-threading and this is best illustrated
-      with an example:
-      
+    This restriction may seem like a significant loss of expressivity. However as we wish to be able to treat
+    Behaviours and Events as first class values we would actually like to avoid ever explicitly evaluating
+    them: this would ideally be carried out by abstractions for graphics or other kinds of output. For instance
+    if we wanted to set some colour in a user interface equal to a Behaviour then explicitly evaluating the Behaviour
+    periodically and setting the colour using a static value would defeat the point of using FRP. We will see in later
+    discussion that we can easily create abstractions to hide this type of logic.
+    
+    It should also be noted that Events are still able to use an unbounded level of memory: we only throw away
+    past occurrences when evaluating a Behaviour so an Event that is never evaluated would collect occurrences
+    infinitely.
+    
+    Of course, the new rules can still be broken if we introduce multi-threading and this is best illustrated
+    with an example:
+    
 \begin{verbatim}
 val beh = new Behaviour(time => 5)
 
 class Runner extends Runnable() {
-  def run() {
-    beh.eval()
-  }
+def run() {
+  beh.eval()
+}
 }
 
 new Thread(new Runner).start()
 new Thread(new Runner).start()
 \end{verbatim}       
 
-      Here we have two threads continuously evaluating one Behaviour. This means that one thread
-      might call \emph{eval} and then be scheduled out allowing the other to proceed to evaluate
-      at a later time. If the original is then scheduled back in it is possible it will
-      be evaluating the Behaviour at a time less than the time the second evaluated it at. This suggests
-      that we desire the \emph{eval} operation to be `atomic'. This can be achieved easily for standalone
-      Behaviours using standard locking tools in Scala.
-      
-      We run into further problems however if the Behaviour is more complex. Suppose, in the above example,
-      the Behaviour was defined as follows:
+    Here we have two threads continuously evaluating one Behaviour. This means that one thread
+    might call \emph{eval} and then be scheduled out allowing the other to proceed to evaluate
+    at a later time. If the original is then scheduled back in it is possible it will
+    be evaluating the Behaviour at a time less than the time the second evaluated it at. This suggests
+    that we desire the \emph{eval} operation to be `atomic'. This can be achieved easily for standalone
+    Behaviours using standard locking tools in Scala.
+    
+    We run into further problems however if the Behaviour is more complex. Suppose, in the above example,
+    the Behaviour was defined as follows:
 
 \begin{verbatim}
 val beh = beh1.until(ev, beh2)
 \end{verbatim}        
 
-      Here, \emph{beh} `depends' on \emph{beh1} and \emph{beh2}: whenever we evaluate \emph{beh}
-      we also need to evaluate \emph{beh1} or \emph{beh2}. This shows that Behaviours can't just
-      be locked on a standalone basis but must share a lock with all their dependencies and other Behaviours
-      that share those dependencies. By this it is meant that a group of dependent Behaviours can
-      only be read by one thread at a time.
-      
-      It should also be noted that restricting evaluation times for Behaviours forces us
-      to remove the \emph{timeTransform} operation for Behaviours (as this allows programmers to explicitly
-      evaluate Behaviours in the past or future).
-      
-      There was one further problem presented due this restriction and that was concerned with
-      implementing the \emph{snapshot} operation. For instance, imagine we execute the following code
-      at time \emph{t}:
-      
+    Here, \emph{beh} `depends' on \emph{beh1} and \emph{beh2}: whenever we evaluate \emph{beh}
+    we also need to evaluate \emph{beh1} or \emph{beh2}. This shows that Behaviours can't just
+    be locked on a standalone basis but must share a lock with all their dependencies and other Behaviours
+    that share those dependencies. By this it is meant that a group of dependent Behaviours can
+    only be read by one thread at a time.
+    
+    It should also be noted that restricting evaluation times for Behaviours forces us
+    to remove the \emph{timeTransform} operation for Behaviours (as this allows programmers to explicitly
+    evaluate Behaviours in the past or future).
+    
+    There was one further problem presented due this restriction and that was concerned with
+    implementing the \emph{snapshot} operation. For instance, imagine we execute the following code
+    at time \emph{t}:
+    
 \begin{verbatim}
 val ev = beh.snapshot(someEvent)
 \end{verbatim}
 
-      This is fine if \emph{someEvent} has not occurred at \emph{t}. If it has occurred however at some time
-      before \emph{t} then in whatever way this is implemented we are forced to evaluate \emph{beh}
-      at a time in the past. If \emph{beh} depends on any Events this time might be before their
-      last occurrence and so we would effectively be returning an incorrect result. Dealing with this
-      presented an interesting problem that caused quite a radical change. It was decided that FRP
-      code (FRP operations on FRP types) could only be performed in an initial setup phase of a program.
-      This setup phase would happen `instantly' as the internal notion of time would be frozen and Event
-      occurrences would not be processed by the framework. As Scala programs are defined inside a singleton
-      object it was decided that a user would simply be able to extend a class with this object and then
-      write their FRP code in a \emph{setup} function:
- 
+    This is fine if \emph{someEvent} has not occurred at \emph{t}. If it has occurred however at some time
+    before \emph{t} then in whatever way this is implemented we are forced to evaluate \emph{beh}
+    at a time in the past. If \emph{beh} depends on any Events this time might be before their
+    last occurrence and so we would effectively be returning an incorrect result. Dealing with this
+    presented an interesting problem that caused quite a radical change. It was decided that FRP
+    code (FRP operations on FRP types) could only be performed in an initial setup phase of a program.
+    This setup phase would happen `instantly' as the internal notion of time would be frozen and Event
+    occurrences would not be processed by the framework. As Scala programs are defined inside a singleton
+    object it was decided that a user would simply be able to extend a class with this object and then
+    write their FRP code in a \emph{setup} function:
+
 \begin{verbatim}
 object App extends EchoApp {
-  def setup(args : Array[String]) {
-    // FRP code here
-  }
+def setup(args : Array[String]) {
+  // FRP code here
+}
 }
 \end{verbatim}
 
-      This allows the FRP world to be setup in one distinct stage. It should be noted that
-      any functions \emph{setup} calls would also be able to run FRP code. Only FRP code that runs
-      after the \emph{setup} function has finished executing will cause an error.
-      
-    \subsection{Time Freezing}
-      Some FRP operations require some internal action to happen `exactly' when an Event occurs. For instance,
-      the snapshot operations needs to be able to sample a Behaviour at the same time as an Event occurs.
-      We can see this will be a problem as time conceptually moves forward as the code to
-      occur an Event is executing. To deal with this in Echo we treat occurrences as if they happen instantly. This
-      creates a similar effect to the initial setup phase as time is frozen at its current value for the duration
-      of the operation and other Events must wait to occur. This may sound like it would cause large lags in time
-      but any lags would only be nanoseconds in length and it allows the very useful \emph{snapshot} operation
-      to be implemented without sacrificing its original denotational semantics.
+    This allows the FRP world to be setup in one distinct stage. It should be noted that
+    any functions \emph{setup} calls would also be able to run FRP code. Only FRP code that runs
+    after the \emph{setup} function has finished executing will cause an error.
     
-    \subsection{Function Renaming}
-      Although a small change it should also be noted that one of the functions originally defined
-      has be renamed for the Echo framework - \emph{snapshot} was renamed to \emph{sample}. This was done as
-      it was felt it added more clarity to the function name was more appropriate given its use.
-      
-    \subsection{Function Additions}
-      When considering different applications of the framework and also in an attempt to
-      tackle the changes in expressiveness between Haskell and Scala some operations
-      were added to the FRP in Echo.
-      
-      Lifting of constants has already been discussed for Echo but lifting of operators and
-      functions presents a few problems. This is because function in Scala (as discussed earlier)
-      are usually attached to classes. For instance, there is no `+' operator in Scala: the numeric
-      types have a \emph{+} function defined in their class declarations (how Scala actually performs additions
-      is a topic for discussion elsewhere). This means that we cannot `lift' many of the operations we
-      would want to. To solve this problem we can use a series of map functions. We can define these
-      here as part of Behaviour[T]:
+  \section{Time Freezing}
+    Some FRP operations require some internal action to happen `exactly' when an Event occurs. For instance,
+    the snapshot operations needs to be able to sample a Behaviour at the same time as an Event occurs.
+    We can see this will be a problem as time conceptually moves forward as the code to
+    occur an Event is executing. To deal with this in Echo we treat occurrences as if they happen instantly. This
+    creates a similar effect to the initial setup phase as time is frozen at its current value for the duration
+    of the operation and other Events must wait to occur. This may sound like it would cause large lags in time
+    but any lags would only be nanoseconds in length and it allows the very useful \emph{snapshot} operation
+    to be implemented without sacrificing its original denotational semantics.
+  
+  \section{Function Renaming}
+    Although a small change it should also be noted that one of the functions originally defined
+    has be renamed for the Echo framework - \emph{snapshot} was renamed to \emph{sample}. This was done as
+    it was felt it added more clarity to the function name was more appropriate given its use.
+    
+  \section{Function Additions}
+    When considering different applications of the framework and also in an attempt to
+    tackle the changes in expressiveness between Haskell and Scala some operations
+    were added to the FRP in Echo.
+    
+    Lifting of constants has already been discussed for Echo but lifting of operators and
+    functions presents a few problems. This is because function in Scala (as discussed earlier)
+    are usually attached to classes. For instance, there is no `+' operator in Scala: the numeric
+    types have a \emph{+} function defined in their class declarations (how Scala actually performs additions
+    is a topic for discussion elsewhere). This means that we cannot `lift' many of the operations we
+    would want to. To solve this problem we can use a series of map functions. We can define these
+    here as part of Behaviour[T]:
 
 \begin{verbatim}
 map[U](func : T => U) : Behaviour[U]
@@ -273,45 +268,45 @@ map2[U, V](beh1 : U)(func : (T, U) => V) : Behaviour[V]
 beh.map2(beh1)(func).at(t) = func(beh.at(t), beh1.at(t))
 \end{verbatim}        
 
-      These functions allow Behaviours to be transformed and combined using functions
-      normally applied to static values.
-      
-      In Hudak and Elliott's original paper an example is constructed to create a Behaviour
-      that toggles back and forth between two given Behaviours whenever an Event occurs. This
-      example took advantage of Haskell's lazy evaluation. While Scala is able to use lazy evaluation
-      it requires extra work and at the time of writing requires some complex syntax. To tackle this
-      a \emph{toggle} function was added to Echo to provide the functionality in the example out of the box.
-      This is defined as part of Behaviour[T]:
-      
+    These functions allow Behaviours to be transformed and combined using functions
+    normally applied to static values.
+    
+    In Hudak and Elliott's original paper an example is constructed to create a Behaviour
+    that toggles back and forth between two given Behaviours whenever an Event occurs. This
+    example took advantage of Haskell's lazy evaluation. While Scala is able to use lazy evaluation
+    it requires extra work and at the time of writing requires some complex syntax. To tackle this
+    a \emph{toggle} function was added to Echo to provide the functionality in the example out of the box.
+    This is defined as part of Behaviour[T]:
+    
 \begin{verbatim}
 toggle(ev : Event[T], beh1 : Behaviour[T]) : Behaviour[T]
 \end{verbatim}        
-      
-      It was felt that another common use of combining Behaviours and Events would be
-      to switch from one Behaviour to another when an Event occurs (but not back again):
+    
+    It was felt that another common use of combining Behaviours and Events would be
+    to switch from one Behaviour to another when an Event occurs (but not back again):
 
 \begin{verbatim}
 until(ev : Event[T], beh1 : Behaviour[T]) : Behaviour[T]
 beh.until(ev, beh1).at(t) = new Switcher(beh, event.map((t,v) => beh1)).at(t)
 \end{verbatim}        
-      
-      It is also useful to be able to to filter Events to produce a new one that only
-      contains occurrences matching a predicate. This allows a Behaviour to only react
-      to some occurrences from an Event. This is defined as part of Event[T]:
+    
+    It is also useful to be able to to filter Events to produce a new one that only
+    contains occurrences matching a predicate. This allows a Behaviour to only react
+    to some occurrences from an Event. This is defined as part of Event[T]:
 
 \begin{verbatim}
 filter(predicate : T => Boolean) : Event[T]
 event.filter(predFunc).occs = event.occs.filter(predFunc)
 \end{verbatim}  
 
-    \subsection{Behaviour Caching}
-      Behaviours possess quite a major inefficiency in the form of redundant evaluation:
+  \section{Behaviour Caching}
+    Behaviours possess quite a major inefficiency in the form of redundant evaluation:
 
 \begin{verbatim}
 beh.at(t)
 beh.at(t)
 \end{verbatim}  
 
-      Here \emph{beh} is evaluated at \emph{t} twice. It can be seen that we could simply cache the last
-      computed value so we could return this value instantly if the Behaviour was sampled at that time again.
-      We take this approach internally in Echo so as to avoid redundantly recomputing values. 
+    Here \emph{beh} is evaluated at \emph{t} twice. It can be seen that we could simply cache the last
+    computed value so we could return this value instantly if the Behaviour was sampled at that time again.
+    We take this approach internally in Echo so as to avoid redundantly recomputing values. 

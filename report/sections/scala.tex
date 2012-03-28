@@ -79,11 +79,19 @@ stepper(v, ev) = switcher(lift(v), map(ev, (t, o) => lift(o)))
       
       The Event's in React are very similar to the Events in Fran \cite{Elliott1997}: they are conceptually infinite
       and have the \emph{merge} and \emph{map} operations defined on them. One slight difference is that React's
-      Events expose an operation to allow them to `occur' with an \emph{emit} function. This functionality
-      is actually never discussed in the original FRP papers and so it should be assumed that this
-      functionality should be hidden publicly (it will be shown later how to internalise this action
-      effectively). Interestingly, React also contains a notion of Signals, just as Reactive does, however
-      it doesn't claim that these are an implementation of Behaviours (although the word `continuous' is
+      Events expose an operation to allow them to `occur' with a public \emph{emit} function. This disrupts
+      the abstraction of Events somewhat. For instance, if we have again have a \emph{mouseB} Event we could do the following:
+
+\begin{verbatim}
+val event = mouseB
+event.emit(())
+\end{verbatim}      
+      
+      Here we cause the mouse button Event to occur without the actual input occurring. It will be shown later how to     
+      internalise this action effectively so as to maintain the abstraction. 
+      
+      Interestingly, React also contains a notion of Signals, just as Reactive does, 
+      however it doesn't claim that these are an implementation of Behaviours (although the word `continuous' is
       used loosely in their description). 
       
   It can be seen from these examples that while many of the concepts from FRP are popular
