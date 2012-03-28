@@ -5,7 +5,7 @@
     this it is meant that it follows both the semantic rules set forth by the original FRP specification
     and also the rules and constraints laid out in this report.
   
-    This was achieved in echo using formal program testing. More specifically, Behaviour Driven
+    This was achieved in Echo using formal program testing. More specifically, Behaviour Driven
     testing was carried out throughout the development process using the Scala framework `Specs' \cite{EricTorreborre}
     to verify that implementations were correct. `Specs' and BDT involve series of tests for
     separate program `invariants' or `behaviours'. For example to test the Behaviour \emph{map} function
@@ -30,7 +30,7 @@
     made the implementation incorrect.
     
   \section{Limitations}
-    There are of course several limitations in `echo'. Firstly, we are unable to evaluate Behaviours at any time.
+    There are of course several limitations in Echo. Firstly, we are unable to evaluate Behaviours at any time.
     Although this does not limit much of the development of real-time, interactive applications there is functionality
     lost. For instance it would be nice to be able to chart a Behaviour's value between certain bounds such as
     the trajectory of an object or a predetermined volume chart. This functionality can be provided with simple
@@ -42,18 +42,18 @@
     
   \section{Efficiency}
     As stated earlier one of the goals of this project was to create an efficient implementation
-    of FRP. It was seen that Events in `echo' are able to only use a small amount of memory by only
+    of FRP. It was seen that Events in Echo are able to only use a small amount of memory by only
     needing to buffer `future' occurrences. As noted earlier this does mean however that it is still
     possible to create a memory leak with Events by instantiating an Event that occurs but is never 
     evaluated by a Behaviour. Of course, there is no practical use for an Event such as this as
     it would have no effect on anything whatsoever and would be effectively redundant. However, any documentation
-    of `echo' should make note of this problem.
+    of Echo should make note of this problem.
     
     As mentioned earlier Behaviour value caching is also used to prevent redundant reevaluation of Behaviours
     and this further leads to a more optimised implementation of FRP.
   
   \section{Demo Applications}
-    So as to gain experience with using `echo' and also for the purposes of evaluation, demonstration
+    So as to gain experience with using Echo and also for the purposes of evaluation, demonstration
     applications were developed. 
     
     The first of these was a small music player application. The application
@@ -67,7 +67,7 @@
     the development of this application that abstractions over input and outputs would have to frequently be
     created to produce non-trivial FRP applications. However, any abstractions built would hopefully be
     reusable in nature due to FRPs high level approach to control. These findings also verify that it
-    is important that `echo' is as extendable as possible.
+    is important that Echo is as extendable as possible.
     
     Additional work was carried out on a small network anagram guessing game. This involved a server that provided
     an anagram and a client application that would present the anagram and allow the user to guess the original

@@ -1,29 +1,29 @@
 \chapter{Implementation}
   As stated earlier the goal of this project was to implement a framework for utilising FRP in Scala. 
-  This framework was dubbed `echo'. This section will explore the motivations and problems ahead of
-  and also the choices made and results rendered during the implementation of `echo'.
+  This framework was dubbed Echo. This section will explore the motivations and problems ahead of
+  and also the choices made and results rendered during the implementation of Echo.
   
   \section{Design \& Implementation Choices}
   Throughout its history FRP implementations have generally been carried out in Haskell. Due to the movement
   in setting and also in an effort to create a efficient implementation without sacrificing FRP's expressive power
-  several design and implementation choices were made for echo. Choices were also made
-  to provide to provide programmers with simpler experiences and to hopefully allow `echo' to be
+  several design and implementation choices were made for Echo. Choices were also made
+  to provide to provide programmers with simpler experiences and to hopefully allow Echo to be
   as powerful as possible. They will all be explored here.
   
     \subsection{Flat Time}
-      Time in `echo' is implemented as a flat value type defined exactly as it is in the earlier
+      Time in Echo is implemented as a flat value type defined exactly as it is in the earlier
       section of this report (as an alias of Double). The internal implementation does take advantage
       of general assumptions about Time. For instance, the \emph{merge} function for Events takes advantage
       of the fact that an Event without occurrences still has a has a lower bound of when it can occur (described
       earlier). 
       
-      Additionally a function is defined in `echo' to return the current time:
+      Additionally a function is defined in Echo to return the current time:
       
 \begin{verbatim}
 def now() : Time = System.nanoTime() - startTime
 \end{verbatim}      
 
-      Here \emph{startTime} refers to the time the current `echo' program started executing and this is
+      Here \emph{startTime} refers to the time the current Echo program started executing and this is
       set by the framework at run time. It should be noted that \emph{nanoTime} (returning current time in
       nano seconds) is the most accurate value available for the current time in Scala. However due the restrictions
       of Java Virtual Machine implementations of this function will start to return incorrect results 
@@ -32,7 +32,7 @@ def now() : Time = System.nanoTime() - startTime
       
     \subsection{Object Orientation}
       Although it may seem obvious it is worth noting that both Behaviours and Events are implemented in
-      `echo' using Scala's object oriented definitions. For instance, a Behaviour[T] is simply
+      Echo using Scala's object oriented definitions. For instance, a Behaviour[T] is simply
       implemented as a generic class with a Time =$>$ T function parameter. An example Behaviour
       could be instantiated as follows:
  
@@ -44,7 +44,7 @@ val beh = new Behaviour[Double](time => sin(time))
       
       It would be possible to implement the original FRP operations as standalone functions. However, so
       as to conform to Scala's object oriented style the operations will be attached to their respective
-      classes. For instance, the \emph{merge} operation will be used in the following way in echo:
+      classes. For instance, the \emph{merge} operation will be used in the following way in Echo:
       
 \begin{verbatim}
 val merged = event1.merge(event2)
@@ -60,7 +60,7 @@ val switch = new Switcher(iniBeh, behEvent)
     \subsection{Implicit Lifting of Constants}
       As mentioned earlier, one of the most powerful features of Scala is it's ability to convert between
       types at run time. This is facilitated by the \emph{implicit} key word allowing a function to be defined
-      that is automatically executed when a corresponding type mismatch occurs. This will be used in echo to allow 
+      that is automatically executed when a corresponding type mismatch occurs. This will be used in Echo to allow 
       static values to be converted to Behaviours \emph{implicitly}.. This is implemented in the following way:  
 
 \begin{verbatim}
@@ -110,7 +110,7 @@ class Five extends EventSource[Int] {
 }
 \end{verbatim}
 
-      It should also be noted that the \emph{occs} function on Events is not actually available in `echo'. This
+      It should also be noted that the \emph{occs} function on Events is not actually available in Echo. This
       choice was made because an Event does not retain all its Events so anything returned from this 
       function would be incorrect and accessing a Event's past data does not really
       provide any useful functionality.
@@ -119,7 +119,7 @@ class Five extends EventSource[Int] {
       Relating back to the earlier discussion of interactive Behaviours it can be seen
       that there are problems when plugging FRP into the real world: the future is uncertain and
       arbitrary access to the past requires an unbounded level of memory. After much deliberation
-      over different compromises it was decided that `echo' would follow a set of rules:
+      over different compromises it was decided that Echo would follow a set of rules:
       
       \begin{itemize}
         \item If a Behaviour was last evaluated at time \emph{u} then it can only be evaluated at
@@ -138,7 +138,7 @@ class Five extends EventSource[Int] {
       constantly be pushed up to the present (leaving only `now' as a possible evaluation time). Although
       other times will be available for evaluation at times (there will often be a gap between `now' and
       the last Event occurrence) it would be monotonous to expose these bounds to the programmer so
-      in `echo' explicit evaluation of a Behaviour is entirely removed from the public API (the
+      in Echo explicit evaluation of a Behaviour is entirely removed from the public API (the
       `at' operation) and replaced with a real-time evaluation function:
 
 \begin{verbatim}
@@ -241,7 +241,7 @@ object App extends EchoApp {
       Some FRP operations require some internal action to happen `exactly' when an Event occurs. For instance,
       the snapshot operations needs to be able to sample a Behaviour at the same time as an Event occurs.
       We can see this will be a problem as time conceptually moves forward as the code to
-      occur an Event is executing. To deal with this in echo we treat occurrences as if they happen instantly. This
+      occur an Event is executing. To deal with this in Echo we treat occurrences as if they happen instantly. This
       creates a similar effect to the initial setup phase as time is frozen at its current value for the duration
       of the operation and other Events must wait to occur. This may sound like it would cause large lags in time
       but any lags would only be nanoseconds in length and it allows the very useful \emph{snapshot} operation
@@ -249,15 +249,15 @@ object App extends EchoApp {
     
     \subsection{Function Renaming}
       Although a small change it should also be noted that one of the functions originally defined
-      has be renamed for the echo framework - \emph{snapshot} was renamed to \emph{sample}. This was done as
+      has be renamed for the Echo framework - \emph{snapshot} was renamed to \emph{sample}. This was done as
       it was felt it added more clarity to the function name was more appropriate given its use.
       
     \subsection{Function Additions}
       When considering different applications of the framework and also in an attempt to
       tackle the changes in expressiveness between Haskell and Scala some operations
-      were added to the FRP in echo.
+      were added to the FRP in Echo.
       
-      Lifting of constants has already been discussed for echo but lifting of operators and
+      Lifting of constants has already been discussed for Echo but lifting of operators and
       functions presents a few problems. This is because function in Scala (as discussed earlier)
       are usually attached to classes. For instance, there is no `+' operator in Scala: the numeric
       types have a \emph{+} function defined in their class declarations (how Scala actually performs additions
@@ -280,7 +280,7 @@ beh.map2(beh1)(func).at(t) = func(beh.at(t), beh1.at(t))
       that toggles back and forth between two given Behaviours whenever an Event occurs. This
       example took advantage of Haskell's lazy evaluation. While Scala is able to use lazy evaluation
       it requires extra work and at the time of writing requires some complex syntax. To tackle this
-      a \emph{toggle} function was added to echo to provide the functionality in the example out of the box.
+      a \emph{toggle} function was added to Echo to provide the functionality in the example out of the box.
       This is defined as part of Behaviour[T]:
       
 \begin{verbatim}
@@ -314,4 +314,4 @@ beh.at(t)
 
       Here \emph{beh} is evaluated at \emph{t} twice. It can be seen that we could simply cache the last
       computed value so we could return this value instantly if the Behaviour was sampled at that time again.
-      We take this approach internally in `echo' so as to avoid redundantly recomputing values. 
+      We take this approach internally in Echo so as to avoid redundantly recomputing values. 
