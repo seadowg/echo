@@ -44,16 +44,6 @@ object EventSpec extends Specification {
       event.pubOccur(5)
       passed.value mustEqual 5
     }
-    
-    "allows constant events to occur when they are created" in {
-      var event : Event[Int] = null
-      
-      freezeTime(1) {
-        event = Event(5)
-      }
-      
-      Stepper(0D, event.map((t, v) => t)).eval() mustEqual 1
-    }
 
     "have a map function" >> {
       "returning a mapped version of the Event" in {

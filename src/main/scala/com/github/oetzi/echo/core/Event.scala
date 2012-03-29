@@ -2,6 +2,7 @@ package com.github.oetzi.echo.core
 
 import com.github.oetzi.echo.Echo._
 import com.github.oetzi.echo.Control._
+import com.github.oetzi.echo.EchoApp
 import collection.mutable.ArrayBuffer
 import collection.mutable.Queue
 
@@ -170,7 +171,9 @@ object Event {
   def apply[T](value: T) : Event[T] = {
     frp {
       new EventSource[T] {
-        occur(value)
+        EchoApp.afterSetup {
+          () => occur(value)
+        }
       }.event
     }
   }
