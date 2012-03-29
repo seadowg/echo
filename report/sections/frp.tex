@@ -130,7 +130,24 @@ merge(ev1, ev2).occs = mergeStr(occs(ev1), occs(ev2))
 \begin{verbatim}
 map[T, U](ev : Event[T], func : (Time, T) => U)  : Event[U]
 occs(map(ev, func)) = occs(event).map(func)
-\end{verbatim}         
+\end{verbatim}     
+
+      A function for flattening events is also defined:
+
+\begin{verbatim}
+delayOccs[T](t : Time, ev : Event[T])
+occs(delayOccs(t, ev)) = occs(ev).map(o => (max(o._1, t), o._2))
+
+join[T](ev : Event[Event[T]])  : Event[T]
+occs(join(ev)) = occs(map(ev, e => delayOccs(e._1, e._2))).foldLeft(emptEv, (e, o) => merge(e, o))
+\end{verbatim}        
+
+      One caveat to this function is that any occurrences of Events that occur in \emph{ev} are delayed
+      so their occurrence times are at least the time that their parent Event occurred. It could be argued that this should 
+      not be the case but after consideration it was decided that it did not make sense for an inner Event's occurrences to 
+      occur before the Event itself
+      in most use cases. Consider this: if an inner Event is a user logging onto a chat room and its occurrences are 
+      messages then how can a message occur before the user logs in?
         
       \subsubsection{Reactivity}
         One of the most powerful aspects of FRP is the ability to use Events to punctuate or `switch' Behaviours.
