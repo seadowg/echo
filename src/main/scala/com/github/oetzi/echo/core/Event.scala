@@ -138,8 +138,9 @@ trait EventSource[T] extends Event[T] {
   }
 
   protected def occur(value: T) {
+    while (!createLock.available) {}
+    
     groupLock synchronized {
-      while (!createLock.available) {}
       length += 1
 			val occ = new Occurrence(now(), value, length)
       present = occ
