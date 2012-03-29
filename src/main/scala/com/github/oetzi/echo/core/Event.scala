@@ -140,14 +140,11 @@ trait EventSource[T] extends Event[T] {
   protected def occur(value: T) {
     groupLock synchronized {
       while (!createLock.available) {}
+      length += 1
+			val occ = new Occurrence(now(), value, length)
+      present = occ
 
-      freezeTime(now()) {
-        length += 1
-				val occ = new Occurrence(now(), value, length)
-        present = occ
-
-        echo(occ)
-      }
+      echo(occ)
     }
   }
 
