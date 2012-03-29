@@ -116,7 +116,6 @@ trait Event[T] {
 
 trait EventSource[T] extends Event[T] {
   private val hooks: ArrayBuffer[Occurrence[T] => Unit] = new ArrayBuffer()
-  private val future : Queue[Occurrence[T]] = new Queue[Occurrence[T]]()
   private var present: Occurrence[T] = null
   private var length: BigInt = 0
 
@@ -135,32 +134,19 @@ trait EventSource[T] extends Event[T] {
   }
 
   protected def occs(time: Time): Occurrence[T] = {
-    this synchronized {
-			if (!future.isEmpty) {
-				var head = future.headOption
-
-		  	while (head != None && future.head.time <= time) {
-	      	present = future.dequeue()
-	      	head = future.headOption
-	      }  	
-		  }
-		
-			present
-    }
+		present
   }
 
   protected def occur(value: T) {
-    this synchronized {
-      writeLock synchronized {
-        while (!createLock.available) {}
+    groupLock synchronized {
+      while (!createLock.available) {}
 
-        freezeTime(now()) {
-          length += 1
-					val occ = new Occurrence(now(), value, length)
-          future += occ
+      freezeTime(now()) {
+        length += 1
+				val occ = new Occurrence(now(), value, length)
+        present = occ
 
-          echo(occ)
-        }
+        echo(occ)
       }
     }
   }
@@ -180,10 +166,6 @@ protected class Occurrence[T](val time: Time, val value: T, val num: BigInt) {
   def map[U](func: (Time, T) => U): Occurrence[U] = {
     new Occurrence(time, func(time, value), num)
   }
-
-	def timePair() : Occurrence[Time] = {
-		new Occurrence(time, time, num)
-	}
 }
 
 object Event {
@@ -197,7 +179,6 @@ object Event {
   
   def join[T](eventEvent: Event[Event[T]]): Event[T] = {
     frp {
-      
       new EventSource[T] {
         private var priorityCount: BigInt = 0
         private var lastPriority: BigInt = 0

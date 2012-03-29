@@ -60,7 +60,7 @@ val switch = new Switcher(iniBeh, behEvent)
 
 \begin{verbatim}
 implicit def liftConst[T](value : T) : Behaviour[T] = {
-new Behaviour(time => value)
+  new Behaviour(time => value)
 }
 \end{verbatim}              
     
@@ -101,7 +101,7 @@ occur(value : T) : Unit
     
 \begin{verbatim}
 class Five extends EventSource[Int] {
-occur(5)
+  occur(5)
 }
 \end{verbatim}
 
@@ -168,9 +168,9 @@ beh.eval() = beh.at(now())
 val beh = new Behaviour(time => 5)
 
 class Runner extends Runnable() {
-def run() {
-  beh.eval()
-}
+  def run() {
+    beh.eval()
+  }
 }
 
 new Thread(new Runner).start()
@@ -222,9 +222,9 @@ val ev = beh.snapshot(someEvent)
 
 \begin{verbatim}
 object App extends EchoApp {
-def setup(args : Array[String]) {
-  // FRP code here
-}
+  def setup(args : Array[String]) {
+    // FRP code here
+  }
 }
 \end{verbatim}
 

@@ -11,11 +11,9 @@ class Behavior[T](private val rule: Time => T) {
 
   
   def eval(): T = {
-    readLock.acquire()
-    val value = this.at(now())
-    readLock.release()
-
-    value
+    groupLock synchronized {
+      this.at(now())
+    }
   }
 
   protected[echo] def at(time: Time): T = {
