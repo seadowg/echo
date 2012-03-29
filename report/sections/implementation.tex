@@ -1,9 +1,9 @@
 \chapter{Implementation}
-  Throughout its history FRP implementations have generally been carried out in Haskell. Due to the movement
+  Throughout its history, FRP implementations have generally been carried out in Haskell. Due to the movement
   in setting and also in an effort to create a efficient implementation without sacrificing FRP's expressive power
   several design and implementation choices were made for Echo. Choices were also made
   to provide to provide programmers with simpler experiences and to hopefully allow Echo to be
-  as powerful as possible. They will all be explored here.
+  as powerful as possible.
 
   \section{Flat Time}
     Time in Echo is implemented as a flat value type defined exactly as it is in 
@@ -105,7 +105,7 @@ class Five extends EventSource[Int] {
 }
 \end{verbatim}
 
-    It should also be noted that the \emph{occs} function on Events is not actually available in Echo. This
+    It should also be noted that the \emph{occs} function on Events is not actually available publicly in Echo. This
     choice was made because an Event does not retain all its Events so anything returned from this 
     function would be incorrect and accessing a Event's past data does not really
     provide any useful functionality.
@@ -153,7 +153,7 @@ beh.eval() = beh.at(now())
     evaluate Behaviours in the past or future).
   
     \section{Setup Phase}
-      There was one further problem presented due this restriction and that was concerned with
+      There was one further problem presented due the restriction on Behaviour evaluation and that was concerned with
       implementing the \emph{snapshot} operation. For instance, imagine we execute the following code
       at time \emph{t}:
 
@@ -163,9 +163,9 @@ beh.eval() = beh.at(now())
 
       This is fine if \emph{someEvent} has not occurred at \emph{t}. If it has occurred however at some time
       before \emph{t} then in whatever way this is implemented we are forced to evaluate \emph{beh}
-      at a time in the past. If \emph{beh} depends on any Events this time might be before their
+      at a time in the past. If \emph{beh} depends on any Events this time might be before the Event's
       last occurrence and so we would effectively be returning an incorrect result. Dealing with this
-      presented an interesting problem that caused quite a radical change. It was decided that FRP
+      presented an interesting problem. It was decided that FRP
       code (FRP operations on FRP types) could only be performed in an initial setup phase of a program.
       This setup phase would happen `instantly' as the internal notion of time would be frozen and Event
       occurrences would not be processed by the framework. As Scala programs are defined inside a singleton
@@ -183,25 +183,28 @@ beh.eval() = beh.at(now())
     This allows the FRP world to be setup in one distinct stage. It should be noted that
     any functions \emph{setup} calls would also be able to run FRP code. Only FRP code that runs
     after the \emph{setup} function has finished executing will cause an error.
-  
-  \section{Atomic Input & Output}
     
-   By this point it is noticeable that the FRP world that Echo builds only really has one form of input and one
-   form of output action: \emph{occur} and \emph{eval} respectively. Conceptually we think of both of these
-   actions happening instantly. For instance, when a Behaviour is sampled it will need to do some evaluation
-   and during that evaluation nothing in the FRP world should change. This suggests that the \emph{occur}
-   and \emph{eval} actions should both be atomic with respect to this world so an Event cannot occur during
-   a Behaviour evaluation and vice versa. 
+    It should be noted that isolated FRP objects can still be instantiated after the setup phase. This is
+    to allow for the possibility Event[Behaviour[T]] or Event[Event[T]] objects.
+  
+  \section{Atomic Input \& Output}
+    
+     By this point it is noticeable that the FRP world that Echo builds only really has one form of input and one
+     form of output action: \emph{occur} and \emph{eval} respectively. Conceptually we think of both of these
+     actions happening instantly. For instance, when a Behaviour is sampled it will need to do some evaluation
+     and during that evaluation nothing in the FRP world should change. This suggests that the \emph{occur}
+     and \emph{eval} actions should both be atomic with respect to this world so an Event cannot occur during
+     a Behaviour evaluation and vice versa. 
    
-   This concept is implemented in Echo using a locking object for the FRP world. If a Behaviour is evaluated it
-   must first acquire this lock and the same goes for the Event \emph{occur} action. This implementation
-   also provides a very large performance gain: Event occurrence times and evaluation times now form one
-   monotonically increasing timed chain \footnote{in fact we can model evaluation and occurrences of an Event as an Event!} 
-   of actions. This fact means that we only ever need to store one occurrence for each Event: if an Event occurs
-   at time \emph{t} it will not be evaluated until a time greater than or equal to \emph{t}. This allows
-   Events to not only be limited to using a bounded level of memory.
+     This concept is implemented in Echo using a locking object for the FRP world. If a Behaviour is evaluated it
+     must first acquire this lock and the same goes for the Event \emph{occur} action. This implementation
+     also provides a very large performance gain: Event occurrence times and evaluation times now form one
+     monotonically increasing timed chain \footnote{We can actually model evaluation and occurrences of an Event as an 
+     Event!} of actions. This fact means that we only ever need to store one occurrence for each Event: if an Event occurs
+     at time \emph{t} it will not be evaluated until a time greater than or equal to \emph{t}. This allows
+     Events to not only be limited to using a bounded level of memory.
    
-   An additional advantage of making these actions atomic is that Behaviour evaluation is thread safe.
+     An additional advantage of making these actions atomic is that Behaviour evaluation is thread safe.
   
   \section{Function Renaming}
     Although a small change it should also be noted that one of the functions originally defined
