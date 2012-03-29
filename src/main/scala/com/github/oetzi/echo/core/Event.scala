@@ -174,6 +174,12 @@ object Event {
     }
   }
   
+  def apply[T]() : Event[T] = {
+    frp {
+      new EventSource[T] {}.event
+    }
+  }
+  
   def join[T](eventEvent: Event[Event[T]]): Event[T] = {
     frp {
       new EventSource[T] {
