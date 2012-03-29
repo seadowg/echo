@@ -19,7 +19,7 @@
     The ideas in in the the Fran paper and in following FRP work are based around two key data types: 
     Behaviours and Events. Here the semantics of the `classic' \footnote{Several
     flavours of FRP have emerged over the years and the term `classic' is often used to describe
-    the FRP described by, and directly descended from, Fran.} flavour of FRP explored in this report will be defined.
+    the FRP defined by, and directly descended from, Fran.} flavour of FRP explored in this report will be defined.
     
     Within this section we will explore a selection of the basic denotational semantics that Elliott
     and Hudak originally laid down and that we hope to implement in Scala. The semantic definitions will
@@ -124,8 +124,8 @@ merge(ev1, ev2).occs = mergeStr(occs(ev1), occs(ev2))
       Events cannot occur in the past we know that the second one will not occur until after the time `now' (the
       present time). Again, this concept is discussed at length by Conal Elliott \cite{Elliott2009}.
        
-       Elliott and Hudak's paper also defined a series of transformer functions for Events. Here we define a
-       `map' function for allowing the same functionality:
+      Elliott and Hudak's paper also defined a series of transformer functions for Events. Here we define a
+     `map' function for allowing the same functionality:
 
 \begin{verbatim}
 map[T, U](ev : Event[T], func : (Time, T) => U)  : Event[U]
@@ -207,11 +207,10 @@ pos.at(5)
 \end{verbatim}    
 
       Now, suppose the time when this code executes is \emph{4}. The first problem we can see here
-      is that we are going to be evaluating \emph{pos} at a time greater than `now'. We don't
-      actually know if the mouse will move in the future or not so any result obtained may not
-      be correct. It can be seen here that there is a very large semantic problem with evaluating
-      Behaviours such as this in the future as we are not asking ``what is the value at time t?''
-      but ``what was the last value we know before time t?''. 
+      is that we are going to be evaluating \emph{pos} at a time greater than `now': we don't
+      actually know if the mouse will move in the future. To deal with this we could delay the return
+      result until we know the answer, raise the error or modify the original semantics. None of these solutions are
+      particularly useful however.
       
       What about the past? Evaluating \emph{pos} at times before `now' certainly makes sense. However, if arbitrary
       access is allowed to the past in this way then we would have to store every occurrence
