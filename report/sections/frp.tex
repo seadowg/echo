@@ -4,12 +4,17 @@
     Reactive Animation} by Conal Elliott and Paul Hudak \cite{Elliott1997}. In this paper Elliott and Hudak
     set forth a ``collection of data types and functions'' designed for creating interactive 
     animations in the form of a framework for Haskell named `Fran'. The paper eventually went on to
-    win an award distinguishing it as the most influential paper of ICFP97. 
+    win an award distinguishing it as the most influential paper of ICFP97 \cite{SIGPLAN}. 
     
-    % Mention further work
-    % Elliot has worked on clarification but not changing the original concepts
-    % Hudak moved onto arrow FRP and experimenting with different approaches
-    
+    Since the original proposal of the paradigm there has been a great amount of research
+    into implementation and modification of FRP. Hudak has mainly focused on experimenting with various
+    implementation methods and a modification to the original semantics categorised as ``Arrow FRP''. Elliot's
+    work has dealt with FRP on a more conceptual level. This work culminated in a further significant paper
+    ``Push-Pull FRP'' \cite{Elliott2009}. This attempted to clarify much of the semantics in a way that allowed for efficient 
+    and
+    structured implementations. This report will not use any of the new concepts in ``Push-Pull'' for definitions
+    of FRP but inspiration was taken from it for many aspects of the implementation of Echo.
+
   \section{Semantics}
     The ideas in in the the Fran paper and in following FRP work are based around two key data types: 
     Behaviours and Events. Here the semantics of the `classic' \footnote{Several
