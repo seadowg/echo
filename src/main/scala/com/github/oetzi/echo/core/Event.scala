@@ -24,7 +24,7 @@ trait Event[T] {
           }
       }
 
-      val jsThisTrick = this
+      val source = this
 
       new Event[U] {
         protected def occs(time: Time): Occurrence[U] = {
@@ -36,7 +36,7 @@ trait Event[T] {
             occ => block(occ.map(func))
           }
 
-          jsThisTrick.hook(mapBlock)
+          source.hook(mapBlock)
         }
       }
     }
@@ -85,7 +85,7 @@ trait Event[T] {
           }
       }
 
-      val jsThisTrick = this
+      val source = this
 
       new Event[T] {
         protected def occs(time: Time): Occurrence[T] = {
@@ -93,7 +93,7 @@ trait Event[T] {
         }
 
         protected[echo] def hook(block: Occurrence[T] => Unit) {
-          jsThisTrick.hook(block)
+          source.hook(block)
           event.hook(block)
         }
       }
@@ -120,15 +120,15 @@ trait EventSource[T] extends Event[T] {
   private var length: BigInt = 0
 
   def event(): Event[T] = {
-    val jsThisTrick = this
+    val source = this
 
     new Event[T] {
       protected def occs(time: Time): Occurrence[T] = {
-        jsThisTrick.occs(time)
+        source.occs(time)
       }
 
       protected[echo] def hook(block: Occurrence[T] => Unit) {
-        jsThisTrick.hook(block)
+        source.hook(block)
       }
     }
   }
