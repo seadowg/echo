@@ -13,24 +13,23 @@ with Breakable {
   private val thread = new Thread(new Runnable() {
     def run() {
       dangerous {
-        () =>
-          val socket = new ServerSocket(port)
+        val socket = new ServerSocket(port)
 
-          while (Receiver.this.running) {
-            val request = socket.accept()
-            val in = new BufferedReader(new InputStreamReader(request.getInputStream))
-            val out = new PrintWriter(request.getOutputStream, true)
+        while (Receiver.this.running) {
+          val request = socket.accept()
+          val in = new BufferedReader(new InputStreamReader(request.getInputStream))
+          val out = new PrintWriter(request.getOutputStream, true)
 
-            val message = in.readLine()
-            Receiver.this.occur(message)
-            out.println(reply(message).eval())
+          val message = in.readLine()
+          Receiver.this.occur(message)
+          out.println(reply(message).eval())
 
-            out.close()
-            in.close()
-            request.close()
-          }
+          out.close()
+          in.close()
+          request.close()
+        }
 
-          socket.close()
+        socket.close()
       }
     }
   })

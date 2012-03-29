@@ -22,18 +22,17 @@ with Breakable {
 
     def sendToSocket(message: String) {
       dangerous {
-        () =>
-          val socket = new java.net.Socket(ip, port)
-          val out = new PrintWriter(socket.getOutputStream, true)
-          val in = new BufferedReader(new InputStreamReader(socket.getInputStream))
+        val socket = new java.net.Socket(ip, port)
+        val out = new PrintWriter(socket.getOutputStream, true)
+        val in = new BufferedReader(new InputStreamReader(socket.getInputStream))
 
-          out.println(message)
-          val reply = in.readLine()
-          Sender.this.occur(reply)
+        out.println(message)
+        val reply = in.readLine()
+        Sender.this.occur(reply)
 
-          out.close()
-          in.close()
-          socket.close()
+        out.close()
+        in.close()
+        socket.close()
       }
     }
   }
