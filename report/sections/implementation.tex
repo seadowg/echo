@@ -108,7 +108,7 @@ class Five extends EventSource[Int] {
     It should also be noted that the \emph{occs} function on Events is not actually available publicly in Echo. This
     choice was made because an Event does not retain all its Events so anything returned from this 
     function would be incorrect and accessing a Event's past data does not really
-    provide any useful functionality.
+    provide any useful functionality.   
 
   \section{Time Travel is Dangerous}
     Relating back to the discussion of interactive Behaviours in section 2 it can be seen
@@ -186,6 +186,23 @@ beh.eval() = beh.at(now())
     
     It should be noted that isolated FRP objects can still be instantiated after the setup phase. This is
     to allow for the possibility Event[Behaviour[T]] or Event[Event[T]] objects.
+  
+  \section{Constant Events}
+    It useful to be able to define an Event that occurs only once. This is provided in Echo
+    via the Event companion apply function:
+
+\begin{verbatim}
+val const = Event("Once")
+\end{verbatim}    
+
+    This would create an Event with a single occurrence of the value ``Once'' at time \emph{0} (as
+    it occurs at the end of the setup phase).
+    Although it may not be as useful it should also be possible to instantiate a never occurring
+    Event. This can be achieved in a similar manner:
+
+\begin{verbatim}
+val empty = Event()
+\end{verbatim}
   
   \section{Atomic Input \& Output}
     
