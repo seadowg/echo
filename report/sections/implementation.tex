@@ -141,15 +141,6 @@ eval() : T
 beh.eval() = beh.at(now())
 \end{verbatim}  
 
-    It can be seen here that \emph{at} will still be used internally. The Events also use explicit time
-    evaluation internally. This is because when Events occur they are buffered until the Event is
-    evaluated at a given time by a Behaviour. The present occurrence is then returned and stored and past occurrences
-    are thrown away. This allows for the fact that although the evaluation is referred to as real time the
-    actual evaluation will execute slightly behind the current time. This feature being the
-    case means we can't simply just store the last occurrence for each Event. Interestingly this also
-    means that each group of dependent Behaviours and Events will have their own view of the `current' time:
-    the last time they were evaluated.
-
     This restriction may seem like a significant loss of expressivity. However as we wish to be able to treat
     Behaviours and Events as first class values we would actually like to avoid ever explicitly evaluating
     them: this would ideally be carried out by abstractions for graphics or other kinds of output. For instance
@@ -157,90 +148,60 @@ beh.eval() = beh.at(now())
     periodically and setting the colour using a static value would defeat the point of using FRP. We will see in later
     discussion that we can easily create abstractions to hide this type of logic.
     
-    It should also be noted that Events are still able to use an unbounded level of memory: we only throw away
-    past occurrences when evaluating a Behaviour so an Event that is never evaluated would collect occurrences
-    infinitely.
-    
-    Of course, the new rules can still be broken if we introduce multi-threading and this is best illustrated
-    with an example:
-    
-\begin{verbatim}
-val beh = new Behaviour(time => 5)
-
-class Runner extends Runnable() {
-  def run() {
-    beh.eval()
-  }
-}
-
-new Thread(new Runner).start()
-new Thread(new Runner).start()
-\end{verbatim}       
-
-    Here we have two threads continuously evaluating one Behaviour. This means that one thread
-    might call \emph{eval} and then be scheduled out allowing the other to proceed to evaluate
-    at a later time. If the original is then scheduled back in it is possible it will
-    be evaluating the Behaviour at a time less than the time the second evaluated it at. This suggests
-    that we desire the \emph{eval} operation to be `atomic'. This can be achieved easily for standalone
-    Behaviours using standard locking tools in Scala.
-    
-    We run into further problems however if the Behaviour is more complex. Suppose, in the above example,
-    the Behaviour was defined as follows:
-
-\begin{verbatim}
-val beh = beh1.until(ev, beh2)
-\end{verbatim}        
-
-    Here, \emph{beh} `depends' on \emph{beh1} and \emph{beh2}: whenever we evaluate \emph{beh}
-    we also need to evaluate \emph{beh1} or \emph{beh2}. This shows that Behaviours can't just
-    be locked on a standalone basis but must share a lock with all their dependencies and other Behaviours
-    that share those dependencies. By this it is meant that a group of dependent Behaviours can
-    only be read by one thread at a time.
-    
     It should also be noted that restricting evaluation times for Behaviours forces us
     to remove the \emph{timeTransform} operation for Behaviours (as this allows programmers to explicitly
     evaluate Behaviours in the past or future).
-    
-    There was one further problem presented due this restriction and that was concerned with
-    implementing the \emph{snapshot} operation. For instance, imagine we execute the following code
-    at time \emph{t}:
-    
-\begin{verbatim}
-val ev = beh.snapshot(someEvent)
-\end{verbatim}
+  
+    \section{Setup Phase}
+      There was one further problem presented due this restriction and that was concerned with
+      implementing the \emph{snapshot} operation. For instance, imagine we execute the following code
+      at time \emph{t}:
 
-    This is fine if \emph{someEvent} has not occurred at \emph{t}. If it has occurred however at some time
-    before \emph{t} then in whatever way this is implemented we are forced to evaluate \emph{beh}
-    at a time in the past. If \emph{beh} depends on any Events this time might be before their
-    last occurrence and so we would effectively be returning an incorrect result. Dealing with this
-    presented an interesting problem that caused quite a radical change. It was decided that FRP
-    code (FRP operations on FRP types) could only be performed in an initial setup phase of a program.
-    This setup phase would happen `instantly' as the internal notion of time would be frozen and Event
-    occurrences would not be processed by the framework. As Scala programs are defined inside a singleton
-    object it was decided that a user would simply be able to extend a class with this object and then
-    write their FRP code in a \emph{setup} function:
+  \begin{verbatim}
+  val ev = beh.snapshot(someEvent)
+  \end{verbatim}
 
-\begin{verbatim}
-object App extends EchoApp {
-  def setup(args : Array[String]) {
-    // FRP code here
+      This is fine if \emph{someEvent} has not occurred at \emph{t}. If it has occurred however at some time
+      before \emph{t} then in whatever way this is implemented we are forced to evaluate \emph{beh}
+      at a time in the past. If \emph{beh} depends on any Events this time might be before their
+      last occurrence and so we would effectively be returning an incorrect result. Dealing with this
+      presented an interesting problem that caused quite a radical change. It was decided that FRP
+      code (FRP operations on FRP types) could only be performed in an initial setup phase of a program.
+      This setup phase would happen `instantly' as the internal notion of time would be frozen and Event
+      occurrences would not be processed by the framework. As Scala programs are defined inside a singleton
+      object it was decided that a user would simply be able to extend a class with this object and then
+      write their FRP code in a \emph{setup} function:
+
+  \begin{verbatim}
+  object App extends EchoApp {
+    def setup(args : Array[String]) {
+      // FRP code here
+    }
   }
-}
-\end{verbatim}
-
+  \end{verbatim}
+  
     This allows the FRP world to be setup in one distinct stage. It should be noted that
     any functions \emph{setup} calls would also be able to run FRP code. Only FRP code that runs
     after the \emph{setup} function has finished executing will cause an error.
+  
+  \section{Atomic Input & Output}
     
-  \section{Time Freezing}
-    Some FRP operations require some internal action to happen `exactly' when an Event occurs. For instance,
-    the snapshot operations needs to be able to sample a Behaviour at the same time as an Event occurs.
-    We can see this will be a problem as time conceptually moves forward as the code to
-    occur an Event is executing. To deal with this in Echo we treat occurrences as if they happen instantly. This
-    creates a similar effect to the initial setup phase as time is frozen at its current value for the duration
-    of the operation and other Events must wait to occur. This may sound like it would cause large lags in time
-    but any lags would only be nanoseconds in length and it allows the very useful \emph{snapshot} operation
-    to be implemented without sacrificing its original denotational semantics.
+   By this point it is noticeable that the FRP world that Echo builds only really has one form of input and one
+   form of output action: \emph{occur} and \emph{eval} respectively. Conceptually we think of both of these
+   actions happening instantly. For instance, when a Behaviour is sampled it will need to do some evaluation
+   and during that evaluation nothing in the FRP world should change. This suggests that the \emph{occur}
+   and \emph{eval} actions should both be atomic with respect to this world so an Event cannot occur during
+   a Behaviour evaluation and vice versa. 
+   
+   This concept is implemented in Echo using a locking object for the FRP world. If a Behaviour is evaluated it
+   must first acquire this lock and the same goes for the Event \emph{occur} action. This implementation
+   also provides a very large performance gain: Event occurrence times and evaluation times now form one
+   monotonically increasing timed chain \footnote{in fact we can model evaluation and occurrences of an Event as an Event!} 
+   of actions. This fact means that we only ever need to store one occurrence for each Event: if an Event occurs
+   at time \emph{t} it will not be evaluated until a time greater than or equal to \emph{t}. This allows
+   Events to not only be limited to using a bounded level of memory.
+   
+   An additional advantage of making these actions atomic is that Behaviour evaluation is thread safe.
   
   \section{Function Renaming}
     Although a small change it should also be noted that one of the functions originally defined
