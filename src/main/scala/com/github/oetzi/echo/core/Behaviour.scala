@@ -6,7 +6,7 @@ import com.github.oetzi.echo.Control._
 /** `Behaviour` provides an implementation of FRP Behaviours.
  */
 
-class Behaviour[T](private val rule: Time => T) {
+sealed class Behaviour[T](private val rule: Time => T) {
   var last: (Time, T) = null
   
   def eval(): T = {
@@ -118,6 +118,41 @@ class Constant[T](val value: T) extends Behaviour[T](time => value) {
 
   override protected[echo] def at(time: Time): T = {
     value
+  }
+}
+
+class Switcher[T](behaviour: Behaviour[T], val event: Event[Behaviour[T]]) extends Behaviour[T](
+  Switcher.construct(behaviour, event)) {
+}
+
+object Switcher {
+  def apply[T](initial: Behaviour[T], event: Event[Behaviour[T]]) : Switcher[T] = {
+    new Switcher(initial, event)
+  }
+  
+  private def construct[T](initial: Behaviour[T], event: Event[Behaviour[T]]): Time => T = {
+    frp {
+      {
+       time =>
+        val occ = event.top()
+
+        if (occ == None) {
+          initial.at(time)
+        }
+
+        else {
+          occ.get.value.at(time)
+        }
+      }
+    }
+  }
+}  
+  
+class Stepper[T](initial: T, event: Event[T]) extends Switcher[T](initial, event.map((t, v) => new Constant(v))) {}
+
+object Stepper {
+  def apply[T](initial: T, event: Event[T]) : Stepper[T] = {
+    new Stepper(initial, event)
   }
 }
 
