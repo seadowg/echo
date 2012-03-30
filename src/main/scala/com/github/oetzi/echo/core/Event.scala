@@ -5,6 +5,9 @@ import com.github.oetzi.echo.Control._
 import com.github.oetzi.echo.EchoApp
 import collection.mutable.ArrayBuffer
 
+/** `Event` provides an implementation of FRP Events.
+ */
+
 trait Event[T] {
   protected def occs(): Occurrence[T]
   protected[echo] def hook(block: Occurrence[T] => Unit)
@@ -113,6 +116,10 @@ trait Event[T] {
     }
   }
 }
+
+/** `EventSource` allows FRP Events to hook into external frameworks
+  * and sources. 
+ */
 
 trait EventSource[T] extends Event[T] {
   private val hooks: ArrayBuffer[Occurrence[T] => Unit] = new ArrayBuffer()

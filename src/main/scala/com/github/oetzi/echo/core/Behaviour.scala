@@ -3,7 +3,7 @@ package com.github.oetzi.echo.core
 import com.github.oetzi.echo.Echo._
 import com.github.oetzi.echo.Control._
 
-/** `Behaviour` provides an implementation of FRP Behaviours
+/** Behaviour provides an implementation of FRP Behaviours.
  */
 
 sealed class Behaviour[T](private val rule: Time => T) {
@@ -111,15 +111,15 @@ sealed class Behaviour[T](private val rule: Time => T) {
   }
 }
 
-class Constant[T](val value: T) extends Behaviour[T](time => value) {
-  override def eval(): T = {
-    value
-  }
-
-  override private[core] def at(time: Time): T = {
-    value
+object Behaviour {
+  def apply[T](rule: Time => T): Behaviour[T] = {
+    new Behaviour(rule)
   }
 }
+
+/** Switcher represents a Behaviour that's value is always the latest evaluated occurrence in
+  * a given Event[Behaviour].
+ */
 
 class Switcher[T](behaviour: Behaviour[T], val event: Event[Behaviour[T]]) extends Behaviour[T](
   Switcher.construct(behaviour, event)) {
@@ -147,6 +147,10 @@ object Switcher {
     }
   }
 }  
+
+/** Stepper is a a static valued version of Switcher that represents the lastest
+  * occurrence in an Event[T].
+ */
   
 class Stepper[T](initial: T, event: Event[T]) extends Switcher[T](initial, event.map((t, v) => new Constant(v))) {}
 
@@ -156,8 +160,17 @@ object Stepper {
   }
 }
 
-object Behaviour {
-  def apply[T](rule: Time => T): Behaviour[T] = {
-    new Behaviour(rule)
+/** Constant is a Behaviour that's value never changes. It is omptimised so
+  * so it only returns the value rather than evaluating it needlessly with respect
+  * to time.
+ */
+
+protected[echo] class Constant[T](val value: T) extends Behaviour[T](time => value) {
+  override def eval(): T = {
+    value
+  }
+
+  override private[core] def at(time: Time): T = {
+    value
   }
 }
