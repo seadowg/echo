@@ -15,14 +15,6 @@ sealed class Behaviour[T](private val rule: Time => T) {
     }
   }
 
-  private[core] def at(time: Time): T = {
-    if (last == null || time != last._1) {
-      last = (time, rule(time))
-    }
-
-    last._2
-  }
-
   def sample[A](sourceEvent: Event[A]): Event[T] = {
     frp {
       val source = new EventSource[T] {
@@ -108,6 +100,14 @@ sealed class Behaviour[T](private val rule: Time => T) {
     frp {
       new Behaviour(time => func(this.at(time), beh1.at(time), beh2.at(time)))
     }
+  }
+  
+  private[core] def at(time: Time): T = {
+    if (last == null || time != last._1) {
+      last = (time, rule(time))
+    }
+
+    last._2
   }
 }
 

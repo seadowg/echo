@@ -7,7 +7,6 @@ import collection.mutable.ArrayBuffer
 
 trait Event[T] {
   protected def occs(): Occurrence[T]
-
   protected[echo] def hook(block: Occurrence[T] => Unit)
 
   def map[U](func: (Time, T) => U): Event[U] = {
