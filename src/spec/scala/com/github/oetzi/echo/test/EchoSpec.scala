@@ -11,7 +11,7 @@ object EchoSpec extends Specification {
 
   "Echo" should {
     "allow values to lifted to constant Behaviours" in {
-      val beh: Behavior[Int] = 5
+      val beh: Behaviour[Int] = 5
       beh must_!= null
     }
 

@@ -19,7 +19,7 @@ object Echo {
     }
   }
 
-  implicit def lift[T](value: T): Behavior[T] = new Constant(value)
+  implicit def lift[T](value: T): Behaviour[T] = new Constant(value)
 
   type Time = Double
 

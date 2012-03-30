@@ -3,16 +3,16 @@ package com.github.oetzi.echo.core
 import com.github.oetzi.echo.Echo._
 import com.github.oetzi.echo.Control._
 
-class Switcher[T](behaviour: Behavior[T], val event: Event[Behavior[T]]) extends Behavior[T](
+class Switcher[T](behaviour: Behaviour[T], val event: Event[Behaviour[T]]) extends Behaviour[T](
   Switcher.construct(behaviour, event)) {
 }
 
 object Switcher {
-  def apply[T](initial: Behavior[T], event: Event[Behavior[T]]) : Switcher[T] = {
+  def apply[T](initial: Behaviour[T], event: Event[Behaviour[T]]) : Switcher[T] = {
     new Switcher(initial, event)
   }
   
-  private def construct[T](initial: Behavior[T], event: Event[Behavior[T]]): Time => T = {
+  private def construct[T](initial: Behaviour[T], event: Event[Behaviour[T]]): Time => T = {
     frp {
       {
        time =>

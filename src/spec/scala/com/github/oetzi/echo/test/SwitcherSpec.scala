@@ -4,7 +4,7 @@ import org.specs._
 import com.github.oetzi.echo.Echo._
 import com.github.oetzi.echo.Control._
 import com.github.oetzi.echo.test.help.TestEvent
-import com.github.oetzi.echo.core.{Switcher, Behavior}
+import com.github.oetzi.echo.core.{Switcher, Behaviour}
 
 
 object SwitcherSpec extends Specification {
@@ -14,13 +14,13 @@ object SwitcherSpec extends Specification {
   "Switcher" should {
     "have an at" >> {
       "returning 'initial' if event hasn't occured" in {
-        val switcher = new Switcher(0, new TestEvent[Behavior[Int]])
+        val switcher = new Switcher(0, new TestEvent[Behaviour[Int]])
 
         switcher.eval() mustBe 0
       }
 
       "returning the newest event if time is >= last event occurrence" in {
-        val event = new TestEvent[Behavior[Int]]
+        val event = new TestEvent[Behaviour[Int]]
         event.pubOccur(5)
         val switcher = new Switcher(0, event)
 
@@ -28,7 +28,7 @@ object SwitcherSpec extends Specification {
       }
 
       "returning an event's value if the time is equal to it" in {
-        val event = new TestEvent[Behavior[Int]]
+        val event = new TestEvent[Behaviour[Int]]
 
         freezeTime(5) {
           event.pubOccur(10)
@@ -38,7 +38,7 @@ object SwitcherSpec extends Specification {
       }
 
       "returning an events value if it has the max before time" in {
-        val event = new TestEvent[Behavior[Int]]
+        val event = new TestEvent[Behaviour[Int]]
 
         freezeTime(5) {
           event.pubOccur(10)

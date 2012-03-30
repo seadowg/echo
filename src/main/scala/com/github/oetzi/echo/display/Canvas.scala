@@ -1,17 +1,17 @@
 package com.github.oetzi.echo.display
 
-import com.github.oetzi.echo.core.Behavior
+import com.github.oetzi.echo.core.Behaviour
 import java.awt.Component
 
 trait Canvas {
-  protected var widthBeh: Behavior[Int] = new Behavior(t => this.swingComponent().getWidth)
-  protected var heightBeh: Behavior[Int] = new Behavior(t => this.swingComponent().getHeight)
+  protected var widthBeh: Behaviour[Int] = new Behaviour(t => this.swingComponent().getWidth)
+  protected var heightBeh: Behaviour[Int] = new Behaviour(t => this.swingComponent().getHeight)
 
-  def width(): Behavior[Int] = {
+  def width(): Behaviour[Int] = {
     this.widthBeh
   }
 
-  def height(): Behavior[Int] = {
+  def height(): Behaviour[Int] = {
     this.heightBeh
   }
 

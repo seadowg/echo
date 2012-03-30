@@ -4,7 +4,7 @@ import javax.swing.JPanel
 import com.github.oetzi.echo.Echo._
 import java.awt.Color
 import java.awt.Component
-import com.github.oetzi.echo.core.Behavior
+import com.github.oetzi.echo.core.Behaviour
 
 class Block private() extends Canvas {
   private var components: List[Canvas] = List[Canvas]()
@@ -15,7 +15,7 @@ class Block private() extends Canvas {
     }
   }
 
-  private var colorBeh: Behavior[Color] = this.internal.getBackground
+  private var colorBeh: Behaviour[Color] = this.internal.getBackground
 
   def color() {
     colorBeh
@@ -39,7 +39,7 @@ class Block private() extends Canvas {
 }
 
 object Block {
-  def apply(width: Behavior[Int], height: Behavior[Int], color: Behavior[Color] = Color.GRAY,
+  def apply(width: Behaviour[Int], height: Behaviour[Int], color: Behaviour[Color] = Color.GRAY,
             components: List[Canvas] = List()): Block = {
     val block = new Block()
 

@@ -6,9 +6,8 @@ import com.github.oetzi.echo.Control._
 /** `Behaviour` provides an implementation of FRP Behaviours.
  */
 
-class Behavior[T](private val rule: Time => T) {
+class Behaviour[T](private val rule: Time => T) {
   var last: (Time, T) = null
-
   
   def eval(): T = {
     groupLock synchronized {
@@ -28,7 +27,7 @@ class Behavior[T](private val rule: Time => T) {
     frp {
       val source = new EventSource[T] {
         sourceEvent.hook {
-          occ => occur(Behavior.this.at(occ.time))
+          occ => occur(Behaviour.this.at(occ.time))
         }
       }
 
@@ -36,7 +35,7 @@ class Behavior[T](private val rule: Time => T) {
     }
   }
 
-  def until[A](event: Event[A], behavior: Behavior[T]): Behavior[T] = {
+  def until[A](event: Event[A], behaviour: Behaviour[T]): Behaviour[T] = {
     frp {
       val rule: Time => T = {
         time =>
@@ -47,15 +46,15 @@ class Behavior[T](private val rule: Time => T) {
           }
 
           else {
-            behavior.at(time)
+            behaviour.at(time)
           }
       }
 
-      new Behavior(rule)
+      new Behaviour(rule)
     }
   }
 
-  def until[A](after: Time, event: Event[A], behaviour: Behavior[T]): Behavior[T] = {
+  def until[A](after: Time, event: Event[A], behaviour: Behaviour[T]): Behaviour[T] = {
     frp {
       val rule: Time => T = {
         time =>
@@ -70,11 +69,11 @@ class Behavior[T](private val rule: Time => T) {
           }
       }
 
-      new Behavior(rule)
+      new Behaviour(rule)
     }
   }
 
-  def toggle[A](event: Event[A], behaviour: Behavior[T]): Behavior[T] = {
+  def toggle[A](event: Event[A], behaviour: Behaviour[T]): Behaviour[T] = {
     frp {
       val rule: Time => T = {
         time =>
@@ -89,30 +88,30 @@ class Behavior[T](private val rule: Time => T) {
           }
       }
 
-      new Behavior(rule)
+      new Behaviour(rule)
     }
   }
 
-  def map[B](func: T => B): Behavior[B] = {
+  def map[B](func: T => B): Behaviour[B] = {
     frp {
-      new Behavior(time => func(this.at(time)))
+      new Behaviour(time => func(this.at(time)))
     }
   }
 
-  def map2[U, V](behaviour: Behavior[U])(func: (T, U) => V): Behavior[V] = {
+  def map2[U, V](behaviour: Behaviour[U])(func: (T, U) => V): Behaviour[V] = {
     frp {
-      new Behavior(time => func(this.at(time), behaviour.at(time)))
+      new Behaviour(time => func(this.at(time), behaviour.at(time)))
     }
   }
 
-  def map3[U, V, W](beh1: Behavior[U], beh2: Behavior[V])(func: (T, U, V) => W): Behavior[W] = {
+  def map3[U, V, W](beh1: Behaviour[U], beh2: Behaviour[V])(func: (T, U, V) => W): Behaviour[W] = {
     frp {
-      new Behavior(time => func(this.at(time), beh1.at(time), beh2.at(time)))
+      new Behaviour(time => func(this.at(time), beh1.at(time), beh2.at(time)))
     }
   }
 }
 
-class Constant[T](val value: T) extends Behavior[T](time => value) {
+class Constant[T](val value: T) extends Behaviour[T](time => value) {
   override def eval(): T = {
     value
   }
@@ -122,8 +121,8 @@ class Constant[T](val value: T) extends Behavior[T](time => value) {
   }
 }
 
-object Behavior {
-  def apply[T](rule: Time => T): Behavior[T] = {
-    new Behavior(rule)
+object Behaviour {
+  def apply[T](rule: Time => T): Behaviour[T] = {
+    new Behaviour(rule)
   }
 }

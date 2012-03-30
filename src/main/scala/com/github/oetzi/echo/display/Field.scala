@@ -2,7 +2,7 @@ package com.github.oetzi.echo.display
 
 import javax.swing.JTextField
 import java.awt.Component
-import com.github.oetzi.echo.core.{Behavior, Stepper, EventSource}
+import com.github.oetzi.echo.core.{Behaviour, Stepper, EventSource}
 import java.awt.event.{KeyEvent, KeyListener}
 
 class Field private() extends Canvas {
@@ -24,7 +24,7 @@ class Field private() extends Canvas {
 
   private val textBeh = new Stepper("", internal.asInstanceOf[EventSource[String]].event())
 
-  def text(): Behavior[String] = {
+  def text(): Behaviour[String] = {
     textBeh
   }
 

@@ -6,9 +6,9 @@ import javax.swing.{BoxLayout, JFrame}
 import java.awt.event.{MouseEvent, MouseMotionListener}
 import java.awt.Point
 import java.awt.Component
-import com.github.oetzi.echo.core.{Stepper, EventSource, Behavior}
+import com.github.oetzi.echo.core.{Stepper, EventSource, Behaviour}
 
-class Frame private(private val visibleBeh: Behavior[Boolean]) extends Canvas {
+class Frame private(private val visibleBeh: Behaviour[Boolean]) extends Canvas {
   private var components: List[Canvas] = List[Canvas]()
   private var lastVis = false
 
@@ -28,11 +28,11 @@ class Frame private(private val visibleBeh: Behavior[Boolean]) extends Canvas {
     }
   }
 
-  private val mouseBeh: Behavior[Point] = new Stepper(new Point(0, 0), mouseListener)
+  private val mouseBeh: Behaviour[Point] = new Stepper(new Point(0, 0), mouseListener)
 
   startClock()
 
-  def mouse(): Behavior[Point] = {
+  def mouse(): Behaviour[Point] = {
     if (this.internal.getMouseMotionListeners.length < 1) {
       this.internal.addMouseMotionListener(mouseListener)
     }
@@ -40,7 +40,7 @@ class Frame private(private val visibleBeh: Behavior[Boolean]) extends Canvas {
     mouseBeh
   }
 
-  def visible(): Behavior[Boolean] = {
+  def visible(): Behaviour[Boolean] = {
     visibleBeh
   }
 
@@ -76,8 +76,8 @@ class Frame private(private val visibleBeh: Behavior[Boolean]) extends Canvas {
 }
 
 object Frame {
-  def apply(width: Behavior[Int], height: Behavior[Int], components: List[Canvas] = List(),
-            visible: Behavior[Boolean] = true): Frame = {
+  def apply(width: Behaviour[Int], height: Behaviour[Int], components: List[Canvas] = List(),
+            visible: Behaviour[Boolean] = true): Frame = {
     val frame = new Frame(visible)
 
     def insets = frame.internal.getInsets

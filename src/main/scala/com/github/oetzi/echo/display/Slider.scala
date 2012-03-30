@@ -19,7 +19,7 @@ class Slider private() extends Canvas {
     }
   }
 
-  val value: Behavior[Int] = new Stepper(internal.getValue, internal.asInstanceOf[EventSource[Int]])
+  val value: Behaviour[Int] = new Stepper(internal.getValue, internal.asInstanceOf[EventSource[Int]])
 
   protected[display] def draw() {
     this.internal.setSize(widthBeh.eval(), heightBeh.eval())
