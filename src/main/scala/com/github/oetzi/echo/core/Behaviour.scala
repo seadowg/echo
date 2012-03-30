@@ -3,7 +3,7 @@ package com.github.oetzi.echo.core
 import com.github.oetzi.echo.Echo._
 import com.github.oetzi.echo.Control._
 
-/** `Behaviour` provides an implementation of FRP Behaviours.
+/** `Behaviour` provides an implementation of FRP Behaviours
  */
 
 sealed class Behaviour[T](private val rule: Time => T) {
@@ -15,7 +15,7 @@ sealed class Behaviour[T](private val rule: Time => T) {
     }
   }
 
-  protected[echo] def at(time: Time): T = {
+  private[core] def at(time: Time): T = {
     if (last == null || time != last._1) {
       last = (time, rule(time))
     }
@@ -116,7 +116,7 @@ class Constant[T](val value: T) extends Behaviour[T](time => value) {
     value
   }
 
-  override protected[echo] def at(time: Time): T = {
+  override private[core] def at(time: Time): T = {
     value
   }
 }
