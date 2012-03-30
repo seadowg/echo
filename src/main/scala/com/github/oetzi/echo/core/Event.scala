@@ -9,8 +9,18 @@ import collection.mutable.ArrayBuffer
  */
 trait Event[T] {
   protected def occs(): Occurrence[T]
+  
+  /** Causes the passed function to execute every time this
+    * Event occurs with the currently occurring occurrence
+    * as input.
+   */
   protected[echo] def hook(block: Occurrence[T] => Unit)
 
+  /** Returns a new Event that's occurrence values
+    * are are the result of of transforming the
+    * callee's occurrences with the given function (occurrence
+    * times are unmodified).
+   */
   def map[U](func: (Time, T) => U): Event[U] = {
     frp {
       val mapFun: () => Occurrence[U] = {
@@ -44,6 +54,10 @@ trait Event[T] {
     }
   }
 
+  /** Returns an Event that filters occurrences
+    * occurrences (via the value) of the callee
+    * with the given predicate.
+   */
   def filter(func: T => Boolean): Event[T] = {
     frp {
       val source = this
@@ -59,6 +73,11 @@ trait Event[T] {
     }
   }
 
+  /** Returns an Event that's occurrences
+    * are a merged version of the callee
+    * and the given Event (merged in time order
+    * with left precedence).
+   */
   def merge(event: Event[T]): Event[T] = {
     frp {
       val func: () => Occurrence[T] = {
@@ -123,6 +142,8 @@ trait EventSource[T] extends Event[T] {
   private var present: Occurrence[T] = null
   private var length: BigInt = 0
 
+  /** Returns a simple Event view of this EventSource.
+   */
   def event(): Event[T] = {
     val source = this
 
@@ -136,11 +157,19 @@ trait EventSource[T] extends Event[T] {
       }
     }
   }
-
+  
   protected def occs(): Occurrence[T] = {
     present
   }
-
+  
+  /** Causes the EventSource to occur with the
+    * given value at the time of the call. This function
+    * is atomic with respect to the run-time
+    * group of FRP objects so occurrence times
+    * are guaranteed to be monotonically increasing for
+    * each Event (even if multiple threads can access the occur
+    * function)
+   */
   protected def occur(value: T) {
     while (!createLock.available) {}
 
@@ -152,15 +181,15 @@ trait EventSource[T] extends Event[T] {
       echo(occ)
     }
   }
-
+  
+  protected[echo] def hook(block: Occurrence[T] => Unit) {
+    hooks += block
+  }
+  
   protected def echo(occurrence: Occurrence[T]) {
     hooks.foreach {
       block => block(occurrence)
     }
-  }
-
-  protected[echo] def hook(block: Occurrence[T] => Unit) {
-    hooks += block
   }
 }
 
@@ -171,6 +200,9 @@ protected class Occurrence[T](val time: Time, val value: T, val num: BigInt) {
 }
 
 object Event {
+  
+  /** Returns an Event that occurs once at time 0.
+   */
   def apply[T](value: T): Event[T] = {
     frp {
       new EventSource[T] {
@@ -181,12 +213,20 @@ object Event {
     }
   }
 
+  /** Returns an Event that never occurs.
+   */
   def apply[T](): Event[T] = {
     frp {
       new EventSource[T] {}.event()
     }
   }
 
+  /** Flattens an Event[Event[T]] to an Event[T]. Occurrences
+    * of the inner Events will be `delayed` to the time
+    * that their parent occurs if they occur any earlier. Apart
+    * from this caveat it is essentially a merge of all
+    * Events in the outer Event.
+   */
   def join[T](eventEvent: Event[Event[T]]): Event[T] = {
     frp {
       new EventSource[T] {
