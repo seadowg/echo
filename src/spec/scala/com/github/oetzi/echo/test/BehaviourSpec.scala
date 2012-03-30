@@ -164,7 +164,7 @@ object BehaviourSpec extends Specification {
         val event = new TestEvent[Unit]
         val beh = new Behaviour(time => time)
 
-        beh.sample(event).top(now()) mustBe None
+        beh.sample(event).top() mustBe None
       }
 
       "returning an event that samples the Behaviour on occurrences" in {
@@ -176,8 +176,8 @@ object BehaviourSpec extends Specification {
           event.pubOccur(())
         }
 
-        sampler.top(now()).get.time mustEqual 1
-        sampler.top(now()).get.value mustEqual 1
+        sampler.top().get.time mustEqual 1
+        sampler.top().get.value mustEqual 1
       }
     }
   }

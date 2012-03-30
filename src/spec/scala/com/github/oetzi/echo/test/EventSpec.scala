@@ -15,17 +15,17 @@ object EventSpec extends Specification {
     "be empty initially" in {
       val event = new TestEvent[Unit]
 
-      event.top(now()) mustEqual None
+      event.top() mustEqual None
     }
 
     "increase the num on each occurrence with each occurrence" in {
       val event = new TestEvent[Unit]
 
       event.pubOccur(())
-      event.top(now()).get.num mustEqual 1
+      event.top().get.num mustEqual 1
 
       event.pubOccur(())
-      event.top(now()).get.num mustEqual 2
+      event.top().get.num mustEqual 2
     }
 
     "have an event that is kept up to date" in {
@@ -33,7 +33,7 @@ object EventSpec extends Specification {
       val test = event.event()
       event.pubOccur(())
 
-      test.top(now()).get.num mustEqual 1
+      test.top().get.num mustEqual 1
     }
 
     "executes hooked blocks when it occurs" in {
@@ -50,7 +50,7 @@ object EventSpec extends Specification {
         val event = new TestEvent[Int]
         event.pubOccur(1)
 
-        event.map((t, v) => v + 1).top(now()).get.value mustEqual 2
+        event.map((t, v) => v + 1).top().get.value mustEqual 2
       }
 
       "that is kept to date with the original" in {
@@ -58,7 +58,7 @@ object EventSpec extends Specification {
         val map = event.map((t, v) => v + 1)
         event.pubOccur(1)
 
-        map.top(now()).get.value mustEqual 2
+        map.top().get.value mustEqual 2
       }
 
       "that executes hooks with a mapped occurrence" in {
@@ -76,7 +76,7 @@ object EventSpec extends Specification {
 			"returning an empty Event for an empty Event" in {
 				val event = new TestEvent[Int]
 				
-				event.filter(e => e == 5).top(now) mustEqual None
+				event.filter(e => e == 5).top() mustEqual None
 			}
 			
 			"returning an Event that only includes matching occurrences" in {
@@ -86,7 +86,7 @@ object EventSpec extends Specification {
 				event.pubOccur(5)
 				event.pubOccur(6)
 				
-				filter.top(now).get.value mustEqual 5
+				filter.top().get.value mustEqual 5
 			}
 			
 			"it only executes hooks for correct occurrences" in {
@@ -110,7 +110,7 @@ object EventSpec extends Specification {
       "that returns an Event that is empty for empty sources" in {
         val event = new TestEvent[Unit].merge(new TestEvent[Unit])
 
-        event.top(now()) mustEqual None
+        event.top() mustEqual None
       }
 
       "that uses the right source as its present if the left hasn't occurred" in {
@@ -119,8 +119,8 @@ object EventSpec extends Specification {
 
         right.pubOccur(5)
 
-        left.merge(right).top(now()).get.value mustEqual 5
-        left.merge(right).top(now()).get.num mustEqual 1
+        left.merge(right).top().get.value mustEqual 5
+        left.merge(right).top().get.num mustEqual 1
       }
 
       "that uses the left source as its present if the right hasn't occurred" in {
@@ -129,8 +129,8 @@ object EventSpec extends Specification {
 
         left.pubOccur(5)
 
-        left.merge(right).top(now()).get.value mustEqual 5
-        left.merge(right).top(now()).get.num mustEqual 1
+        left.merge(right).top().get.value mustEqual 5
+        left.merge(right).top().get.num mustEqual 1
       }
 
       "that uses the newest occurrence (in the present) if both source have occurred" in {
@@ -144,16 +144,16 @@ object EventSpec extends Specification {
           right.pubOccur(6)
         }
 
-        left.merge(right).top(now()).get.value mustEqual 6
-        left.merge(right).top(now()).get.num mustEqual 2
+        left.merge(right).top().get.value mustEqual 6
+        left.merge(right).top().get.num mustEqual 2
 
         freezeTime(2) {
           left.pubOccur(4)
         }
 
         val tuple = freezeTime(3) {
-          (left.merge(right).top(now()).get.value,
-            left.merge(right).top(now()).get.num)
+          (left.merge(right).top().get.value,
+            left.merge(right).top().get.num)
         }
 
         tuple mustEqual(4, 3)
@@ -168,7 +168,7 @@ object EventSpec extends Specification {
           right.pubOccur(6)
         }
 
-        left.merge(right).top(now()).get.value mustEqual 6
+        left.merge(right).top().get.value mustEqual 6
       }
 
       "that executes hooks when either event occurs" in {
@@ -191,7 +191,7 @@ object EventSpec extends Specification {
       "returns an empty Event for empty Events" in {
         val event = Event.join(new TestEvent[Event[Int]])
 
-        event.top(now()) mustEqual None
+        event.top() mustEqual None
       }
 
       "always has the newest occurrence from any occurred Event" in {
@@ -206,7 +206,7 @@ object EventSpec extends Specification {
         occurSource2.pubOccur(5)
         occurSource1.pubOccur(6)
 
-        event.top(now()).get.value mustEqual 6
+        event.top().get.value mustEqual 6
       }
 
       "uses right precedence if two occurrences from seperate events are equal" in {
@@ -223,7 +223,7 @@ object EventSpec extends Specification {
           occurSource1.pubOccur(6)
         }
 
-        event.top(now()).get.value mustEqual 7
+        event.top().get.value mustEqual 7
       }
 
       "it delays old occurrences in occuring Events" in {
@@ -240,7 +240,7 @@ object EventSpec extends Specification {
           source.pubOccur(occurSource1)
         }
 
-        event.top(now()).get.time mustEqual 2
+        event.top().get.time mustEqual 2
       }
 
       "it should have correct length" in {
@@ -259,7 +259,7 @@ object EventSpec extends Specification {
         occurSource2.pubOccur(1)
         occurSource1.pubOccur(2)
 
-        event.top(now()).get.num mustEqual 3
+        event.top().get.num mustEqual 3
       }
     }
   }

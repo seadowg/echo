@@ -16,7 +16,7 @@ object Switcher {
     frp {
       {
        time =>
-        val occ = event.top(time)
+        val occ = event.top()
 
         if (occ == None) {
           initial.at(time)

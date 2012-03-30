@@ -39,7 +39,7 @@ class Behaviour[T](private val rule: Time => T) {
     frp {
       val rule: Time => T = {
         time =>
-          val occ = event.top(time)
+          val occ = event.top()
 
           if (occ == None) {
             this.at(time)
@@ -58,7 +58,7 @@ class Behaviour[T](private val rule: Time => T) {
     frp {
       val rule: Time => T = {
         time =>
-          val occ = event.top(time)
+          val occ = event.top()
 
           if (occ == None || occ.get.time < after) {
             this.at(time)
@@ -77,7 +77,7 @@ class Behaviour[T](private val rule: Time => T) {
     frp {
       val rule: Time => T = {
         time =>
-          val occ = event.top(time)
+          val occ = event.top()
 
           if (occ == None || occ.get.num % 2 == 0) {
             this.at(time)

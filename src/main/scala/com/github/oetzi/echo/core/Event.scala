@@ -7,14 +7,14 @@ import collection.mutable.ArrayBuffer
 import collection.mutable.Queue
 
 trait Event[T] {
-  protected def occs(time: Time): Occurrence[T]
+  protected def occs(): Occurrence[T]
   protected[echo] def hook(block: Occurrence[T] => Unit)
 
   def map[U](func: (Time, T) => U): Event[U] = {
     frp {
-      val mapFun: Time => Occurrence[U] = {
-        time =>
-          val occ = occs(time)
+      val mapFun: () => Occurrence[U] = {
+        () =>
+          val occ = occs()
 
           if (occ == null) {
             null
@@ -28,8 +28,8 @@ trait Event[T] {
       val source = this
 
       new Event[U] {
-        protected def occs(time: Time): Occurrence[U] = {
-          mapFun(time)
+        protected def occs(): Occurrence[U] = {
+          mapFun()
         }
 
         protected[echo] def hook(block: Occurrence[U] => Unit) {
@@ -60,10 +60,10 @@ trait Event[T] {
 
   def merge(event: Event[T]): Event[T] = {
     frp {
-      val func: Time => Occurrence[T] = {
-        time =>
-          val left = this.occs(time)
-          val right = event.top(time).getOrElse(null)
+      val func: () => Occurrence[T] = {
+        () =>
+          val left = this.occs()
+          val right = event.top().getOrElse(null)
 
           if (left == null && right == null) {
             null
@@ -89,8 +89,8 @@ trait Event[T] {
       val source = this
 
       new Event[T] {
-        protected def occs(time: Time): Occurrence[T] = {
-          func(time)
+        protected def occs(): Occurrence[T] = {
+          func()
         }
 
         protected[echo] def hook(block: Occurrence[T] => Unit) {
@@ -102,8 +102,8 @@ trait Event[T] {
   }
 
   // echo utility functions
-  def top(time: Time): Option[Occurrence[T]] = {
-    val top = occs(time)
+  def top(): Option[Occurrence[T]] = {
+    val top = occs()
 
     if (top != null) {
       Some(top)
@@ -124,8 +124,8 @@ trait EventSource[T] extends Event[T] {
     val source = this
 
     new Event[T] {
-      protected def occs(time: Time): Occurrence[T] = {
-        source.occs(time)
+      protected def occs(): Occurrence[T] = {
+        source.occs()
       }
 
       protected[echo] def hook(block: Occurrence[T] => Unit) {
@@ -134,7 +134,7 @@ trait EventSource[T] extends Event[T] {
     }
   }
 
-  protected def occs(time: Time): Occurrence[T] = {
+  protected def occs(): Occurrence[T] = {
 		present
   }
 
@@ -199,13 +199,13 @@ object Event {
               occ => joinOccur(occ, priority)
             }
 
-            val old = e.value.top(now())
+            val old = e.value.top()
             if (old != None) joinOccur(old.get, priority)
         }
 
         private def joinOccur(occurrence: Occurrence[T], priority: BigInt) {
           this synchronized {
-            val lastOcc = this.top(now())
+            val lastOcc = this.top()
 
             if (lastOcc != None && occurrence.time == lastOcc.get.time) {
               if (priority >= lastPriority) {
