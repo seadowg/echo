@@ -47,7 +47,6 @@ object Echo {
 
 private[echo] object Control {
   val groupLock = new Lock()
-  val writeLock = new Lock()
   val createLock = new Lock()
   private var devModeOn = false
 
