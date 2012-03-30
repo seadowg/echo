@@ -12,7 +12,7 @@ object EchoSpec extends Specification {
   "Echo" should {
     "allow values to lifted to constant Behaviours" in {
       val beh: Behaviour[Int] = 5
-      beh must_!= null
+      beh.eval() mustEqual 5
     }
 
     "has a freezeTime function" >> {

@@ -291,3 +291,29 @@ beh.at(t)
     Here \emph{beh} is evaluated at \emph{t} twice. It can be seen that we could simply cache the last
     computed value so we could return this value instantly if the Behaviour was sampled at that time again.
     We take this approach internally in Echo so as to avoid redundantly recomputing values. 
+  
+  \section{Test Driven Development}
+    Echo was mainly developed using Test Driven Development. This methodology is based around the idea
+    of specifying some program feature with a test and then writing code to pass that test. The hope
+    is that doing so will not just ensure testing is thorough (as all features will require tests) but
+    that solutions are not over thought (the code is as simple as possible). TDD also encourages
+    refactoring as if refactored code passes the tests for the initial solution we can be more confident
+    that it is semantically equivalent in it's execution.
+
+    Test implementation for Echo was carried out using the Scala framework `Specs' \cite{EricTorreborre}. This framework
+    encompasses a DSL that allows tests to easily be defined. For instance, this code tests the implicit lifting
+    of constants feature:
+
+\begin{verbatim}
+"Echo" should {
+  "allow values to lifted to constant Behaviours" in {
+    val beh: Behaviour[Int] = 5
+    beh.eval() mustEqual 5
+  }
+}
+\end{verbatim}
+
+    Carrying out testing such as this was imperative to the project goals as it was very important to be able
+    to verify that code did not only compile and run but that implementations matched the original denotational 
+    semantics. In other words developing Echo with TDD allowed for verification that the implementation
+    was correct throughout the development process.
