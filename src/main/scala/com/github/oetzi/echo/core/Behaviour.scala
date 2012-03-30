@@ -5,16 +5,24 @@ import com.github.oetzi.echo.Control._
 
 /** Behaviour provides an implementation of FRP Behaviours.
  */
-
 sealed class Behaviour[T](private val rule: Time => T) {
   var last: (Time, T) = null
   
+  /** Evaluates the Behaviour at the current time. The function is atomic
+    * with respect to the run-time group of FRP objects so evaluation times
+    * are guaranteed to be monotonically increasing (even for Behaviours part
+    * of more than one composite Behaviour and for concurrently evaluated 
+    * Behaviours.)
+   */
   def eval(): T = {
     groupLock synchronized {
       this.at(now())
     }
   }
 
+  /** Returns a Event[T] that occurs every time sourceEvent occurs
+    * with the value of the Behaviour at that time.
+   */
   def sample[A](sourceEvent: Event[A]): Event[T] = {
     frp {
       val source = new EventSource[T] {
@@ -27,6 +35,10 @@ sealed class Behaviour[T](private val rule: Time => T) {
     }
   }
 
+  /** Returns a Behaviour that behaves as the callee until the
+    * Event occurs. It then switches to behaving as the passed
+    * Behaviour.
+    */
   def until[A](event: Event[A], behaviour: Behaviour[T]): Behaviour[T] = {
     frp {
       val rule: Time => T = {
@@ -46,6 +58,10 @@ sealed class Behaviour[T](private val rule: Time => T) {
     }
   }
 
+  /** Similar to the previous until funtion except for the Event must
+    * have occurred on or after the specified time for the Behaviour to
+    * switch.
+   */
   def until[A](after: Time, event: Event[A], behaviour: Behaviour[T]): Behaviour[T] = {
     frp {
       val rule: Time => T = {
@@ -65,6 +81,9 @@ sealed class Behaviour[T](private val rule: Time => T) {
     }
   }
 
+  /** Returns a Behaviour that toggles between behaving as the callee
+    * and the passed Behaviour whenever the passed Event occurs.
+   */
   def toggle[A](event: Event[A], behaviour: Behaviour[T]): Behaviour[T] = {
     frp {
       val rule: Time => T = {
@@ -84,18 +103,27 @@ sealed class Behaviour[T](private val rule: Time => T) {
     }
   }
 
+  /** Returns a Behaviour that transorms the callee's
+    * value with the passed function.
+   */
   def map[B](func: T => B): Behaviour[B] = {
     frp {
       new Behaviour(time => func(this.at(time)))
     }
   }
-
+  
+  /** Returns a Behaviour that transorms the callee's
+    * and passed Behavior's value with the passed function.
+   */
   def map2[U, V](behaviour: Behaviour[U])(func: (T, U) => V): Behaviour[V] = {
     frp {
       new Behaviour(time => func(this.at(time), behaviour.at(time)))
     }
   }
 
+  /** Returns a Behaviour that transorms the callee's
+    * and passed Behaviors' value with the passed function.
+   */
   def map3[U, V, W](beh1: Behaviour[U], beh2: Behaviour[V])(func: (T, U, V) => W): Behaviour[W] = {
     frp {
       new Behaviour(time => func(this.at(time), beh1.at(time), beh2.at(time)))
@@ -120,7 +148,6 @@ object Behaviour {
 /** Switcher represents a Behaviour that's value is always the latest evaluated occurrence in
   * a given Event[Behaviour].
  */
-
 class Switcher[T](behaviour: Behaviour[T], val event: Event[Behaviour[T]]) extends Behaviour[T](
   Switcher.construct(behaviour, event)) {
 }
@@ -151,7 +178,6 @@ object Switcher {
 /** Stepper is a a static valued version of Switcher that represents the lastest
   * occurrence in an Event[T].
  */
-  
 class Stepper[T](initial: T, event: Event[T]) extends Switcher[T](initial, event.map((t, v) => new Constant(v))) {}
 
 object Stepper {
@@ -164,7 +190,6 @@ object Stepper {
   * so it only returns the value rather than evaluating it needlessly with respect
   * to time.
  */
-
 protected[echo] class Constant[T](val value: T) extends Behaviour[T](time => value) {
   override def eval(): T = {
     value
