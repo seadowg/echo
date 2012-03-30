@@ -1,4 +1,4 @@
-package com.github.oetzi.echo.test
+package com.github.oetzi.echo.core.test
 
 import help.TestEvent
 import com.github.oetzi.echo.Echo._

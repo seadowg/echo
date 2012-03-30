@@ -1,9 +1,9 @@
-package com.github.oetzi.echo.test
+package com.github.oetzi.echo.core.test
 
 import org.specs._
 import com.github.oetzi.echo.Echo._
 import com.github.oetzi.echo.Control._
-import com.github.oetzi.echo.test.help.TestEvent
+import com.github.oetzi.echo.core.test.help.TestEvent
 import com.github.oetzi.echo.core.{Switcher, Behaviour}
 
 

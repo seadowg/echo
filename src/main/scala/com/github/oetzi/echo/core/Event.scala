@@ -102,7 +102,7 @@ trait Event[T] {
   }
 
   // echo utility functions
-  def top(): Option[Occurrence[T]] = {
+  private[core] def top(): Option[Occurrence[T]] = {
     val top = occs()
 
     if (top != null) {

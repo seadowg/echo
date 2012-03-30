@@ -1,4 +1,4 @@
-package com.github.oetzi.echo.test.help
+package com.github.oetzi.echo.core.test.help
 
 import com.github.oetzi.echo.core.EventSource
 

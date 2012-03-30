@@ -1,6 +1,6 @@
-package com.github.oetzi.echo.test
+package com.github.oetzi.echo.core.test
 
-import help.TestEvent
+import com.github.oetzi.echo.core.test.help.TestEvent
 import org.specs._
 import com.github.oetzi.echo.Echo._
 import com.github.oetzi.echo.Control._
