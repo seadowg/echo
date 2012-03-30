@@ -4,10 +4,10 @@ import com.github.oetzi.echo.Echo._
 import com.github.oetzi.echo.Control._
 import com.github.oetzi.echo.EchoApp
 import collection.mutable.ArrayBuffer
-import collection.mutable.Queue
 
 trait Event[T] {
   protected def occs(): Occurrence[T]
+
   protected[echo] def hook(block: Occurrence[T] => Unit)
 
   def map[U](func: (Time, T) => U): Event[U] = {
@@ -43,20 +43,20 @@ trait Event[T] {
     }
   }
 
-	def filter(func: T => Boolean) : Event[T] = {
-		frp {
-			val source = this
+  def filter(func: T => Boolean): Event[T] = {
+    frp {
+      val source = this
 
-			new EventSource[T] {
-				source.hook {
-					occ =>
-						if (func(occ.value)) {
-							occur(occ.value)
-						}
-				}
-			}
-		}
-	}
+      new EventSource[T] {
+        source.hook {
+          occ =>
+            if (func(occ.value)) {
+              occur(occ.value)
+            }
+        }
+      }
+    }
+  }
 
   def merge(event: Event[T]): Event[T] = {
     frp {
@@ -135,15 +135,15 @@ trait EventSource[T] extends Event[T] {
   }
 
   protected def occs(): Occurrence[T] = {
-		present
+    present
   }
 
   protected def occur(value: T) {
     while (!createLock.available) {}
-    
+
     groupLock synchronized {
       length += 1
-			val occ = new Occurrence(now(), value, length)
+      val occ = new Occurrence(now(), value, length)
       present = occ
 
       echo(occ)
@@ -168,22 +168,22 @@ protected class Occurrence[T](val time: Time, val value: T, val num: BigInt) {
 }
 
 object Event {
-  def apply[T](value: T) : Event[T] = {
+  def apply[T](value: T): Event[T] = {
     frp {
       new EventSource[T] {
         EchoApp.afterSetup {
           () => occur(value)
         }
-      }.event
+      }.event()
     }
   }
-  
-  def apply[T]() : Event[T] = {
+
+  def apply[T](): Event[T] = {
     frp {
-      new EventSource[T] {}.event
+      new EventSource[T] {}.event()
     }
   }
-  
+
   def join[T](eventEvent: Event[Event[T]]): Event[T] = {
     frp {
       new EventSource[T] {
