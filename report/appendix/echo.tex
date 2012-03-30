@@ -1,0 +1,37 @@
+\chapter{Echo Specification}
+
+  \section*{Behaviour[T]}
+    \subsection*{eval(): T}
+      Lorem ipsum
+    
+    \subsection*{sample[A](srcEv: Event[A]): Event[T]}
+      Lorem ipsum
+    
+    \subsection*{until[A](ev: Event[A], beh: Behaviour[T]): Behaviour[T]}
+      Lorem ipsum
+      
+    \subsection*{until[A](after: Time, ev: Event[A], beh: Behaviour[T]): Behaviour[T]}
+      Lorem ipsum
+      
+    \subsection*{toggle[A](ev: Event[A], beh: Behaviour[T]): Behaviour[T]}
+      Lorem ipsum
+      
+    \subsection*{map[B](func: T => B): Behaviour[B]}
+      Lorem ipsum
+      
+    \subsection*{map2[U, V](beh: Behaviour[U])(func: (T, U) => V): Behaviour[V]}
+      Lorem ipsum
+
+    \subsection*{map3[U, V, W](beh1: Behaviour[U], beh2: Behaviour[V])(func: (T, U, V) => W): Behaviour[W]}
+      Lorem ipsum
+      
+  \section*{Event[T]}
+    \subsection*{map[U](func: (Time, T) => U): Event[U]}
+      Lorem ipsum
+    
+    \subsection*{filter(func: T => Boolean): Event[T]}
+      Lorem ipsum
+      
+    \subsection*{merge(event: Event[T]): Event[T]}
+      Lorem ipsum
+    

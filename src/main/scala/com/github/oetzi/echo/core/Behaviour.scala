@@ -58,7 +58,7 @@ sealed class Behaviour[T](private val rule: Time => T) {
     }
   }
 
-  /** Similar to the previous until funtion except for the Event must
+  /** Similar to the previous until function except for the Event must
     * have occurred on or after the specified time for the Behaviour to
     * switch.
    */
