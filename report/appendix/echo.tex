@@ -1,37 +1,123 @@
 \chapter{Echo Specification}
 
+  This section will define the various types implemented in Echo and their
+  respective instance and companion object functions. Operations will be defined 
+  semantically in terms of the Fran semantics specified in section 2 of this report.
+
   \section*{Behaviour[T]}
-    \subsection*{eval(): T}
-      Lorem ipsum
+    \subsection*{Instance Functions:}
+    \subsubsection*{eval(): T}
+      Evaluated and returns the current value of the
+      Behaviour. If the current time is \emph{t} then the
+      function can be expressed in the following manor:
+
+\begin{verbatim}
+beh.eval() = at(beh, t)
+\end{verbatim}      
     
-    \subsection*{sample[A](srcEv: Event[A]): Event[T]}
-      Lorem ipsum
+    \subsubsection*{sample[A](srcEv: Event[A]): Event[T]}
+      Returns a Event[T] that occurs every time the given
+      Event occurs with the value of the Behaviour at that time.
+      The \emph{sample} function is an implementation of the \emph{snapshot} operation:
+      
+\begin{verbatim}
+beh.sample(event) = snapshot(beh, event)
+\end{verbatim}
     
-    \subsection*{until[A](ev: Event[A], beh: Behaviour[T]): Behaviour[T]}
-      Lorem ipsum
+    \subsubsection*{until[A](ev: Event[A], beh: Behaviour[T]): Behaviour[T]}
+      Returns a Behaviour that behaves as the callee until the
+      Event occurs. It then switches to behaving as the passed
+      Behaviour. The \emph{until} function can be determined in terms
+      of \emph{switcher}:
+
+\begin{verbatim}
+beh1.until(ev, beh2) = switcher(beh1, map(ev, (t, v) => beh2))
+\end{verbatim}      
       
-    \subsection*{until[A](after: Time, ev: Event[A], beh: Behaviour[T]): Behaviour[T]}
-      Lorem ipsum
-      
-    \subsection*{toggle[A](ev: Event[A], beh: Behaviour[T]): Behaviour[T]}
+    \subsubsection*{toggle[A](ev: Event[A], beh: Behaviour[T]): Behaviour[T]}
       Lorem ipsum
       
     \subsection*{map[B](func: T => B): Behaviour[B]}
-      Lorem ipsum
-      
-    \subsection*{map2[U, V](beh: Behaviour[U])(func: (T, U) => V): Behaviour[V]}
-      Lorem ipsum
+      Returns a Behaviour that transforms the callee's
+      value with the passed function.
+      This function can be expressed in terms of \emph{lift1}:
 
-    \subsection*{map3[U, V, W](beh1: Behaviour[U], beh2: Behaviour[V])(func: (T, U, V) => W): Behaviour[W]}
-      Lorem ipsum
+\begin{verbatim}
+beh.map(func) = lift1(func, beh)
+\end{verbatim}      
+      
+    \subsubsection*{map2[U, V](beh: Behaviour[U])(func: (T, U) => V): Behaviour[V]}
+      Returns a Behaviour that transforms the callee's
+      and passed Behavior's value with the passed function. This operation
+      can be defined using \emph{lift2}:
+
+\begin{verbatim}
+beh1.map2(beh2)(func) = lift2(func, beh1, beh2)
+\end{verbatim}      
+
+    \subsubsection*{map3[U, V, W](beh1: Behaviour[U], beh2: Behaviour[V])(func: (T, U, V) => W): Behaviour[W]}
+      Returns a Behaviour that transforms the callee's
+      and passed Behaviors' value with the passed function. It cab
+      be expressed with \emph{lift3}:
+
+\begin{verbatim}
+beh1.map3(beh2, beh3)(func) = lift3(func, beh1, beh2, beh3)
+\end{verbatim}    
+
+    \subsection*{Companion Functions:}
+    \subsubsection*{apply[T](func : Time => T)}
+      Standard constructor. Returns a Behaviour
+      that can be expressed in the following way:
+
+\begin{verbatim}
+at(Behaviour(func), t) = func(t)
+\end{verbatim}
       
   \section*{Event[T]}
-    \subsection*{map[U](func: (Time, T) => U): Event[U]}
-      Lorem ipsum
+    \subsection*{Instance Functions:}
+    \subsubsection*{map[U](func: (Time, T) => U): Event[U]}
+      Returns a new Event that's occurrence values
+      are are the result of of transforming the
+      callee's occurrences with the given function (occurrence
+      times are unmodified). It can be defined in terms of 
+      the Fran \emph{map} operation:
+
+\begin{verbatim}
+ev.map(func) = map(ev, merge)
+\end{verbatim}      
     
-    \subsection*{filter(func: T => Boolean): Event[T]}
-      Lorem ipsum
+    \subsubsection*{filter(func: T => Boolean): Event[T]}
+      Returns an Event that filters occurrences
+      occurrences (via the value) of the callee
+      with the given predicate. We can define it as such:
+
+\begin{verbatim}
+ev.filter(pred) = occs(ev).filter(pred)
+\end{verbatim}
       
-    \subsection*{merge(event: Event[T]): Event[T]}
-      Lorem ipsum
-    
+    \subsubsection*{merge(event: Event[T]): Event[T]}
+      Returns an Event that's occurrences
+      are a merged version of the callee
+      and the given Event (merged in time order
+      with left precedence). The \emph{merge}
+      function can be specified with the Fran \emph{merge}
+      operation:
+
+\begin{verbatim}
+ev1.merge(ev2) = merge(ev1, ev2)
+\end{verbatim}   
+
+ \subsection*{Companion Functions:}
+  \subsubsection*{apply[T](value : T)}
+    Returns an Event that occurs once at time 0:
+  
+\begin{verbatim}
+occs(Event(value)).first = (0, value) 
+\end{verbatim} 
+
+  \subsubsection*{apply[T]()}
+    Returns an Event that never occurs:
+
+\begin{verbatim}
+occs(Event(value)).first = None
+\end{verbatim}    
