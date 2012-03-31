@@ -4,8 +4,8 @@
   applications.
   
   \section{UI Framework}
-    To enable users to build interactive user facing applications with echo it would be useful to have a simple User 
-    Interface framework in place. Of course echo could interact with standard UI frameworks but the use of Behaviours 
+    To enable users to build interactive user facing applications with Echo it would be useful to have a simple User 
+    Interface framework in place. Of course Echo could interact with standard UI frameworks but the use of Behaviours 
     and Events would be very limited and clunky. The goal with the UI framework is to allow the programmer to define 
     attributes as Behaviours and have them kept up to date and to also interact with the user through FRP 
     Events. 
@@ -21,25 +21,23 @@ val frame = Frame(new Behaviour(time => sin(time)), 200)
 
     The implementation of this is based around re-evaluating and redrawing the graphics on a clock tick. Each 
     Frame has its own `clock' that updates all the components attached to the Frame at a standard interval (currently 
-    20ms). The actual graphical code was built by simply abstracting over the Java Swing UI Framework. This allows the FRP 
-    components to be built quickly as no actual lower end graphics code has to be implemented.
+    20ms). The actual graphical code was built by simply abstracting over the Java Swing UI Framework \cite{Oracle}. This 
+    allows the FRP 
+    components to be built quickly as no actual lower level graphics code has to be implemented.
 
     The UI framework also allows the programmer to interact with the user via Events. Again this is best illustrated 
     with an example:
 
 \begin{verbatim}
-val button = Button("Click Me!") 
-val hello = new Behaviour(time => "Hello")
-val goodbye = new Behaviour(time => "Goodbye!")
-val someString = hello.until(button.click, goodbye) 
+val button = Button("Click Me!")
+val someString = "Hello!".until(button.click, "Goodbye!") 
 \end{verbatim}
 
-    Here it can be seen that the Button type owns a `click' event. This Event occurs every time the 
+    Here it can be seen that the Button type has a \emph{click} event. This Event occurs every time the 
     Button is clicked by the user. This was made possible by abstracting over Swing's own event framework. Many other 
     FRP Events can be easily generated in this way in Swing.
   
   \section{IO Framework}
-  
   As mentioned earlier FRP can ease programming functional I/O as FRP Events introduce a declarative way to represent 
   and interact with external sources. One obvious place to experiment with this is with socket programming. To create sockets 
   in FRP the two core Java socket abstractions Socket and ServerSocket were abstracted over to produce
@@ -81,5 +79,20 @@ val socket = Sender("localhost", 1997, Event(0, "Hello"))
 \end{verbatim}
 
   Here the Java socket code will fail as it will be refused a connection (causing an Exception). The errors Event
-  will then occur with the Exception. This allows exceptions to interact with the FRP paradigm and allows programmers to 
-  build failure tolerant systems within an FRP setting.
+  will then occur with the Exception. This allows Exceptions to interact with the FRP paradigm and allows programmers to 
+  build failure tolerant systems within an FRP setting. So this functionality could be used elsewhere it was generalised
+  to create a Breakable trait. Classes that extend this trait are able to write code in a \emph{dangerous} function like so:
+
+\begin{verbatim}
+class Resource extends Breakable {
+  dangerous {
+    breakEverything()
+  }
+}
+
+val broken = new Resource()
+val errors = broken.errors
+\end{verbatim}
+  
+  As described with Sender and Receiver any Exceptions that are thrown inside \emph{dangerous} will occur in the Breakable  
+  \emph{errors} Event. 
