@@ -120,4 +120,23 @@ occs(Event(value)).first = (0, value)
 
 \begin{verbatim}
 occs(Event(value)).first = None
-\end{verbatim}    
+\end{verbatim} 
+
+   \section*{Switcher[T] extends Behaviour[T]}
+    \subsection*{Companion Functions:}
+      \subsubsection*{apply[T](beh : Behaviour[T], ev : Event[Behaviour[T]])}
+        Can be defined in terms of the FRP \emph{switcher}
+        operation:
+
+\begin{verbatim}
+Switcher(beh, ev) = switcher(beh, ev)
+\end{verbatim}   
+
+  \section*{Stepper[T] extends Behaviour[T]}
+    \subsection*{Companion Functions:}
+      \subsubsection*{apply[T](ini : T, ev : Event[T])}
+        Can be defined in terms of the FRP \emph{switcher} function:
+
+\begin{verbatim}
+Stepper(ini, ev) = switcher(lift0(in), map(ev, (t,v) => lift0(v))
+\end{verbatim}
