@@ -1,9 +1,6 @@
 \chapter{Implementation}
-  Throughout its history, FRP implementations have generally been carried out in Haskell. Due to the movement
-  in setting and also in an effort to create a efficient implementation without sacrificing FRP's expressive power
-  several design and implementation choices were made for Echo. Choices were also made
-  to provide to provide programmers with simpler experiences and to hopefully allow Echo to be
-  as powerful as possible.
+  This section will explore various aspects of the implementation and choices made during the development
+  of Echo. 
   
   \section{Scala}
     Scala is a multi-paradigm programming language developed to run on the Java Virtual Machine \cite{Odersky2004}. Scala 
@@ -23,12 +20,12 @@
     a rather unique type conversion functionality that allows types to be converted on the fly. This provides
     incredibly expressive and powerful ways to embed FRP into Scala and will be explored later.
     
-    One slight problem with implementing FRP in Scala is that, unlike Haskell, it is an `impure'
+    One slight problem with implementing FRP in Scala was that, unlike Haskell, it is an `impure'
     language. In terms of functional programming, `purity' refers to a languages ability to write functions
     thats results are affected by some external estate or in turn effect some external state. For instance,
     this means that a function that defines a Behaviour could be impure and could therefore cause side effects
     whenever the Behaviour was evaluated. There has been some work into pure function verification in Scala but it has not materialised into an  
-    implementation \cite{Nordenberg}. Due to this, we will only deal with Behaviours defined using pure Behaviours in Echo.
+    implementation \cite{Nordenberg}. Due to this, we assume that Behaviours are defined using pure functions in Echo.
 
   \section{Flat Time}
     Time in Echo is implemented as a flat value type defined exactly as it is in 
@@ -78,10 +75,10 @@ val switch = new Switcher(iniBeh, behEvent)
 \end{verbatim}
 
   \section{Implicit Lifting of Constants}
-    As mentioned earlier, one of the most powerful features of Scala is it's ability to convert between
+    As mentioned earlier, one of the most powerful features of Scala is it's ability to implicitly convert between
     types at run time. This is facilitated by the \emph{implicit} key word allowing a function to be defined
     that is automatically executed when a corresponding type mismatch occurs. This will be used in Echo to allow 
-    static values to be converted to Behaviours \emph{implicitly}.. This is implemented in the following way:  
+    static values to be converted to Behaviours implicitly. This is implemented in the following way:  
 
 \begin{verbatim}
 implicit def liftConst[T](value : T) : Behaviour[T] = {
@@ -113,11 +110,13 @@ val switcher = new Switcher(false, eventBeh)
     public API to allow it to occur. Here we will show an alternative approach.
     
     When observing how Events are composed (using \emph{merge} and \emph{map} operations) it can be seen that
-    only a subset of Events actually `occur' while others are simply views and combinations of these.
-    In `echo' this is modelled directly. FRP Events are represented by two traits: Event[T] and EventSource[T].
+    only a subset of Events actually `occur' while others are simply views and combinations of these `source' Events.
+    In `echo' this is modelled directly. FRP Events are represented by two traits \footnote{Traits are abstract
+    classes that can possess concrete members. A class can extend from multiple Traits (like Java's interfaces)}: 
+    Event[T] and EventSource[T].
     Event has concrete implementations of \emph{map} and \emph{merge} operations that
     return concrete Event[T] instantiations. EventSource[T] extends
-    from Event[T] and additionally has a protected level concrete function `occur':
+    from Event[T] and additionally has a protected level concrete function \emph{occur}:
     
 \begin{verbatim}
 occur(value : T) : Unit
@@ -133,12 +132,7 @@ occur(value : T) : Unit
 class Five extends EventSource[Int] {
   occur(5)
 }
-\end{verbatim}
-
-    It should also be noted that the \emph{occs} function on Events is not actually available publicly in Echo. This
-    choice was made because an Event does not retain all its Events so anything returned from this 
-    function would be incorrect and accessing a Event's past data does not really
-    provide any useful functionality.   
+\end{verbatim} 
 
   \section{Time Travel is Dangerous}
     Relating back to the discussion of interactive Behaviours in section 2 it can be seen
@@ -164,7 +158,7 @@ class Five extends EventSource[Int] {
     other times will be available for evaluation at times (there will often be a gap between `now' and
     the last Event occurrence) it would be monotonous to expose these bounds to the programmer so
     in Echo explicit evaluation of a Behaviour is entirely removed from the public API (the
-    `at' operation) and replaced with a real-time evaluation function:
+    \emph{at} operation) and replaced with a real-time evaluation function:
 
 \begin{verbatim}
 eval() : T
@@ -181,6 +175,43 @@ beh.eval() = beh.at(now())
     It should also be noted that restricting evaluation times for Behaviours forces us
     to remove the \emph{timeTransform} operation for Behaviours (as this allows programmers to explicitly
     evaluate Behaviours in the past or future).
+    
+    With these rules in place, Echo is able to circumvent the semantic problems of evaluating the future
+    and does not need to store an Event's entire past. With only these restrictions we may still have to
+    buffer `future' Events however as we can't swap in new occurrences while an Event is being evaluated.
+    
+  \section{Atomic Input \& Output}
+
+     By this point it is noticeable that the FRP world that Echo builds only really has one form of input and one
+     form of output action: \emph{occur} and \emph{eval} respectively. Conceptually we think of both of these
+     actions happening instantly. For instance, when a Behaviour is sampled it will need to do some evaluation
+     and during that evaluation nothing in the FRP world should change. This suggests that the \emph{occur}
+     and \emph{eval} actions should both be atomic with respect to this world so an Event cannot occur during
+     a Behaviour evaluation and vice versa. 
+
+     This concept is implemented in Echo using a locking object for the FRP world. If a Behaviour is evaluated it
+     must first acquire this lock and the same goes for the Event \emph{occur} action. This implementation
+     also provides a very large performance gain: Event occurrence times and evaluation times now form one
+     monotonically increasing timed chain \footnote{We can actually model evaluation and occurrences of an Event as an 
+     Event!} of actions. This fact means that we only ever need to store one occurrence for each Event: if an Event occurs
+     at time \emph{t} it will not be evaluated until a time greater than or equal to \emph{t}. This allows
+     Events to only use a bounded level of memory. 
+
+     It could be argued that this implementation is problematic as there may be some lag between a real world
+     occurrence and it being processed by the FRP system in Echo. For instance, if a user clicks on a button
+     while some network Event is occurring the button click will have to wait to `occur' in the FRP system.
+     However, if these actions weren't atomic there would be the possibility of latency inside the FRP
+     system itself. Taking the example above, imagine the two real world occurrences are delivered on two
+     separate threads and that the button click arrives at time \emph{t} and the network occurrence
+     arrives later at time \emph{u}. In this
+     situation our FRP system's accuracy is at the mercy of thread scheduling as the button click
+     could be part of the way through the \emph{occur} action and then be scheduled out to allow the network
+     occurrence to happen. If these Events had been merged we would effectively skip a state:
+     we would never be able to observe the occurrence at \emph{t}. It can be seen here that this implementation
+     choice is required so we are able to deal properly with Event's generated from multiple sources. 
+     \footnote{It is also required if Behaviours are evaluated concurrently as thread scheduling could
+     allow a Behaviour to be evaluated at a time later than the present if an evaluating thread is
+     scheduled out for some time.}
   
     \section{Setup Phase}
       There was one further problem presented due the restriction on Behaviour evaluation and that was concerned with
@@ -215,7 +246,8 @@ beh.eval() = beh.at(now())
     after the \emph{setup} function has finished executing will cause an error.
     
     It should be noted that isolated FRP objects can still be instantiated after the setup phase. This is
-    to allow for the possibility Event[Behaviour[T]] or Event[Event[T]] objects.
+    to allow for the possibility Event[Behaviour[T]] or Event[Event[T]] objects to \emph{occur}
+    dynamically.
   
   \section{Constant Events}
     It useful to be able to define an Event that occurs only once. This is provided in Echo
@@ -233,44 +265,11 @@ val const = Event("Once")
 \begin{verbatim}
 val empty = Event()
 \end{verbatim}
-  
-  \section{Atomic Input \& Output}
-    
-     By this point it is noticeable that the FRP world that Echo builds only really has one form of input and one
-     form of output action: \emph{occur} and \emph{eval} respectively. Conceptually we think of both of these
-     actions happening instantly. For instance, when a Behaviour is sampled it will need to do some evaluation
-     and during that evaluation nothing in the FRP world should change. This suggests that the \emph{occur}
-     and \emph{eval} actions should both be atomic with respect to this world so an Event cannot occur during
-     a Behaviour evaluation and vice versa. 
-   
-     This concept is implemented in Echo using a locking object for the FRP world. If a Behaviour is evaluated it
-     must first acquire this lock and the same goes for the Event \emph{occur} action. This implementation
-     also provides a very large performance gain: Event occurrence times and evaluation times now form one
-     monotonically increasing timed chain \footnote{We can actually model evaluation and occurrences of an Event as an 
-     Event!} of actions. This fact means that we only ever need to store one occurrence for each Event: if an Event occurs
-     at time \emph{t} it will not be evaluated until a time greater than or equal to \emph{t}. This allows
-     Events to only use a bounded level of memory.
-   
-     It could be argued that this implementation is problematic as there may be some lag between a real world
-     occurrence and it being processed by the FRP system in Echo. For instance, if a user clicks on a button
-     while some network Event is occurring the button click will have to wait to `occur' in the FRP system.
-     However, if these actions weren't atomic there would be the possibility of latency inside the FRP
-     system itself. Taking the example above, imagine the two real world occurrences are delivered on two
-     separate threads and that the button click arrives at time \emph{t} and the network occurrence
-     arrives later at time \emph{u}. In this
-     situation our FRP system's accuracy is at the mercy of thread scheduling as the button click
-     could be part of the way through the \emph{occur} action and then be scheduled out to allow the network
-     occurrence to happen. If these Events had been merged we would effectively skip a state:
-     we would never observe the occurrence at \emph{t}. It can be seen here that this implementation
-     choice is required so we are able to deal properly with Event's generated from multiple sources. 
-     \footnote{It is also required if Behaviours are evaluated concurrently as thread scheduling could
-     allow a Behaviour to be evaluated at a time later than the present if an evaluating thread is
-     scheduled out for some time.}
      
   \section{Function Renaming}
     Although a small change it should also be noted that one of the functions originally defined
-    has be renamed for the Echo framework - \emph{snapshot} was renamed to \emph{sample}. This was done as
-    it was felt it added more clarity to the function name was more appropriate given its use.
+    has been renamed for the Echo framework - \emph{snapshot} was renamed to \emph{sample}. This was done as
+    it was felt it added more clarity to the function name and was more appropriate given its use.
     
   \section{Function Additions}
     When considering different applications of the framework and also in an attempt to
@@ -359,5 +358,5 @@ beh.at(t)
 
     Carrying out testing such as this was imperative to the project goals as it was very important to be able
     to verify that code did not only compile and run but that implementations matched the original denotational 
-    semantics. In other words developing Echo with TDD allowed for verification that the implementation
+    semantics. In other words, developing Echo with TDD allowed for verification that the implementation
     was correct throughout the development process.
