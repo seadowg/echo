@@ -1,4 +1,22 @@
 \chapter{Previous Implementations}
+  Since Fran was first announced there have been several further implementations of FRPs semantics. Here
+  we will explore a selection of these, focusing on work carried out in both Haskell and Scala.
+  
+  \section{Haskell}
+    Much of the FRP community could be described as a subset of the Haskell community due to FRP's
+    origins and sensibilities. It's not surprising that there have been several major implementations
+    of FRP in the language. Here we will explore on of the most prominent:
+    
+    \subsection{Reactive-Banana}
+      `Reactive-Banana' is a Haskell FRP framework created by Heinrich Apfelmus \cite{Apfelmus}. Reactive-banana
+      is directly based on the on the FRP defined in Functional Reactive Animation \cite{Elliott1997}. Apfelmus
+      implements continuous Behaviours and Events in terms of these original semantics and the framework
+      is quite popular. There has also been work into allowing Reactive-banana to integrate with event based
+      frameworks (such as GUI frameworks) which is probably seen as an advantage for many potential users.
+      
+      Apfelmus' framework does drop some functionality from FRP in the form of the \emph{switcher} function as
+      he argues that in some cases it requires storing the entire history of an Event (as discussed previously
+      in section 2).
 
   \section{Scala}
     As one might imagine, there has been previous work in implementing FRP in Scala. 
@@ -69,7 +87,25 @@ event.emit(())
       Interestingly, React also contains a notion of Signals, just as Reactive does, 
       however it doesn't claim that these are an implementation of Behaviours (although the word `continuous' is
       used loosely in their description). 
-
-  It can be seen from these examples that while many of the concepts from FRP are popular
-  in the Scala community there has been little attempt to implement FRP within Scala while honouring
-  the original denotational semantics.
+      
+\section{Comparison}
+  We can compare these frameworks with respect to the presence of various key features. These are Behaviours, Events, 
+  \emph{stepper} - discretely 
+  changing value and \emph{switcher} - continuous value that switches to other continuous values at discrete points in time.
+  
+  \begin{center}
+     \begin{tabular}{ | l | l | l | l | }
+       \hline
+        & Reactive-Banana & Reactive & React \\ \hline \hline
+       Behaviours & Yes & No & No \\ \hline
+       Events & Yes & Yes & Yes \\ \hline
+       \emph{stepper} & Yes & Yes & Yes \\ \hline
+       \emph{switcher} & No & No & No \\ \hline  
+       \hline
+     \end{tabular}
+   \end{center}
+   
+   It can be seen that purely continuous Behaviours are often not implemented the \emph{stepper} version
+   of them often is (it can be seen that this is very useful in Appendix A and B). In this report it will
+   be shown that it is possible to implement all of these features in Scala without having to use unbounded levels
+   of memory for Events.
