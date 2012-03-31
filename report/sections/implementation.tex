@@ -78,7 +78,7 @@ val switch = new Switcher(iniBeh, behEvent)
 \end{verbatim}
 
   \section{Implicit Lifting of Constants}
-    As mentioned earlier (in section 3), one of the most powerful features of Scala is it's ability to convert between
+    As mentioned earlier, one of the most powerful features of Scala is it's ability to convert between
     types at run time. This is facilitated by the \emph{implicit} key word allowing a function to be defined
     that is automatically executed when a corresponding type mismatch occurs. This will be used in Echo to allow 
     static values to be converted to Behaviours \emph{implicitly}.. This is implemented in the following way:  
@@ -98,6 +98,11 @@ val switcher = new Switcher(false, eventBeh)
 
     It can immediately be seen that this allows the programmer to switch between static and more complex
     Behaviours in a very naturalistic manor.
+    
+    Another advantage of specifying constant Behaviours this way is we can take advantage of the fact that
+    we know the Behaviours value will not need to be recalculated. We do this by returning a Behaviour
+    that simply stores the static value rather than a function to compute it. This means that whenever the Behaviour
+    is evaluated it simply returns a value rather than executing a function.
     
   \section{Extendable Events}
     FRP Events provide a very useful abstraction for external stimuli such as I/O and user input. Of course
