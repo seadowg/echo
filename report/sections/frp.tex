@@ -10,7 +10,7 @@
     into implementation and modification of FRP. Hudak has mainly focused on experimenting with various
     implementation methods and a modification to the original semantics categorised as ``Arrow FRP''. Elliot's
     work has dealt with FRP on a more conceptual level. This work culminated in a further significant paper
-    ``Push-Pull FRP'' \cite{Elliott2009}. This attempted to clarify much of the semantics in a way that allowed for efficient 
+    ``Push-Pull FRP'' \cite{Elliott2009}. In this paper Elliott attempted to clarify much of the semantics in a way that encouraged more efficient 
     and
     structured implementations. This report will not use any of the new concepts in ``Push-Pull'' for definitions
     of FRP types and operation but inspiration was taken from it for many aspects of the implementation of Echo.
@@ -21,8 +21,8 @@
     flavours of FRP have emerged over the years and the term `classic' is often used to describe
     the FRP defined by, and directly descended from, Fran.} flavour of FRP explored in this report will be defined.
     
-    Within this section we will explore a selection of the basic denotational semantics that Elliott
-    and Hudak originally laid down and that we hope to implement in Scala. The semantic definitions will
+    Within this section we will explore a selection of the basic denotational semantics defined in Fran
+    that we hope to implement in Scala. The semantic definitions will
     be presented using Scala syntax so as to provide continuity throughout the report.
   
     \subsection{Types}
@@ -39,9 +39,8 @@ type Time = Double
         However, there are some interesting properties of Time that we can utilise in FRP. For instance,
         conceptually there is no minimum Double value but with Time we can say that a given Time is `at least'
         some value. For instance, imagine we are recording the times at which a person claps: even though we
-        may not know the time of the next clap we can always say that it is greater than `now'. This
-        general assumption will be used internally within Echo. This idea is explored in great detail
-        within two of Conal Elliott's papers \cite{Elliott1997}, \cite{Elliott2009} but will not feature
+        may not know the time of the next clap we can always say that it is greater than `now'. This idea is explored 
+        in great detail within two of Conal Elliott's papers \cite{Elliott1997}, \cite{Elliott2009} but will not feature
         heavily in this report for the sake of simplicity.
    
       \subsubsection{Behaviour}
@@ -52,14 +51,14 @@ type Time = Double
 Behaviour[T] : Time => T
 \end{verbatim}
         
-        We can access some Behaviour's value at some time \emph{t} with the \emph{at} function:
+        We can access a Behaviour's value at some time \emph{t} with the \emph{at} function:
 
 \begin{verbatim}
 at[T](t  : Time, beh : Behaviour[T]) : T
 \end{verbatim}
       
       \subsubsection{Event}
-        Events can be thought of as an (infinite) stream of Time-value pairs:
+        Events can be thought of as an infinite stream of Time-value pairs:
 
 \begin{verbatim}
 Event[T] : Stream[(Time, T)]
@@ -125,7 +124,7 @@ merge(ev1, ev2).occs = mergeStr(occs(ev1), occs(ev2))
       present time). Again, this concept is discussed at length by Conal Elliott \cite{Elliott2009}.
        
       Elliott and Hudak's paper also defined a series of transformer functions for Events. Here we define a
-     `map' function for allowing the same functionality:
+     \emph{map} function for allowing the same functionality:
 
 \begin{verbatim}
 map[T, U](ev : Event[T], func : (Time, T) => U)  : Event[U]
@@ -143,11 +142,7 @@ occs(join(ev)) = occs(map(ev, e => delayOccs(e._1, e._2))).foldLeft(emptEv, (e, 
 \end{verbatim}        
 
       One caveat to this function is that any occurrences of Events that occur in \emph{ev} are delayed
-      so their occurrence times are at least the time that their parent Event occurred. It could be argued that this should 
-      not be the case but after consideration it was decided that it did not make sense for an inner Event's occurrences to 
-      occur before the Event itself
-      in most use cases. Consider this: if an inner Event is a user logging onto a chat room and its occurrences are 
-      messages then how can a message occur before the user logs in?
+      so their occurrence times are at least the time that their parent Event occurred.
         
       \subsubsection{Reactivity}
         One of the most powerful aspects of FRP is the ability to use Events to punctuate or `switch' Behaviours.
@@ -205,8 +200,8 @@ val event2 = dangerMap(event1, (t, v) => (t - 1, v))
       be careful to avoid allowing situations like these to happen when implementing FRP.
       
     \subsection{Events are Infinite}  
-      It is also important to highlight that an Event's stream is \emph{infinite}. This means
-      that streams must be evaluated lazily: we can't merge two infinite streams when we actually
+      It is also important to highlight that an Event is conceptually \emph{infinite}. This means
+      that they must be evaluated lazily: we can't merge two infinite streams when we actually
       call \emph{merge} as it would never finish! This also means that there are some things we
       can't express for an Event such as its `length' or its `last' element.
     
@@ -226,15 +221,15 @@ pos.at(5)
       Now, suppose the time when this code executes is \emph{4}. The first problem we can see here
       is that we are going to be evaluating \emph{pos} at a time greater than `now': we don't
       actually know if the mouse will move in the future. To deal with this we could delay the return
-      result until we know the answer, raise the error or modify the original semantics. None of these solutions are
+      result until we know the answer, raise an error or modify the original semantics. None of these solutions are
       particularly useful however.
       
       What about the past? Evaluating \emph{pos} at times before `now' certainly makes sense. However, if arbitrary
       access is allowed to the past in this way then we would have to store every occurrence
       of an Event. It may be the case that this is how Events must be implemented but it does
-      mean that any FRP program would use an increasing amount of memory as its run time increased (
-      not a desirable property of any piece of code). This will also result in very large Event data sets which
-      may be impossible to traverse quickly for performing operations such as \emph{at}.
+      mean that any FRP program would use an increasing amount of memory as its run time increased (not a 
+      desirable property of any piece of code). This will also result in very large Event data sets which
+      may be impossible to traverse quickly for performing operations such as \emph{at} in real-time.
       
       These examples shows that implementing FRP without some restriction might either involve modifying the
       semantics or sacrificing efficiency.
