@@ -4,6 +4,31 @@
   several design and implementation choices were made for Echo. Choices were also made
   to provide to provide programmers with simpler experiences and to hopefully allow Echo to be
   as powerful as possible.
+  
+  \section{Scala}
+    Scala is a multi-paradigm programming language developed to run on the Java Virtual Machine \cite{Odersky2004}. Scala 
+    programs are
+    generally structured in an object oriented programming style like Java but it also incorporates many features of
+    functional languages such as closures, high order functions, lazy evaluation, immutable state and currying. These 
+    features 
+    aid
+    implementation of FRP concepts as closures will allow for Behaviour definition. Also, functions such as \emph{map} on
+    Behaviours and Events to be expressed in a more natural and succinct form in a functional language. It is
+    important to note that although Scala is thought of as `functional' its functions are not `pure'. This means
+    that object functions and closures can cause side effects and can be affected by external states.
+
+    Scala also possesses an advanced, powerful and feature rich static type system. This provides large
+    advantages when implementing FRP. Firstly, Scala supports generic classes and it can be quite easily seen
+    that both Behaviours and Events will rely on this feature for type safety. Scala additionally provides
+    a rather unique type conversion functionality that allows types to be converted on the fly. This provides
+    incredibly expressive and powerful ways to embed FRP into Scala and will be explored later.
+    
+    One slight problem with implementing FRP in Scala is that, unlike Haskell, it is an `impure'
+    language. In terms of functional programming, `purity' refers to a languages ability to write functions
+    thats results are affected by some external estate or in turn effect some external state. For instance,
+    this means that a function that defines a Behaviour could be impure and could therefore cause side effects
+    whenever the Behaviour was evaluated. There has been some work into pure function verification in Scala but it has not materialised into an  
+    implementation \cite{Nordenberg}. Due to this, we will only deal with Behaviours defined using pure Behaviours in Echo.
 
   \section{Flat Time}
     Time in Echo is implemented as a flat value type defined exactly as it is in 
