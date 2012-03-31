@@ -219,10 +219,24 @@ val empty = Event()
      monotonically increasing timed chain \footnote{We can actually model evaluation and occurrences of an Event as an 
      Event!} of actions. This fact means that we only ever need to store one occurrence for each Event: if an Event occurs
      at time \emph{t} it will not be evaluated until a time greater than or equal to \emph{t}. This allows
-     Events to not only be limited to using a bounded level of memory.
+     Events to only use a bounded level of memory.
    
-     An additional advantage of making these actions atomic is that Behaviour evaluation is thread safe.
-  
+     It could be argued that this implementation is problematic as there may be some lag between a real world
+     occurrence and it being processed by the FRP system in Echo. For instance, if a user clicks on a button
+     while some network Event is occurring the button click will have to wait to `occur' in the FRP system.
+     However, if these actions weren't atomic there would be the possibility of latency inside the FRP
+     system itself. Taking the example above, imagine the two real world occurrences are delivered on two
+     separate threads and that the button click arrives at time \emph{t} and the network occurrence
+     arrives later at time \emph{u}. In this
+     situation our FRP system's accuracy is at the mercy of thread scheduling as the button click
+     could be part of the way through the \emph{occur} action and then be scheduled out to allow the network
+     occurrence to happen. If these Events had been merged we would effectively skip a state:
+     we would never observe the occurrence at \emph{t}. It can be seen here that this implementation
+     choice is required so we are able to deal properly with Event's generated from multiple sources. 
+     \footnote{It is also required if Behaviours are evaluated concurrently as thread scheduling could
+     allow a Behaviour to be evaluated at a time later than the present if an evaluating thread is
+     scheduled out for some time.}
+     
   \section{Function Renaming}
     Although a small change it should also be noted that one of the functions originally defined
     has be renamed for the Echo framework - \emph{snapshot} was renamed to \emph{sample}. This was done as
