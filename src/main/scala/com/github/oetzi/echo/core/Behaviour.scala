@@ -20,8 +20,8 @@ sealed class Behaviour[T](private val rule: Time => T) {
     }
   }
 
-  /** Returns a Event[T] that occurs every time sourceEvent occurs
-    * with the value of the Behaviour at that time.
+  /** Returns a Event[T] that occurs every time the given
+    * Event occurs with the value of the Behaviour at that time.
    */
   def sample[A](sourceEvent: Event[A]): Event[T] = {
     frp {
@@ -68,7 +68,7 @@ sealed class Behaviour[T](private val rule: Time => T) {
         time =>
           val occ = event.top()
 
-          if (occ == None || occ.get.time < after) {
+          if (occ == None || occ.get.time < time) {
             this.at(time)
           }
 
@@ -103,7 +103,7 @@ sealed class Behaviour[T](private val rule: Time => T) {
     }
   }
 
-  /** Returns a Behaviour that transorms the callee's
+  /** Returns a Behaviour that transforms the callee's
     * value with the passed function.
    */
   def map[B](func: T => B): Behaviour[B] = {
@@ -112,7 +112,7 @@ sealed class Behaviour[T](private val rule: Time => T) {
     }
   }
   
-  /** Returns a Behaviour that transorms the callee's
+  /** Returns a Behaviour that transforms the callee's
     * and passed Behavior's value with the passed function.
    */
   def map2[U, V](behaviour: Behaviour[U])(func: (T, U) => V): Behaviour[V] = {
@@ -121,7 +121,7 @@ sealed class Behaviour[T](private val rule: Time => T) {
     }
   }
 
-  /** Returns a Behaviour that transorms the callee's
+  /** Returns a Behaviour that transforms the callee's
     * and passed Behaviors' value with the passed function.
    */
   def map3[U, V, W](beh1: Behaviour[U], beh2: Behaviour[V])(func: (T, U, V) => W): Behaviour[W] = {
@@ -190,11 +190,7 @@ object Stepper {
   * so it only returns the value rather than evaluating it needlessly with respect
   * to time.
  */
-protected[echo] class Constant[T](val value: T) extends Behaviour[T](time => value) {
-  override def eval(): T = {
-    value
-  }
-
+protected[echo] class Constant[T](private val value: T) extends Behaviour[T](time => value) {
   override private[core] def at(time: Time): T = {
     value
   }
