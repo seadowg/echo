@@ -21,6 +21,13 @@
     
     As mentioned in section 4 Behaviour value caching is also used to prevent redundant reevaluation of Behaviours
     and this further leads to a more optimised implementation of FRP.
+    
+    There is a minor inefficiency due to the choice to make the \emph{occur} and \emph{eval} objects atomic for
+    with respect to all the FRP objects for an application. This means that even if two Behaviours are in no way
+    related they cannot be read concurrently. It can be seen that in many application the FRP objects will
+    form disjoint groups of dependent Behaviours and Events. An optimisation to the framework could be to
+    only lock access during \emph{occur} and \emph{eval} executions on a group by group basis rather than sharing
+    a lock between all FRP object in an application. This would also allow unrelated Events to occur simultaneously.
   
   \section{Demo Applications}
     So as to gain experience with using Echo and also for the purposes of evaluation, demonstration
