@@ -1,10 +1,11 @@
 \chapter{Evaluation}    
   \section{Limitations}
-    There are of course several limitations in Echo. Firstly, we are unable to evaluate Behaviours at any time.
+    There are of course several limitations in Echo. Firstly, we are unable to evaluate Behaviours at any time
+    we choose.
     Although this does not limit much of the development of real-time, interactive applications there is functionality
     lost. For instance it would be nice to be able to chart a Behaviour's value between certain bounds such as
     the trajectory of an object or a predetermined volume chart. This functionality can be provided with simple
-    Time input functions but Behaviours could have provided a nice abstraction for these.
+    Time =$>$ T functions but Behaviours could have provided a nice abstraction for these.
     
     The ability to transform Behaviours into different time frames is also lost due to the restriction on Behaviour
     evaluation. However, many of the use cases of this functionality can still be accomplished using the
@@ -32,7 +33,7 @@
     of a `Song' component. For this component playback is controlled by a Behaviour[Boolean] of whether the audio
     should be playing or not and the volume is dictated by a Behaviour[Int] that represents the current percentage
     volume. Once the abstraction was in place programming the FRP logic for the application using the 
-    graphics framework was very simple and, quite importantly, took very little time. It can be seen from
+    UI framework was very simple and, quite importantly, took very little time. It can be seen from
     the development of this application that abstractions over input and outputs would have to frequently be
     created to produce non-trivial FRP applications. However, any abstractions built would hopefully be
     reusable in nature due to FRPs high level approach to control. These findings also verify that it
