@@ -2,6 +2,8 @@
   This section will explore various aspects of the implementation and choices made during the development
   of Echo. 
   
+  % TODO: Note on semantic definitions in this section (original at, occs etc)
+  
   \section{Scala}
     Scala is a multi-paradigm programming language developed to run on the Java Virtual Machine \cite{Odersky2004}. Scala 
     programs are
@@ -73,6 +75,8 @@ val merged = event1.merge(event2)
 \begin{verbatim}
 val switch = new Switcher(iniBeh, behEvent)
 \end{verbatim}
+
+  % TODO: Note on Stepper and note `apply' style
 
   \section{Implicit Lifting of Constants}
     As mentioned earlier, one of the most powerful features of Scala is it's ability to implicitly convert between
@@ -162,7 +166,7 @@ class Five extends EventSource[Int] {
 
 \begin{verbatim}
 eval() : T
-beh.eval() = beh.at(now())
+beh.eval() = at(beh, now())
 \end{verbatim}  
 
     This restriction may seem like a significant loss of expressivity. However as we wish to be able to treat
@@ -218,9 +222,9 @@ beh.eval() = beh.at(now())
       implementing the \emph{snapshot} operation. For instance, imagine we execute the following code
       at time \emph{t}:
 
-  \begin{verbatim}
-  val ev = beh.snapshot(someEvent)
-  \end{verbatim}
+\begin{verbatim}
+val ev = beh.snapshot(someEvent)
+\end{verbatim}
 
       This is fine if \emph{someEvent} has not occurred at \emph{t}. If it has occurred however at some time
       before \emph{t} then in whatever way this is implemented we are forced to evaluate \emph{beh}
@@ -233,13 +237,13 @@ beh.eval() = beh.at(now())
       object it was decided that a user would simply be able to extend a class with this object and then
       write their FRP code in a \emph{setup} function:
 
-  \begin{verbatim}
-  object App extends EchoApp {
-    def setup(args : Array[String]) {
-      // FRP code here
-    }
+\begin{verbatim}
+object App extends EchoApp {
+  def setup(args : Array[String]) {
+    // FRP code here
   }
-  \end{verbatim}
+}
+\end{verbatim}
   
     This allows the FRP world to be setup in one distinct stage. It should be noted that
     any functions \emph{setup} calls would also be able to run FRP code. Only FRP code that runs
@@ -286,10 +290,10 @@ val empty = Event()
 
 \begin{verbatim}
 map[U](func : T => U) : Behaviour[U]
-beh.map(func).at(t) = func(beh.at(t))
+at(beh.map(func), t) = func(at(beh, t))
 
 map2[U, V](beh1 : U)(func : (T, U) => V) : Behaviour[V]
-beh.map2(beh1)(func).at(t) = func(beh.at(t), beh1.at(t))
+at(beh.map2(beh1)(func), t) = func(at(beh, t), at(beh1, t))
 \end{verbatim}        
 
     These functions allow Behaviours to be transformed and combined using functions
@@ -311,7 +315,7 @@ toggle(ev : Event[T], beh1 : Behaviour[T]) : Behaviour[T]
 
 \begin{verbatim}
 until(ev : Event[T], beh1 : Behaviour[T]) : Behaviour[T]
-beh.until(ev, beh1).at(t) = new Switcher(beh, event.map((t,v) => beh1)).at(t)
+at(beh.until(ev, beh1), t) = at(new Switcher(beh, event.map((t,v) => beh1)), t)
 \end{verbatim}        
     
     It is also useful to be able to to filter Events to produce a new one that only
@@ -320,15 +324,15 @@ beh.until(ev, beh1).at(t) = new Switcher(beh, event.map((t,v) => beh1)).at(t)
 
 \begin{verbatim}
 filter(predicate : T => Boolean) : Event[T]
-event.filter(predFunc).occs = event.occs.filter(predFunc)
+occs(event.filter(predFunc)) = occs(event).filter(predFunc)
 \end{verbatim}  
 
   \section{Behaviour Caching}
     Behaviours possess quite a major inefficiency in the form of redundant evaluation:
 
 \begin{verbatim}
-beh.at(t)
-beh.at(t)
+at(beh, t)
+at(beh, t)
 \end{verbatim}  
 
     Here \emph{beh} is evaluated at \emph{t} twice. It can be seen that we could simply cache the last

@@ -54,7 +54,7 @@ Behaviour[T] : Time => T
         We can access a Behaviour's value at some time \emph{t} with the \emph{at} function:
 
 \begin{verbatim}
-at[T](t  : Time, beh : Behaviour[T]) : T
+at[T](beh : Behaviour[T], t  : Time) : T
 \end{verbatim}
       
       \subsubsection{Event}
@@ -152,7 +152,7 @@ occs(join(ev)) = occs(map(ev, e => delayOccs(e._1, e._2))).foldLeft(emptEv, (e, 
 \begin{verbatim}
 switcher[T](ini : Behaviour[T], ev : Event[Behaviour[T]])
 at(switcher(ini, ev), t) = at(occs(ev).filter(
-                              (ti, v) => ti <= t).last), t)
+                              (ti, v) => ti <= t).last._2), t)
 \end{verbatim}
 
         Another useful interaction between Behaviours and Events is to be able to sample
@@ -161,7 +161,7 @@ at(switcher(ini, ev), t) = at(occs(ev).filter(
 
 \begin{verbatim}
 snapshot[T, U](beh : Behaviour[T], ev : Event[U]) : Event[(T, U)]
-t = occs(ev)(x).time
+t = occs(ev)(x)._1
 occs(snapshot(beh, ev)(x)) = (t, at(beh, t))
 \end{verbatim} 
   
@@ -214,8 +214,8 @@ val event2 = dangerMap(event1, (t, v) => (t - 1, v))
 
 \begin{verbatim}
 val pos = switcher(lift0((0, 0)), map(mousePos, (t, pos) => lift0(t, pos)))
-pos.at(2)
-pos.at(5)
+at(pos, 2)
+at(pos, 5)
 \end{verbatim}    
 
       Now, suppose the time when this code executes is \emph{4}. The first problem we can see here
