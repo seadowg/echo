@@ -317,7 +317,8 @@ toggle(ev : Event[T], beh1 : Behaviour[T]) : Behaviour[T]
 
 \begin{verbatim}
 until(ev : Event[T], beh1 : Behaviour[T]) : Behaviour[T]
-at(beh.until(ev, beh1), t) = at(new Switcher(beh, event.map((t,v) => beh1)), t)
+at(beh.until(ev, beh1), t) = at(new Switcher(beh, 
+  event.map((t,v) => beh1)), t)
 \end{verbatim}        
     
     It is also useful to be able to to filter Events to produce a new one that only

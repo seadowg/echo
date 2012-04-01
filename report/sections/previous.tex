@@ -22,7 +22,7 @@ type Reactive[T] = Stream[(Time, T)]
 
       We can think of Behaviours in a similar manner as a Behaviour is
       a Stream of Time =$>$ T functions:
- 
+      
 \begin{verbatim}
 type Behaviour[T] = Reactive[Time => T]
 \end{verbatim}      
@@ -132,7 +132,3 @@ event.emit(())
    of them often is (it can be seen that this version is very useful in Appendix A and B). In this report it will
    be shown that it is possible to implement all of these features in Scala without having to use unbounded levels
    of memory for Events.
-   
-   There are also some general observations over all the frameworks. None of the frameworks possess an
-   implementation of either the \emph{timeTransform} function or the \emph{predicate} function defined 
-   in the Fran semantics. We will see later that this is also the case with Echo. 

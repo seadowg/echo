@@ -96,7 +96,8 @@ at(lift0(v), t) = v
        slowing down or speeding up a Behaviour. We define this function like so:
 
 \begin{verbatim}
-timeTransform[T](beh : Behaviour[T], time : Behaviour[Time]) : Behaviour[T]
+timeTransform[T](beh : Behaviour[T], 
+  time : Behaviour[Time]) : Behaviour[T]
 at(timeTransform(beh, timeBeh), t) = at(beh, at(timeBeh, t))
 \end{verbatim}
         
@@ -136,9 +137,13 @@ occs(map(ev, func)) = occs(event).map(func)
 \begin{verbatim}
 delayOccs[T](t : Time, ev : Event[T])
 occs(delayOccs(t, ev)) = occs(ev).map(o => (max(o._1, t), o._2))
+\end{verbatim}
 
+\begin{verbatim}
 join[T](ev : Event[Event[T]])  : Event[T]
-occs(join(ev)) = occs(map(ev, e => delayOccs(e._1, e._2))).foldLeft(emptEv, (e, o) => merge(e, o))
+occs(join(ev)) = occs(map(ev, 
+  e => delayOccs(e._1, e._2))).foldLeft(emptEv,
+    (e, o) => merge(e, o))
 \end{verbatim}        
 
       One caveat to this function is that any occurrences of Events that occur in \emph{ev} are delayed
@@ -189,7 +194,8 @@ occs(snapshot(beh, ev)(x)) = (t, at(beh, t))
       First we define the new function:
       
 \begin{verbatim}
-dangerMap[T, U](ev : Event[T], func : (Time, T) => (Time, U))  : Event[U]
+dangerMap[T, U](ev : Event[T], 
+  func : (Time, T) => (Time, U))  : Event[U]
 occs(map(ev, func)) = occs(event).map(func)
 \end{verbatim}
 
@@ -218,7 +224,8 @@ val event2 = dangerMap(event1, (t, v) => (t - 1, v))
       Event[(Int, Int)] \emph{mousePos} that occurs every time the user's mouse moves with the new position:
 
 \begin{verbatim}
-val pos = switcher(lift0((0, 0)), map(mousePos, (t, pos) => lift0(t, pos)))
+val pos = switcher(lift0((0, 0)), 
+  map(mousePos, (t, pos) => lift0(t, pos)))
 at(pos, 2)
 at(pos, 5)
 \end{verbatim}    
