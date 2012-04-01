@@ -46,10 +46,12 @@ type Behaviour[T] = Reactive[Time => T]
       Reactive-Banana uses a form of Behaviour equivalent to the \emph{stepper}
       (also similar to the Reactive type discussed above) operation seen in section 2. This simplification of Behaviours allows 
       Apfelmus to use a push
-      based implementation where Behaviours don't need polling as changes in their values are exposed
-      by Events occurring. While this may be more efficient it excludes the ability to create truly 
+      based implementation where Behaviours don't need polling to keep output components (UI etc) up to date as changes in their values are exposed
+      by Events occurring. While this may be more efficient \footnote{The fact that Behaviours must polled is not really an inefficiency as it is required due to their continuous nature. } it excludes the ability to create truly 
       continuous Behaviours and therefore Reactive-Banana does not really provide a true implementation
-      of Behaviours.
+      of Behaviours. This seems like a strange decision. Optimising `constant' Behaviours would be sensible
+      but removing continuous Behaviours removes the ability to create abstractions that programmers
+      might be willing to except a performance drop for.
       
       Apfelmus' framework also drops some functionality from FRP in the form of the \emph{switcher} function as
       he argues that in some cases it requires storing the entire history of an Event (as discussed previously
@@ -118,4 +120,4 @@ event.emit(())
    It can be seen that purely continuous Behaviours are often not implemented the \emph{stepper} version
    of them often is (it can be seen that this is very useful in Appendix A and B). In this report it will
    be shown that it is possible to implement all of these features in Scala without having to use unbounded levels
-   of memory for Events.
+   of memory for Events. 
