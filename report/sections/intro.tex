@@ -1,16 +1,16 @@
 \chapter{Introduction}
 
   Dealing with animations, user interactions and I/O are often thought of as monotonous imperative tasks
-  in programming. Even in higher level languages programmers to use imperative
+  in programming. Even in higher level languages programmers often use imperative
   styles within more declarative code. This is somewhat counter intuitive as often many of these tasks are possible to generalise: adding
-  some action to a button click, looping through some animation etc. Functional Reactive Programming
+  some action to a button click or looping through some animation for instance. Functional Reactive Programming
   is a programming paradigm that aims to provide programmers with the tools to create high level,
   declarative abstractions of these kinds of tasks. This report is concerned with a project to
   implement Functional Reactive Programming as a framework dubbed `Echo' \cite{Stott} for the multi-paradigm programming language
   Scala.
 
-  For various reasons, implementations of FRP have had various problems in the past: many have had to sacrifice the original semantics or functionality in some way to avoid many have had problems
-  memory leaks (often referred to as ``time leaks''). One of the goals
+  For various reasons, implementations of FRP have had problems in the past: many have had to sacrifice the original semantics or functionality in some way to avoid
+  memory leaks (often referred to as ``time leaks'') or other inefficiencies. One of the goals
   of this project was to try and implement FRP in a way that allowed for a controlled usage of memory while also
   adhering the original denotational semantics. 
   
