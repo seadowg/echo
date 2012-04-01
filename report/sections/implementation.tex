@@ -102,7 +102,8 @@ val switcher = new Switcher(false, eventBeh)
     Another advantage of specifying constant Behaviours this way is we can take advantage of the fact that
     we know the Behaviours value will not need to be recalculated. We do this by returning a Behaviour
     that simply stores the static value rather than a function to compute it. This means that whenever the Behaviour
-    is evaluated it simply returns a value rather than executing a function.
+    is evaluated it simply returns a value rather than executing a function. However these optimised Behaviours
+    are externally identical to normal Behaviours so no functionality is lost.
     
   \section{Extendable Events}
     FRP Events provide a very useful abstraction for external stimuli such as I/O and user input. Of course

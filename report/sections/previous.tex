@@ -8,13 +8,35 @@
     of FRP in the language. Here we will explore two of the most prominent.
     
     \subsection{Reactive}
-      % Developed by Conal Elliott as a research project
-      % Subject of the paper Push-pull
-      % Motivated by inefficiency in having to poll Behaviours
-      % Refines and optimises semantics with underlying Future and Reactive types (without altering Behaviour/Event)
-      % Implementation has all features but is reportedly buggy
-      % Doesn't remove polling problem as Behaviours still exist
+      Reactive was developed as a research project by Conal Elliott and was the feature
+      of the paper ``Push-Pull Functional Reactive Programming'' \cite{Elliott2009}. As mentioned
+      in section 2 this paper dealt with clarifying and restructuring the Behaviour and Events
+      to promote more efficient implementations without altering the overall semantic model.
+      
+      Reactive introduces a new type that can be used to simplify what he referred to as
+      `reactive' values (such as lifted static values and \emph{stepper} Behaviours):
     
+\begin{verbatim}
+type Reactive[T] = Stream[(Time, T)]
+\end{verbatim}
+
+      We can think of Behaviours in a similar manner as a Behaviour is
+      a Stream of Time =$>$ T functions:
+ 
+\begin{verbatim}
+type Behaviour[T] = Reactive[Time => T]
+\end{verbatim}      
+
+      In other words a Behaviour is simply a stream of `phases' that exist between discrete
+      points in time (think of the \emph{switcher} operation in section 2). Of course, we
+      still think of a Behaviour's value at a sample time as the result of evaluating a
+      Time =$>$ T function but this representation
+      does provide a clearer definition of Behaviours used reactively with Events.
+      
+      As one might expect from a framework created by Elliott, Reactive has all the other major features
+      of Fran: Events and \emph{switcher} etc. However, Reactive was mainly intended as an experiment
+      and as such hasn't been utilised in many cases and is reportedly not altogether stable.
+  
     \subsection{Reactive-Banana}
       `Reactive-Banana' is a Haskell FRP framework created by Heinrich Apfelmus \cite{Apfelmus}. Reactive-Banana
       is directly based on the on the FRP defined in Functional Reactive Animation \cite{Elliott1997}. Apfelmus
@@ -84,7 +106,7 @@ event.emit(())
   \begin{center}
      \begin{tabular}{ | l | l | l | l | l | }
        \hline
-        & Reactive & Reactive-Banana & Reactive & React \\ \hline \hline
+        & Reactive (Haskell) & Reactive-Banana & Reactive (Scala) & React \\ \hline \hline
        Behaviours & Yes & No & No & No \\ \hline
        Events & Yes & Yes & Yes & Yes \\ \hline
        \emph{stepper} & Yes & Yes & Yes & Yes \\ \hline
