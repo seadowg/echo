@@ -1,8 +1,7 @@
 \chapter{Implementation}
   This section will explore various aspects of the implementation and choices made during the development
-  of Echo. 
-  
-  % TODO: Note on semantic definitions in this section (original at, occs etc)
+  of Echo. Any functions or concepts introduced or modified in this section will be expressed in terms
+  of the Fran semantics specified in section 2 where possible.
   
   \section{Scala}
     Scala is a multi-paradigm programming language developed to run on the Java Virtual Machine \cite{Odersky2004}. Scala 
@@ -76,7 +75,7 @@ val merged = event1.merge(event2)
 val switch = new Switcher(iniBeh, behEvent)
 \end{verbatim}
 
-  % TODO: Note on Stepper and note `apply' style
+  We also define a type for the \emph{stepper} concept detailed in section 3. 
 
   \section{Implicit Lifting of Constants}
     As mentioned earlier, one of the most powerful features of Scala is it's ability to implicitly convert between
