@@ -174,7 +174,9 @@ beh.eval() = at(beh, now())
     them: this would ideally be carried out by abstractions for graphics or other kinds of output. For instance
     if we wanted to set some colour in a user interface equal to a Behaviour then explicitly evaluating the Behaviour
     periodically and setting the colour using a static value would defeat the point of using FRP. We will see in later
-    discussion that we can easily create abstractions to hide this type of logic.
+    discussion that we can easily create abstractions to hide this type of logic. Additionally, this
+    choice to not expose Behaviour evaluation to the programmer is also seen in the frameworks
+    discussed in section 3.
     
     It should also be noted that restricting evaluation times for Behaviours forces us
     to remove the \emph{timeTransform} operation for Behaviours (as this allows programmers to explicitly

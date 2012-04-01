@@ -58,9 +58,10 @@ type Behaviour[T] = Reactive[Time => T]
       in section 2).
       
     It should be noted that both Reactive and Reactive-banana do not expose an \emph{at} or \emph{occs} function
-    and treat Behaviours and Events as values. They also both do not retain Event occurrences infinitely: only the last
-    occurrence at any point in time is stored. Similar decisions are made in the implementation of Echo
-    and the consequences of this will be discussed later.
+    and treat Behaviours and Events as real-time changing values (with respect to the current time). They also both do not 
+    retain Event 
+    occurrences infinitely: only the last occurrence at any point in time is stored. Similar decisions are made in the 
+    implementation of Echo and the consequences and advantages of these will be discussed later.
 
   \section{Scala}
     As one might imagine, there has also been previous work in implementing FRP in Scala. 
