@@ -35,7 +35,7 @@ type Behaviour[T] = Reactive[Time => T]
       
       As one might expect from a framework created by Elliott, Reactive has all the other major features
       of Fran: Events and \emph{switcher} etc. However, Reactive was mainly intended as an experiment
-      and as such hasn't been utilised in many cases and is reportedly not altogether stable.
+      and as such hasn't been utilised in many cases.
   
     \subsection{Reactive-Banana}
       `Reactive-Banana' is a Haskell FRP framework created by Heinrich Apfelmus \cite{Apfelmus}. Reactive-Banana
@@ -44,17 +44,20 @@ type Behaviour[T] = Reactive[Time => T]
       Behaviours somewhat. 
       
       Reactive-Banana uses a form of Behaviour equivalent to the \emph{stepper}
-      (also similar to the Reactive type discussed above) operation seen in section 2. This simplification of Behaviours allows 
+      (also similar to the Reactive type discussed above) operation seen in section 2. This simplification of Behaviours 
+      allows 
       Apfelmus to use a push
-      based implementation where Behaviours don't need polling to keep output components (UI etc) up to date as changes in their values are exposed
-      by Events occurring. While this may be more efficient \footnote{The fact that Behaviours must polled is not really an inefficiency as it is required due to their continuous nature. } it excludes the ability to create truly 
+      based implementation where Behaviours don't need polling to keep output components (UI etc) up to date as changes in 
+      their values are exposed
+      by Events occurring. While this may be more efficient \footnote{The fact that Behaviours must polled is not really an 
+      inefficiency as it is required due to their continuous nature. } it excludes the ability to create truly 
       continuous Behaviours and therefore Reactive-Banana does not really provide a true implementation
-      of Behaviours. This seems like a strange decision. Optimising `constant' Behaviours is sensible
+      of FRP. This seems like a strange decision. Optimising `constant' Behaviours is sensible
       but removing continuous Behaviours entirely removes the ability to create abstractions that may present
       an acceptable loss in performance to the programmer.
       
       Apfelmus' framework also drops some functionality from FRP in the form of the \emph{switcher} function as
-      he argues that in some cases it requires storing the entire history of an Event (as discussed previously
+      he argues that in some cases it requires storing the entire history of an Event \cite{Apfelmus2011} (as discussed previously
       in section 2).
       
     It should be noted that both Reactive and Reactive-banana do not expose an \emph{at} or \emph{occs} function
