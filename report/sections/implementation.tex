@@ -7,19 +7,13 @@
     Scala is a multi-paradigm programming language developed to run on the Java Virtual Machine \cite{Odersky2004}. Scala 
     programs are
     generally structured in an object oriented programming style like Java but it also incorporates many features of
-    functional languages such as closures, high order functions, lazy evaluation, immutable state and currying. These 
-    features 
-    aid
-    implementation of FRP concepts as closures will allow for Behaviour definition. Also, functions such as \emph{map} on
-    Behaviours and Events to be expressed in a more natural and succinct form in a functional language. It is
-    important to note that although Scala is thought of as `functional' its functions are not `pure'. This means
-    that object functions and closures can cause side effects and can be affected by external states.
+    functional languages such as closures, high order functions, lazy evaluation, immutable state and currying.
 
     Scala also possesses an advanced, powerful and feature rich static type system. This provides large
     advantages when implementing FRP. Firstly, Scala supports generic classes and it can be quite easily seen
     that both Behaviours and Events will rely on this feature for type safety. Scala additionally provides
     a rather unique type conversion functionality that allows types to be converted on the fly. This provides
-    incredibly expressive and powerful ways to embed FRP into Scala and will be explored later.
+    incredibly expressive and powerful ways to embed FRP into Scala as will be demonstrated later.
     
     One slight problem with implementing FRP in Scala was that, unlike Haskell, it is an `impure'
     language. In terms of functional programming, `purity' refers to a languages ability to write functions
@@ -35,21 +29,20 @@
     of the fact that an Event without occurrences still has a has a lower bound of when it can occur (again described
     in section 2). 
     
-    Additionally a function is defined in Echo to return the current time:
+    So we can refer the `present' we define a function for calculating this in Echo:
     
 \begin{verbatim}
 def now() : Time = System.nanoTime() - startTime
 \end{verbatim}      
 
-    Here \emph{startTime} refers to the time the current Echo program started executing and this is
-    set by the framework at run time. It should be noted that \emph{nanoTime} (returning current time in
-    nano seconds) is the most accurate value available for the current time in Scala. However due the restrictions
-    of Java Virtual Machine implementations of this function will start to return incorrect results 
-    after running for around 292 years due to an overflow in the calculation (thought to be an allowable
+    Here \emph{startTime} refers to the time the current Echo program started executing. It should be noted that \emph{nanoTime} (returning current time in
+    nano seconds) is the most accurate value available for the current system time in Scala. But, due to the
+    implementation of the Java Virtual Machine \emph{now} will start to return incorrect results 
+    after a program has been running for around 292 years due to an overflow in the calculation (thought to be an allowable
     problem).
     
   \section{Object Orientation}
-    Although it may seem obvious it is worth noting that both Behaviours and Events are implemented in
+    Behaviours and Events are implemented in
     Echo using Scala's object oriented definitions. For instance, a Behaviour[T] is simply
     implemented as a generic class with a Time =$>$ T function parameter. An example Behaviour
     could be instantiated as follows:
@@ -69,19 +62,19 @@ val merged = event1.merge(event2)
 \end{verbatim}
 
   This allows the FRP code to fit more naturally into Scala. We will also replace the \emph{switcher} function
-  with a type that extends Behaviour rather than a function:
+  with a type that extends the Behaviour type:
   
 \begin{verbatim}
 val switch = new Switcher(iniBeh, behEvent)
 \end{verbatim}
 
-  We also define a type for the \emph{stepper} concept detailed in section 3. 
+  We also define a type for the \emph{stepper} function in a similar manner.
 
   \section{Implicit Lifting of Constants}
     As mentioned earlier, one of the most powerful features of Scala is it's ability to implicitly convert between
     types at run time. This is facilitated by the \emph{implicit} key word allowing a function to be defined
-    that is automatically executed when a corresponding type mismatch occurs. This will be used in Echo to allow 
-    static values to be converted to Behaviours implicitly. This is implemented in the following way:  
+    that is automatically executed when a corresponding type mismatch occurs. This functionality is used in Echo to allow 
+    static values to be converted to Behaviours implicitly and can be implemented in the following way:
 
 \begin{verbatim}
 implicit def liftConst[T](value : T) : Behaviour[T] = {
@@ -89,25 +82,23 @@ implicit def liftConst[T](value : T) : Behaviour[T] = {
 }
 \end{verbatim}              
     
-    This would allow the following for instance:
+    This allows us to express simple `constant' Behaviours as values:
 
 \begin{verbatim}
 val beh : Behaviour[Int] = 0
 val switcher = new Switcher(false, eventBeh)
 \end{verbatim}       
 
-    It can immediately be seen that this allows the programmer to switch between static and more complex
+    It can be seen that this allows the programmer to switch between static and more complex
     Behaviours in a very naturalistic manor.
     
-    Another advantage of specifying constant Behaviours this way is we can take advantage of the fact that
-    we know the Behaviours value will not need to be recalculated. We do this by returning a Behaviour
-    that simply stores the static value rather than a function to compute it. This means that whenever the Behaviour
-    is evaluated it simply returns a value rather than executing a function. However these optimised Behaviours
-    are externally identical to normal Behaviours so no functionality is lost.
+    Another advantage of lifting constants in this way is that we can guarantee that Behaviours
+    returned from \emph{liftConst} will have the same value at any point in time. We exploit this by returning a Behaviour
+    that simply returns a value when evaluated rather than evaluating a function with respect to time. These optimised Behaviours are still externally identical to normal Behaviours however so no functionality is lost.
     
   \section{Extendable Events}
     FRP Events provide a very useful abstraction for external stimuli such as I/O and user input. Of course
-    to allow for this and also so that Events can be useful in anyway they must be allowed to actually `occur'.
+    to allow for Events to interact with this input they must be allowed to actually `occur'.
     It is noticeable that the original denotational semantics \cite{Elliott1997} do not explore how to achieve
     this and it is assumed that this is because the actual occurring of Events is really just an implementation
     issue. As discussed earlier (section 3), previous implementations of Events in Scala add an operation to Event's
@@ -115,12 +106,12 @@ val switcher = new Switcher(false, eventBeh)
     
     When observing how Events are composed (using \emph{merge} and \emph{map} operations) it can be seen that
     only a subset of Events actually `occur' while others are simply views and combinations of these `source' Events.
-    In `echo' this is modelled directly. FRP Events are represented by two traits \footnote{Traits are abstract
+    This is modelled directly in the implementation of Echo. FRP Events are represented by two traits \footnote{Traits are abstract
     classes that can possess concrete members. A class can extend from multiple Traits (like Java's interfaces)}: 
     Event[T] and EventSource[T].
     Event has concrete implementations of \emph{map} and \emph{merge} operations that
     return concrete Event[T] instantiations. EventSource[T] extends
-    from Event[T] and additionally has a protected level concrete function \emph{occur}:
+    from Event[T] and additionally has a protected access concrete function \emph{occur}:
     
 \begin{verbatim}
 occur(value : T) : Unit
@@ -128,7 +119,7 @@ occur(value : T) : Unit
 
     This function causes the EventSource[T] to `occur' with the given value (with the time the call was made). This allows 
     programmers
-    to easily build FRP Event abstractions for any form of input without exposing the \emph{occur} action itself.
+    to easily build FRP Event abstractions for any form of input without exposing the \emph{occur} action externally.
     As an example, Here is a simple implementation for an Event that occurs once with the value `5' when it 
     is created:
     
@@ -161,8 +152,8 @@ class Five extends EventSource[Int] {
     constantly be pushed up to the present (leaving only `now' as a possible evaluation time). Although
     other times will be available for evaluation at times (there will often be a gap between `now' and
     the last Event occurrence) it would be monotonous to expose these bounds to the programmer so
-    in Echo explicit evaluation of a Behaviour is entirely removed from the public API (the
-    \emph{at} operation) and replaced with a real-time evaluation function:
+    in Echo explicit evaluation of a Behaviour with the
+    \emph{at} operation is entirely removed from the public API and replaced with a real-time evaluation function:
 
 \begin{verbatim}
 eval() : T
@@ -179,12 +170,13 @@ beh.eval() = at(beh, now())
     discussed in section 3.
     
     It should also be noted that restricting evaluation times for Behaviours forces us
-    to remove the \emph{timeTransform} operation for Behaviours (as this allows programmers to explicitly
-    evaluate Behaviours in the past or future).
+    to remove the \emph{timeTransform} operation for Behaviours as this function allows
+    a programmer to create a Behaviour that at a time \emph{t} would be evaluated in respect
+    to a time less than or greater than \emph{t}.
     
-    With these rules in place, Echo is able to circumvent the semantic problems of evaluating the future
-    and does not need to store an Event's entire past. With only these restrictions we may still have to
-    buffer `future' Events however as we can't swap in new occurrences while an Event is being evaluated.
+    These rules being the case allows Echo to circumvent the semantic problems of evaluating the future
+    and also prevents it from having to store an Event's entire past. With only these restrictions we may still have to
+    buffer some occurrences as we would not want swap in new occurrences that happen while an Event is being evaluated.
     
   \section{Atomic Input \& Output}
 
@@ -197,7 +189,7 @@ beh.eval() = at(beh, now())
 
      This concept is implemented in Echo using a locking object for the FRP world. If a Behaviour is evaluated it
      must first acquire this lock and the same goes for the Event \emph{occur} action. This implementation
-     also provides a very large performance gain: Event occurrence times and evaluation times now form one
+     also provides a significant advantage: Event occurrence times and evaluation times now form one
      monotonically increasing timed chain \footnote{We can actually model evaluation and occurrences of an Event as an 
      Event!} of actions. This fact means that we only ever need to store one occurrence for each Event: if an Event occurs
      at time \emph{t} it will not be evaluated until a time greater than or equal to \emph{t}. This allows
@@ -213,12 +205,10 @@ beh.eval() = at(beh, now())
      situation our FRP system's accuracy is at the mercy of thread scheduling as the button click
      could be part of the way through the \emph{occur} action and then be scheduled out to allow the network
      occurrence to happen. If these Events had been merged we would effectively skip a state:
-     we would never be able to observe the occurrence at \emph{t}. It can be seen here that this implementation
-     choice is required so we are able to deal properly with Event's generated from multiple sources. 
-     \footnote{It is also required if Behaviours are evaluated concurrently as thread scheduling could
-     allow a Behaviour to be evaluated at a time later than the present if an evaluating thread is
-     scheduled out for some time.}
-  
+     we would never be able to observe the occurrence at \emph{t}. Atomic input and output allows us
+     to avoid internal inaccuracies such as these and so is acceptable despite any slight lag it might
+     produce with processing external input.
+     
     \section{Setup Phase}
       There was one further problem presented due the restriction on Behaviour evaluation and that was concerned with
       implementing the \emph{snapshot} operation. For instance, imagine we execute the following code
