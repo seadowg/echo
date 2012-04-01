@@ -27,7 +27,7 @@ type Reactive[T] = Stream[(Time, T)]
 type Behaviour[T] = Reactive[Time => T]
 \end{verbatim}      
 
-      In other words a Behaviour is simply a stream of `phases' that exist between discrete
+      In other words a Behaviour can be seen as a stream of `phases' that exist between discrete
       points in time (think of the \emph{switcher} operation in section 2). Of course, we
       still think of a Behaviour's value at a sample time as the result of evaluating a
       Time =$>$ T function but using the Reactive type
@@ -38,13 +38,11 @@ type Behaviour[T] = Reactive[Time => T]
       and as such hasn't been utilised in many cases.
   
     \subsection{Reactive-Banana}
-      `Reactive-Banana' is a Haskell FRP framework created by Heinrich Apfelmus \cite{Apfelmus}. Reactive-Banana
-      is directly based on the on the FRP defined in Functional Reactive Animation \cite{Elliott1997}. Apfelmus
-      implements Events in manner representing the original semantics but chooses to alter
-      Behaviours somewhat. 
+      `Reactive-Banana' is an FRP framework created by Heinrich Apfelmus \cite{Apfelmus}. Reactive-Banana
+      is directly based on the on the FRP defined in Functional Reactive Animation \cite{Elliott1997}. 
       
       Reactive-Banana uses a form of Behaviour equivalent to the \emph{stepper}
-      (also similar to the Reactive type discussed above) operation seen in section 2. This simplification of Behaviours 
+      (also similar to the Reactive[T] type discussed above) operation seen in section 2. This simplification of Behaviours 
       allows 
       Apfelmus to use a push
       based implementation where Behaviours don't need polling to keep output components (UI etc) up to date as changes in 
@@ -70,9 +68,9 @@ type Behaviour[T] = Reactive[Time => T]
     As one might imagine, there has also been previous work in implementing FRP in Scala. 
 
     \subsection{Reactive}
-      Arguably the most significant of the FRP work in Scala is the library `reactive' created by `nafg' \cite{Nafg}. This    
-      framework was designed to allow for the creation of functional reactive web applications however here we are concerned 
-      with the basic FRP library `reactive-core'. Unfortunately while claiming to be an FRP library `Reactive'
+      Arguably the most significant of the FRP work in Scala is the library `Reactive' created by `nafg' \cite{Nafg}. This    
+      framework was designed to allow for the creation of functional reactive web applications. Here we are concerned 
+      only with the basic FRP library `reactive-core' however. Unfortunately while claiming to be an FRP library Reactive
       has a couple of problems.
 
       The framework is based around two types designed to represent Behaviours and Events respectively: Signals
@@ -95,7 +93,8 @@ type Behaviour[T] = Reactive[Time => T]
       The Event's in React are very similar to the Events in Fran \cite{Elliott1997}: they are conceptually infinite
       and have the \emph{merge} and \emph{map} operations defined on them. One slight difference is that React's
       Events expose an operation to allow them to `occur' with a public \emph{emit} function. This disrupts
-      the abstraction of Events somewhat. For instance, if we have again have a \emph{mouseB} Event we could do the following:
+      the abstraction of Events somewhat. For instance, imagine we have an Event \emph{mouseB} that occurs
+      every time a mouse button is clicked:
 
 \begin{verbatim}
 val event = mouseB
@@ -110,8 +109,8 @@ event.emit(())
       used loosely in their description). 
       
       As with the Haskell frameworks, the implementation of Reactive does not retain Event occurrences before the
-      last one. The source code for React is not currently available Event implementation in the framework is unclear
-      however the functionality never implies that Events would need to retain old data.
+      last one. The source code for React is not currently available however so Event implementation in the framework is  
+      unclear.
       
 \section{Comparison}
   We can compare these frameworks with respect to the presence of various key features. These are Behaviours, Events, 
@@ -132,6 +131,6 @@ event.emit(())
    
    It can be seen that purely continuous Behaviours are often not implemented for whatever reason
    but the \emph{stepper} version
-   of them often is (it can be seen that this version is very useful in Appendix A and B). In this report it will
+   of them often is. In this report it will
    be shown that it is possible to implement all of these features in Scala without having to use unbounded levels
    of memory for Events.
