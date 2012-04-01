@@ -5,12 +5,13 @@
   \section{Haskell}
     Much of the FRP community could be described as a subset of the Haskell community due to FRP's
     origins and sensibilities. It's not surprising that there have been several major implementations
-    of FRP in the language. Here we will explore two of the most prominent.
+    of FRP in the language therefore. Here we will explore two of the most prominent.
     
     \subsection{Reactive}
       Reactive was developed as a research project by Conal Elliott and was the feature
       of the paper ``Push-Pull Functional Reactive Programming'' \cite{Elliott2009}. As mentioned
-      in section 2 this paper dealt with clarifying and restructuring the Behaviour and Events
+      in section 2 this paper dealt with clarifying and restructuring the denotational
+      semantics of FRP
       to promote more efficient implementations without altering the overall semantic model.
       
       Reactive introduces a new type that can be used to simplify what he referred to as
@@ -20,8 +21,7 @@
 type Reactive[T] = Stream[(Time, T)]
 \end{verbatim}
 
-      We can think of Behaviours in a similar manner as a Behaviour is
-      a Stream of Time =$>$ T functions:
+      Elliott also presents a way to express Behaviours using this new type:
       
 \begin{verbatim}
 type Behaviour[T] = Reactive[Time => T]
@@ -30,7 +30,7 @@ type Behaviour[T] = Reactive[Time => T]
       In other words a Behaviour is simply a stream of `phases' that exist between discrete
       points in time (think of the \emph{switcher} operation in section 2). Of course, we
       still think of a Behaviour's value at a sample time as the result of evaluating a
-      Time =$>$ T function but this representation
+      Time =$>$ T function but using the Reactive type
       does provide a clearer definition of Behaviours used reactively with Events.
       
       As one might expect from a framework created by Elliott, Reactive has all the other major features
@@ -49,9 +49,9 @@ type Behaviour[T] = Reactive[Time => T]
       based implementation where Behaviours don't need polling to keep output components (UI etc) up to date as changes in their values are exposed
       by Events occurring. While this may be more efficient \footnote{The fact that Behaviours must polled is not really an inefficiency as it is required due to their continuous nature. } it excludes the ability to create truly 
       continuous Behaviours and therefore Reactive-Banana does not really provide a true implementation
-      of Behaviours. This seems like a strange decision. Optimising `constant' Behaviours would be sensible
-      but removing continuous Behaviours altogether removes the ability to create abstractions that programmers
-      might be willing to except a performance drop for.
+      of Behaviours. This seems like a strange decision. Optimising `constant' Behaviours is sensible
+      but removing continuous Behaviours entirely removes the ability to create abstractions that may present
+      an acceptable loss in performance to the programmer.
       
       Apfelmus' framework also drops some functionality from FRP in the form of the \emph{switcher} function as
       he argues that in some cases it requires storing the entire history of an Event (as discussed previously
