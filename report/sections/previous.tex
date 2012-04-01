@@ -10,17 +10,17 @@
     \subsection{Reactive-Banana}
       `Reactive-Banana' is a Haskell FRP framework created by Heinrich Apfelmus \cite{Apfelmus}. Reactive-banana
       is directly based on the on the FRP defined in Functional Reactive Animation \cite{Elliott1997}. Apfelmus
-      implements continuous Behaviours and Events in terms of these original semantics and the framework
-      is quite popular. There has also been work into allowing Reactive-banana to integrate with event based
-      frameworks (such as GUI frameworks) which is probably seen as an advantage for many potential users.
+      implements Events in manner representing the original semantics but chooses to alter
+      Behaviours somewhat. Reactive-banana uses a form of Behaviour equivalent to the \emph{stepper}
+      operation seen in section 2. This simplification of Behaviours allows Apfelmus to use a push
+      based implementation where Behaviours don't need polling as changes in their values are exposed
+      by Events occurring. While this may be more efficient it excludes the ability to create truly 
+      continuous Behaviours and therefore Reactive-banana does not really provide a true implementation
+      of Behaviours.
       
-      Apfelmus' framework does drop some functionality from FRP in the form of the \emph{switcher} function as
+      Apfelmus' framework also drops some functionality from FRP in the form of the \emph{switcher} function as
       he argues that in some cases it requires storing the entire history of an Event (as discussed previously
       in section 2).
-      
-      % TODO: Redo this as Behaviour = Stepper in Reactive-banana
-      % Problem with Stepper Behaviour is optimisations are useless when combined with
-      % continuous Behaviours
 
   \section{Scala}
     As one might imagine, there has been previous work in implementing FRP in Scala. 
@@ -32,43 +32,16 @@
       has a couple of problems.
 
       The framework is based around two types designed to represent Behaviours and Events respectively: Signals
-      and EventStreams. EventStreams are very close to the original Event semantics but Signal deviates quite significantly from 
-      Behaviour's. Signal is defined as follows:
+      and EventStreams. EventStreams are very close to the original Event semantics but Signal deviates quite significantly 
+      from Behaviour's. Signal is defined as follows:
 
       \begin{quote}
         In practical terms, a Signal has a current value, and an EventStream that, whenever the Signal's value changes,     
         fires the new value.
       \end{quote}  
-
-      Although it is claimed that this results in Signals having a continuous value we can see
-      that it is really just a static value that changes at discrete point in
-      time. We can see that this doesn't allow us to represent purely continuous values. For instance
-      we could not represent the following basic Behaviour with a Signal:
-
-\begin{verbatim}
-new Behaviour(time => time)
-\end{verbatim}
-
-      It can be seen that a Signal[T] can however be represented in terms
-      of the `switcher' function meaning that it does have some relevance to Behaviours:
-
-\begin{verbatim}
-def signal[T](v : T, ev : Event[T]) = {
-  switcher(lift0(v), map(ev, (t, o) => lift0(o)))
-}
-\end{verbatim}  
-
-      This functionality was additionally encapsulated within the `stepper' function in Conal Elliott's
-      `Push-Pull' paper \cite{Elliott2009}:
-
-\begin{verbatim}
-stepper[T](v : T, ev : Event[T]) : Behaviour[T]
-stepper(v, ev) = switcher(lift0(v), map(ev, (t, o) => lift0(o)))
-\end{verbatim} 
-
-      It can be seen here that although Signal provides a useful programming tool it is not an implementation
-      of an FRP Behaviour and only allows for a subset of a Behaviour's functionality meaning that `Reactive'
-      does not successfully implement FRPs semantics.
+      
+      It can be seen that, as with `Reactive-banana', this is just optimised implementation of the \emph{stepper}
+      operation.
 
     \subsection{React}
       While not claiming to be an implementation of FRP the `React' framework proposed in the 
@@ -101,7 +74,7 @@ event.emit(())
      \begin{tabular}{ | l | l | l | l | }
        \hline
         & Reactive-Banana & Reactive & React \\ \hline \hline
-       Behaviours & Yes & No & No \\ \hline
+       Behaviours & No & No & No \\ \hline
        Events & Yes & Yes & Yes \\ \hline
        \emph{stepper} & Yes & Yes & Yes \\ \hline
        \emph{switcher} & No & No & No \\ \hline  
