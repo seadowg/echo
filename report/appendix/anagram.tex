@@ -3,7 +3,7 @@
 AnagramServer.scala
 
 \begin{verbatim}
-object App extends EchoApp {
+object AnagramServer extends EchoApp {
   val WORD = "PASSWORD"
   val ANAGRAM = "WRSSPAOD"
 
@@ -16,9 +16,9 @@ object App extends EchoApp {
 
   	val answers = Receiver(1997) {
   	  in =>
-  			if (in == WORD) {
-  			  "That's correct!"
-  			}
+  	    if (in == WORD) {
+  	      "That's correct!"
+  	    }
 
   			else {
   			  "Wrong! Try again..."
@@ -31,34 +31,38 @@ object App extends EchoApp {
 Anagram.scala
 
 \begin{verbatim}
-object App extends EchoApp {
-	def setup(args : Array[String]) {
-		val sendButton = Button("Send")
-		val field = Field()
+object Anagram extends EchoApp {
+	  def setup(args : Array[String]) {
+		  val sendButton = Button("Send")
+		  val field = Field()
+		  
+		  val anagram = Sender("localhost", 1996, Event("Anagram"))
+		  val replies = Sender("localhost", 1997, 
+		    field.text.sample(sendButton.click))
+		  val messages = replies.errors.map(
+		    (t, v) => "Can't connect to server!").merge(replies)
 
-		val anagram = Sender("localhost", 1996, Event("Anagram"))
+		  val correct = replies.filter(r => r == "That's correct!")
+		  val gameOver = false.until(correct, true)
+		  val winTime = Stepper(-1.toDouble, 
+		    correct.map((t, v) => (t / 1000000000)))
 
-		val replies = Sender("localhost", 1997, field.text.sample(sendButton.click))
-		val messages = replies.errors.map(
-		  (t, v) => "Can't connect to server!").merge(replies)
+		  val timer = Behavior(t => t / 1000000000)
 
-		val correct = replies.filter(r => r == "That's correct!")
-		val gameOver = false.until(correct, true)
-		val winTime = Stepper(-1.toDouble, correct.map((t, v) => (t / 1000000000)))
+		  val frame = Frame(200, 200, List(
+		    Text(Stepper("Loading...", 
+		      anagram).map(a => "Anagram: " + a)),
+		    Text(Stepper("Guess the word...", messages)),
+        Text("Time Taken: ".map2(timer.map(
+          t => t.toInt.toString))((s, t) => s + t)),
+        field,
+        sendButton
+		  ), gameOver.map(g => !g))
 
-		val timer = Behavior(t => t / 1000000000)
-
-		val frame = Frame(200, 200, List(
-		  Text(Stepper("Loading...", anagram).map(a => "Anagram: " + a)),
-			Text(Stepper("Guess the word...", messages)),
-			Text("Time Taken: ".map2(timer.map(t => t.toInt.toString))((s, t) => s + t)),
-			field,
-			sendButton
-		), gameOver.map(g => !g))
-
-		val winScreen = Frame(200, 50, List(
-			Text("You win! You took ".map2(winTime)((s, w) => s + w.toInt + " seconds."))
-		), gameOver)
+		  val winScreen = Frame(200, 50, List(
+		    Text("You win! You took ".map2(winTime)
+		      ((s, w) => s + w.toInt + " seconds."))
+		  ), gameOver)
 	}
 }
 \end{verbatim}
