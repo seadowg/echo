@@ -191,6 +191,10 @@ object Stepper {
   * to time.
  */
 protected[echo] class Constant[T](private val value: T) extends Behaviour[T](time => value) {
+  override def eval() : T = {
+    value
+  }
+  
   override private[core] def at(time: Time): T = {
     value
   }
