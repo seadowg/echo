@@ -96,6 +96,26 @@ val switcher = new Switcher(false, eventBeh)
     returned from \emph{liftConst} will have the same value at any point in time. We exploit this by returning a Behaviour
     that simply returns a value when evaluated rather than evaluating a function with respect to time. These optimised Behaviours are still externally identical to normal Behaviours however so no functionality is lost.
     
+    \section{Lifting Functions}
+    Lifting of operators and
+    functions presents a few problems. This is because functions in Scala (as discussed earlier)
+    are usually attached to classes. For instance, there is no `+' operator in Scala: the numeric
+    types have a \emph{+} function defined in their class declarations (how Scala actually performs additions
+    is a topic for discussion elsewhere). This means that we cannot `lift' many of the operations we
+    would want to. To solve this problem we can use a series of map functions. We can define these
+    here as part of Behaviour[T]:
+
+\begin{verbatim}
+map[U](func : T => U) : Behaviour[U]
+at(beh.map(func), t) = func(at(beh, t))
+
+map2[U, V](beh1 : U)(func : (T, U) => V) : Behaviour[V]
+at(beh.map2(beh1)(func), t) = func(at(beh, t), at(beh1, t))
+\end{verbatim}        
+
+    These functions allow Behaviours to be transformed and combined using functions
+    normally applied to static values.
+    
   \section{Extendable Events}
     FRP Events provide a very useful abstraction for external stimuli such as I/O and user input. Of course
     to allow for Events to interact with this input they must be allowed to actually `occur'.
@@ -178,6 +198,42 @@ beh.eval() = at(beh, now())
     and also prevents it from having to store an Event's entire past. With only these restrictions we may still have to
     buffer some occurrences as we would not want swap in new occurrences that happen while an Event is being evaluated.
     
+    \section{Setup Phase}
+      There was one further problem presented due to the restriction on Behaviour evaluation. This was concerned with
+      implementing the \emph{snapshot} operation. To illustrate the problem, imagine we execute the following code
+      at time \emph{t}:
+
+\begin{verbatim}
+val ev = beh.snapshot(someEvent)
+\end{verbatim}
+
+      This is fine if \emph{someEvent} has not occurred at \emph{t}. If it has occurred however at some time
+      before \emph{t} then in whatever way this is implemented we are forced to evaluate \emph{beh}
+      at a time in the past. If \emph{beh} depends on any Events this time might be before the Event's
+      last occurrence and so we would effectively be returning an incorrect result. Dealing with this
+      presented an interesting problem. It was decided that FRP
+      code (FRP operations on FRP types) could only be performed in an initial setup phase of a program.
+      This setup phase would happen `instantly' as the internal notion of time is frozen and Event
+      occurrences are not processed by the framework during this phase. As Scala programs are defined inside a singleton
+      object it was decided that a user would simply be able to extend a class with this object and then
+      write their FRP code in a \emph{setup} function:
+
+\begin{verbatim}
+object App extends EchoApp {
+  def setup(args : Array[String]) {
+    // FRP code here
+  }
+}
+\end{verbatim}
+  
+    This allows the FRP world to be setup in one distinct stage. It should be noted that
+    any functions \emph{setup} calls would also be able to run FRP code. Only FRP code that runs
+    after the \emph{setup} function has finished executing will cause an error.
+    
+    Behaviour and Event instantiation is not blocked after the setup phase however. This is
+    to allow for Event[Behaviour[T]] or Event[Event[T]] objects to \emph{occur}
+    dynamically.
+    
   \section{Atomic Input \& Output}
 
      By this point it is noticeable that the FRP world that Echo builds only really has one form of input and one
@@ -208,42 +264,6 @@ beh.eval() = at(beh, now())
      we would never be able to observe the occurrence at \emph{t}. Atomic input and output allows us
      to avoid internal inaccuracies such as these and so is acceptable despite any slight lag it might
      produce with processing external input.
-     
-    \section{Setup Phase}
-      There was one further problem presented due the restriction on Behaviour evaluation and that was concerned with
-      implementing the \emph{snapshot} operation. For instance, imagine we execute the following code
-      at time \emph{t}:
-
-\begin{verbatim}
-val ev = beh.snapshot(someEvent)
-\end{verbatim}
-
-      This is fine if \emph{someEvent} has not occurred at \emph{t}. If it has occurred however at some time
-      before \emph{t} then in whatever way this is implemented we are forced to evaluate \emph{beh}
-      at a time in the past. If \emph{beh} depends on any Events this time might be before the Event's
-      last occurrence and so we would effectively be returning an incorrect result. Dealing with this
-      presented an interesting problem. It was decided that FRP
-      code (FRP operations on FRP types) could only be performed in an initial setup phase of a program.
-      This setup phase would happen `instantly' as the internal notion of time would be frozen and Event
-      occurrences would not be processed by the framework. As Scala programs are defined inside a singleton
-      object it was decided that a user would simply be able to extend a class with this object and then
-      write their FRP code in a \emph{setup} function:
-
-\begin{verbatim}
-object App extends EchoApp {
-  def setup(args : Array[String]) {
-    // FRP code here
-  }
-}
-\end{verbatim}
-  
-    This allows the FRP world to be setup in one distinct stage. It should be noted that
-    any functions \emph{setup} calls would also be able to run FRP code. Only FRP code that runs
-    after the \emph{setup} function has finished executing will cause an error.
-    
-    It should be noted that isolated FRP objects can still be instantiated after the setup phase. This is
-    to allow for the possibility Event[Behaviour[T]] or Event[Event[T]] objects to \emph{occur}
-    dynamically.
   
   \section{Constant Events}
     It useful to be able to define an Event that occurs only once. This is provided in Echo
@@ -253,8 +273,10 @@ object App extends EchoApp {
 val const = Event("Once")
 \end{verbatim}    
 
-    This would create an Event with a single occurrence of the value ``Once'' at time \emph{0} (as
-    it occurs at the end of the setup phase).
+    This would create an Event with a single occurrence of the value ``Once'' at time \emph{0} as
+    it occurs at the end of the setup phase. Due to the occurrence time these Events can only created
+    within the \emph{setup} function described earlier.
+    
     Although it may not be as useful it should also be possible to instantiate a never occurring
     Event. This can be achieved in a similar manner:
 
@@ -270,32 +292,13 @@ val empty = Event()
   \section{Function Additions}
     When considering different applications of the framework and also in an attempt to
     tackle the changes in expressiveness between Haskell and Scala some operations
-    were added to the FRP in Echo.
-    
-    Lifting of constants has already been discussed for Echo but lifting of operators and
-    functions presents a few problems. This is because functions in Scala (as discussed earlier)
-    are usually attached to classes. For instance, there is no `+' operator in Scala: the numeric
-    types have a \emph{+} function defined in their class declarations (how Scala actually performs additions
-    is a topic for discussion elsewhere). This means that we cannot `lift' many of the operations we
-    would want to. To solve this problem we can use a series of map functions. We can define these
-    here as part of Behaviour[T]:
-
-\begin{verbatim}
-map[U](func : T => U) : Behaviour[U]
-at(beh.map(func), t) = func(at(beh, t))
-
-map2[U, V](beh1 : U)(func : (T, U) => V) : Behaviour[V]
-at(beh.map2(beh1)(func), t) = func(at(beh, t), at(beh1, t))
-\end{verbatim}        
-
-    These functions allow Behaviours to be transformed and combined using functions
-    normally applied to static values.
+    were added to the FRP contained in Echo.
     
     In Hudak and Elliott's original paper an example is constructed to create a Behaviour
     that toggles back and forth between two given Behaviours whenever an Event occurs. This
     example took advantage of Haskell's lazy evaluation. While Scala is able to use lazy evaluation
-    it requires extra work and at the time of writing requires some complex syntax. To tackle this
-    a \emph{toggle} function was added to Echo to provide the functionality in the example out of the box.
+    it is not particularly intuitive and requires some rather awkward syntax. To tackle this
+    a \emph{toggle} function was added to Echo to provide the functionality shown in Elliott and Hudak example out of the box.
     This is defined as part of Behaviour[T]:
     
 \begin{verbatim}
@@ -336,13 +339,12 @@ at(beh, t)
     Echo was mainly developed using Test Driven Development \cite{Cunningham}. This methodology is based around the idea
     of specifying some program feature with a test and then writing code to pass that test. The hope
     is that doing so will not just ensure testing is thorough (as all features will require tests) but
-    that solutions are not over thought (the code is as simple as possible). TDD also encourages
-    refactoring as if refactored code passes the tests for the initial solution we can be more confident
-    that it is semantically equivalent in it's execution.
+    that solutions are as simple as possible. TDD also encourages
+    refactoring after each test/test passed phase.
 
     Test implementation for Echo was carried out using the Scala framework `Specs' \cite{EricTorreborre}. This framework
     encompasses a DSL that allows tests to easily be defined. For instance, this code tests the implicit lifting
-    of constants feature:
+    of constants feature in Echo:
 
 \begin{verbatim}
 "Echo" should {
