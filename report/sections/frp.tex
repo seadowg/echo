@@ -155,6 +155,11 @@ at(switcher(ini, ev), t) = at(occs(ev).filter(
                               (ti, v) => ti <= t).last._2), t)
 \end{verbatim}
 
+        We can also extend this concept to static values which is very useful in practice:
+        
+stepper[T](ini : T, ev : Event[T])
+stepper(ini, ev) = switcher(lift0(0), map(ev, (t, v) => lift0(v)))    
+
         Another useful interaction between Behaviours and Events is to be able to sample
         a Behaviour at the exact moment an Event occurs. This functionality was originally defined in the
         form of the \emph{snapshot} operation:
