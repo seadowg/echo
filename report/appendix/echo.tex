@@ -6,7 +6,7 @@
 
   \section*{Behaviour[T]}
     \subsection*{Instance Functions:}
-    \subsubsection*{eval(): T}
+    \subsubsection*{def eval(): T}
       Evaluated and returns the current value of the
       Behaviour. If the current time is \emph{t} then the
       function can be expressed in the following manor:
@@ -15,7 +15,7 @@
 beh.eval() = at(beh, t)
 \end{verbatim}      
     
-    \subsubsection*{sample[A](srcEv: Event[A]): Event[T]}
+    \subsubsection*{def sample[A](srcEv: Event[A]): Event[T]}
       Returns a Event[T] that occurs every time the given
       Event occurs with the value of the Behaviour at that time.
       The \emph{sample} function is an implementation of the \emph{snapshot} operation:
@@ -24,7 +24,7 @@ beh.eval() = at(beh, t)
 beh.sample(event) = snapshot(beh, event)
 \end{verbatim}
     
-    \subsubsection*{until[A](ev: Event[A], beh: Behaviour[T]): Behaviour[T]}
+    \subsubsection*{def until[A](ev: Event[A], beh: Behaviour[T]): Behaviour[T]}
       Returns a Behaviour that behaves as the callee until the
       Event occurs. It then switches to behaving as the passed
       Behaviour. The \emph{until} function can be determined in terms
@@ -34,11 +34,11 @@ beh.sample(event) = snapshot(beh, event)
 beh1.until(ev, beh2) = switcher(beh1, map(ev, (t, v) => beh2))
 \end{verbatim}      
       
-    \subsubsection*{toggle[A](ev: Event[A], beh: Behaviour[T]): Behaviour[T]}
+    \subsubsection*{def toggle[A](ev: Event[A], beh: Behaviour[T]): Behaviour[T]}
       Returns a Behaviour that toggles between behaving as the callee
       and the passed Behaviour whenever the passed Event occurs.
       
-    \subsubsection*{map[B](func: T =$>$ B): Behaviour[B]}
+    \subsubsection*{def map[B](func: T =$>$ B): Behaviour[B]}
       Returns a Behaviour that transforms the callee's
       value with the passed function.
       This function can be expressed in terms of \emph{lift1}:
@@ -47,7 +47,7 @@ beh1.until(ev, beh2) = switcher(beh1, map(ev, (t, v) => beh2))
 beh.map(func) = lift1(func, beh)
 \end{verbatim}      
       
-    \subsubsection*{map2[U, V](beh: Behaviour[U])(func: (T, U) =$>$ V): Behaviour[V]}
+    \subsubsection*{def map2[U, V](beh: Behaviour[U])(func: (T, U) =$>$ V): Behaviour[V]}
       Returns a Behaviour that transforms the callee's
       and passed Behaviour's value with the passed function. This operation
       can be defined using \emph{lift2}:
@@ -56,7 +56,7 @@ beh.map(func) = lift1(func, beh)
 beh1.map2(beh2)(func) = lift2(func, beh1, beh2)
 \end{verbatim}      
 
-    \subsubsection*{map3[U, V, W](beh1: Behaviour[U], beh2: Behaviour[V])(func: (T, U, V) =$>$ W): Behaviour[W]}
+    \subsubsection*{def map3[U, V, W](beh1: Behaviour[U], beh2: Behaviour[V])(func: (T, U, V) =$>$ W): Behaviour[W]}
       Returns a Behaviour that transforms the callee's
       and passed Behaviours' value with the passed function. It cab
       be expressed with \emph{lift3}:
@@ -66,7 +66,7 @@ beh1.map3(beh2, beh3)(func) = lift3(func, beh1, beh2, beh3)
 \end{verbatim}    
 
     \subsection*{Companion Functions:}
-    \subsubsection*{apply[T](func : Time =$>$ T)}
+    \subsubsection*{def apply[T](func : Time =$>$ T)}
       Standard constructor. Returns a Behaviour
       that can be expressed in the following way:
 
@@ -76,7 +76,7 @@ at(Behaviour(func), t) = func(t)
       
   \section*{Event[T]}
     \subsection*{Instance Functions:}
-    \subsubsection*{map[U](func: (Time, T) =$>$ U): Event[U]}
+    \subsubsection*{def map[U](func: (Time, T) =$>$ U): Event[U]}
       Returns a new Event that's occurrence values
       are are the result of of transforming the
       callee's occurrences with the given function (occurrence
@@ -87,7 +87,7 @@ at(Behaviour(func), t) = func(t)
 ev.map(func) = map(ev, merge)
 \end{verbatim}      
     
-    \subsubsection*{filter(func: T =$>$ Boolean): Event[T]}
+    \subsubsection*{def filter(func: T =$>$ Boolean): Event[T]}
       Returns an Event that filters occurrences
       occurrences (via the value) of the callee
       with the given predicate. We can define it as such:
@@ -96,7 +96,7 @@ ev.map(func) = map(ev, merge)
 ev.filter(pred) = occs(ev).filter(pred)
 \end{verbatim}
       
-    \subsubsection*{merge(event: Event[T]): Event[T]}
+    \subsubsection*{def merge(event: Event[T]): Event[T]}
       Returns an Event that's occurrences
       are a merged version of the callee
       and the given Event (merged in time order
@@ -109,14 +109,14 @@ ev1.merge(ev2) = merge(ev1, ev2)
 \end{verbatim}   
 
  \subsection*{Companion Functions:}
-  \subsubsection*{apply[T](value : T)}
+  \subsubsection*{def apply[T](value : T)}
     Returns an Event that occurs once at time 0:
   
 \begin{verbatim}
 occs(Event(value)).first = (0, value) 
 \end{verbatim} 
 
-  \subsubsection*{apply[T]()}
+  \subsubsection*{def apply[T]()}
     Returns an Event that never occurs:
 
 \begin{verbatim}
@@ -125,7 +125,7 @@ occs(Event(value)).first = None
 
    \section*{Switcher[T] extends Behaviour[T]}
     \subsection*{Companion Functions:}
-      \subsubsection*{apply[T](beh : Behaviour[T], ev : Event[Behaviour[T]])}
+      \subsubsection*{def apply[T](beh : Behaviour[T], ev : Event[Behaviour[T]])}
         Can be defined in terms of the FRP \emph{switcher}
         operation:
 
@@ -135,7 +135,7 @@ Switcher(beh, ev) = switcher(beh, ev)
 
   \section*{Stepper[T] extends Behaviour[T]}
     \subsection*{Companion Functions:}
-      \subsubsection*{apply[T](ini : T, ev : Event[T])}
+      \subsubsection*{def apply[T](ini : T, ev : Event[T])}
         Can be defined in terms of the FRP \emph{switcher} function:
 
 \begin{verbatim}

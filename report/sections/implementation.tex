@@ -176,7 +176,7 @@ class Five extends EventSource[Int] {
     \emph{at} operation is entirely removed from the public API and replaced with a real-time evaluation function:
 
 \begin{verbatim}
-eval() : T
+def eval() : T
 beh.eval() = at(beh, now())
 \end{verbatim}  
 
@@ -302,14 +302,14 @@ val empty = Event()
     This is defined as part of Behaviour[T]:
     
 \begin{verbatim}
-toggle(ev : Event[T], beh1 : Behaviour[T]) : Behaviour[T]
+def toggle(ev : Event[T], beh1 : Behaviour[T]) : Behaviour[T]
 \end{verbatim}        
     
     It was felt that another common use of combining Behaviours and Events would be
     to switch from one Behaviour to another when an Event occurs (but not back again):
 
 \begin{verbatim}
-until(ev : Event[T], beh1 : Behaviour[T]) : Behaviour[T]
+def until(ev : Event[T], beh1 : Behaviour[T]) : Behaviour[T]
 at(beh.until(ev, beh1), t) = at(new Switcher(beh, 
   event.map((t,v) => beh1)), t)
 \end{verbatim}        
@@ -319,7 +319,7 @@ at(beh.until(ev, beh1), t) = at(new Switcher(beh,
     to some occurrences from an Event. This is defined as part of Event[T]:
 
 \begin{verbatim}
-filter(predicate : T => Boolean) : Event[T]
+def filter(predicate : T => Boolean) : Event[T]
 occs(event.filter(predFunc)) = occs(event).filter(predFunc)
 \end{verbatim}  
 

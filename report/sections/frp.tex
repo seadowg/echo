@@ -18,7 +18,8 @@
   \section{Semantics}
     Within this section we will explore a selection of the basic denotational semantics defined in Fran
     that we hope to implement in Scala. The semantic definitions will
-    be presented using Scala syntax so as to provide continuity throughout the report.
+    be presented using Scala syntax so as to provide continuity throughout the report. Definitions will
+    be in the form of a function signature followed by an expression that denotes its operation.
   
     \subsection{Types}
       The concepts introduced in the Fran paper and in following FRP work are based around two key data types: 
@@ -45,26 +46,26 @@ type Time = Double
         a function from Time to some type T:
 
 \begin{verbatim}
-Behaviour[T] : Time => T
+type Behaviour[T] = Time => T
 \end{verbatim}
         
         We can access a Behaviour's value at some time \emph{t} with the \emph{at} function:
 
 \begin{verbatim}
-at[T](beh : Behaviour[T], t  : Time) : T
+def at[T](beh : Behaviour[T], t  : Time) : T
 \end{verbatim}
       
       \subsubsection{Event}
         Events can be thought of as an infinite stream of Time-value pairs:
 
 \begin{verbatim}
-Event[T] : Stream[(Time, T)]
+type Event[T] = Stream[(Time, T)]
 \end{verbatim}
         
         As with Behaviours, we define a function to access an Event's data:
         
 \begin{verbatim}
-occs[T](ev : Event[T]) : Stream[(Time, T)]
+def occs[T](ev : Event[T]) : Stream[(Time, T)]
 \end{verbatim}
        
     \subsection{Operations}
@@ -75,7 +76,7 @@ occs[T](ev : Event[T]) : Stream[(Time, T)]
         and Elliott define a series functions for accomplishing this:
         
 \begin{verbatim}
-liftn[T1,..,Tn U](a1 : T1,..,an : Tn => U, 
+def liftn[T1,..,Tn U](a1 : T1,..,an : Tn => U, 
 b1 : Behaviour[T1],..., bn : Behaviour[Tn]) : Behaviour[U]
 at(lift(func, b1,...,bn), t) = func (at(b1, t),..., at(bn, t))
 \end{verbatim}
@@ -85,7 +86,7 @@ at(lift(func, b1,...,bn), t) = func (at(b1, t),..., at(bn, t))
       be in Haskell}. To achieve this we can simply define a function explicitly:
 
 \begin{verbatim}
-lift0[T](t : T) : Behaviour[T]
+def lift0[T](t : T) : Behaviour[T]
 at(lift0(v), t) = v
 \end{verbatim}
         
@@ -93,7 +94,7 @@ at(lift0(v), t) = v
        slowing down or speeding up a Behaviour. We define this function like so:
 
 \begin{verbatim}
-timeTransform[T](beh : Behaviour[T], 
+def timeTransform[T](beh : Behaviour[T], 
   time : Behaviour[Time]) : Behaviour[T]
 at(timeTransform(beh, timeBeh), t) = at(beh, at(timeBeh, t))
 \end{verbatim}
@@ -102,7 +103,7 @@ at(timeTransform(beh, timeBeh), t) = at(beh, at(timeBeh, t))
         It is useful to be able to merge two Events into one. We can achieve this with the \emph{merge} function:
 
 \begin{verbatim}
-merge[T](ev1 : Event[T], ev2 : Event[T]) : Event[T]
+def merge[T](ev1 : Event[T], ev2 : Event[T]) : Event[T]
 def mergeStr[T](str1 : Stream[Time, T], str1 : Stream[Time, T]) = {
   if (str1.first.time <= str2.first.time) {
     new Stream(str1.first, mergeStr(str1.drop(1), str2))
@@ -126,19 +127,19 @@ occs(merge(ev1, ev2)) = mergeStr(occs(ev1), occs(ev2))
      \emph{map} function for allowing the same functionality:
 
 \begin{verbatim}
-map[T, U](ev : Event[T], func : (Time, T) => U)  : Event[U]
+def map[T, U](ev : Event[T], func : (Time, T) => U)  : Event[U]
 occs(map(ev, func)) = occs(event).map(func)
 \end{verbatim}     
 
       A function for flattening Event[Event[T]] to an Event[T] is also defined:
 
 \begin{verbatim}
-delayOccs[T](t : Time, ev : Event[T])
+def delayOccs[T](t : Time, ev : Event[T])
 occs(delayOccs(t, ev)) = occs(ev).map(o => (max(o._1, t), o._2))
 \end{verbatim}
 
 \begin{verbatim}
-join[T](ev : Event[Event[T]])  : Event[T]
+def join[T](ev : Event[Event[T]])  : Event[T]
 occs(join(ev)) = occs(map(ev, 
   e => delayOccs(e._1, e._2))).foldLeft(emptEv,
     (e, o) => merge(e, o))
@@ -153,7 +154,7 @@ occs(join(ev)) = occs(map(ev,
         author's mind) to \emph{switcher} \cite{Elliott2009}:
 
 \begin{verbatim}
-switcher[T](ini : Behaviour[T], ev : Event[Behaviour[T]])
+def switcher[T](ini : Behaviour[T], ev : Event[Behaviour[T]])
 at(switcher(ini, ev), t) = at(occs(ev).filter(
                               (ti, v) => ti <= t).last._2), t)
 \end{verbatim}
@@ -161,7 +162,7 @@ at(switcher(ini, ev), t) = at(occs(ev).filter(
         We can also extend this concept to static values which is very useful in practice:
       
 \begin{verbatim}  
-stepper[T](ini : T, ev : Event[T])
+def stepper[T](ini : T, ev : Event[T])
 stepper(ini, ev) = switcher(lift0(0), map(ev, (t, v) => lift0(v)))    
 \end{verbatim}
 
@@ -170,9 +171,8 @@ stepper(ini, ev) = switcher(lift0(0), map(ev, (t, v) => lift0(v)))
         form of the \emph{snapshot} operation:
 
 \begin{verbatim}
-snapshot[T, U](beh : Behaviour[T], ev : Event[U]) : Event[(T, U)]
-t = occs(ev)(x)._1
-occs(snapshot(beh, ev)(x)) = (t, at(beh, t))
+def snapshot[T, U](beh : Behaviour[T], ev : Event[U]) : Event[(T, U)]
+occs(snapshot(beh, ev)(x)) = (occs(ev)(x)._1, at(beh, t))
 \end{verbatim} 
   
   \section{Subtleties}
@@ -194,7 +194,7 @@ occs(snapshot(beh, ev)(x)) = (t, at(beh, t))
       First we define the new function:
       
 \begin{verbatim}
-dangerMap[T, U](ev : Event[T], 
+def dangerMap[T, U](ev : Event[T], 
   func : (Time, T) => (Time, U))  : Event[U]
 occs(map(ev, func)) = occs(event).map(func)
 \end{verbatim}
