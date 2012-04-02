@@ -220,6 +220,10 @@ beh.eval() = at(beh, now())
     and also prevents it from having to store an Event's entire past. With only these restrictions we may still have to
     buffer some occurrences as we would not want swap in new occurrences that happen while an Event is being evaluated.
     
+    It should be noted that restricting evaluation times does not alter the original semantic model of FRP as our description
+    of Behaviours and Events still holds: we have merely restricted the values that can be used in the evaluation of the
+    \emph{at} function.
+    
     \section{Setup Phase}
       There was one further problem presented due to the restriction on Behaviour evaluation. This was concerned with
       implementing the \emph{snapshot} operation. To illustrate the problem, imagine we execute the following code
