@@ -15,7 +15,7 @@
 beh.eval() = at(beh, t)
 \end{verbatim}      
     
-    \subsubsection*{def sample[A](srcEv: Event[A]): Event[T]}
+    \subsubsection*{def sample[U](ev : Event[U]) : Event[(U, T)]}
       Returns a Event[T] that occurs every time the given
       Event occurs with the value of the Behaviour at that time.
       The \emph{sample} function is an implementation of the \emph{snapshot} operation:

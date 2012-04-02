@@ -171,8 +171,8 @@ stepper(ini, ev) = switcher(lift0(0), map(ev, (t, v) => lift0(v)))
         form of the \emph{snapshot} operation:
 
 \begin{verbatim}
-def snapshot[T, U](beh : Behaviour[T], ev : Event[U]) : Event[(T, U)]
-occs(snapshot(beh, ev)(x)) = (occs(ev)(x)._1, at(beh, t))
+def snapshot[T, U](beh : Behaviour[T], ev : Event[U]) : Event[(U, T)]
+occs(snapshot(beh, ev)) = occs(ev).map((t, v) => (v, at(beh, t)))
 \end{verbatim} 
 
     \subsubsection{Predicate}
