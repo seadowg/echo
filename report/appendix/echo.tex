@@ -5,7 +5,7 @@
   semantically in terms of the Fran semantics specified in section 2 of this report.
 
   \section*{Behaviour[T]}
-    \subsection*{Instance Functions:}
+    \subsection*{Concrete Members}
     \subsubsection*{def eval(): T}
       Evaluated and returns the current value of the
       Behaviour. If the current time is \emph{t} then the
@@ -65,7 +65,7 @@ beh1.map2(beh2)(func) = lift2(func, beh1, beh2)
 beh1.map3(beh2, beh3)(func) = lift3(func, beh1, beh2, beh3)
 \end{verbatim}    
 
-    \subsection*{Companion Functions:}
+    \subsection*{Companion Concrete Members}
     \subsubsection*{def apply[T](func : Time =$>$ T)}
       Standard constructor. Returns a Behaviour
       that can be expressed in the following way:
@@ -75,7 +75,7 @@ at(Behaviour(func), t) = func(t)
 \end{verbatim}
       
   \section*{Event[T]}
-    \subsection*{Instance Functions:}
+    \subsection*{Concrete Members}
     \subsubsection*{def map[U](func: (Time, T) =$>$ U): Event[U]}
       Returns a new Event that's occurrence values
       are are the result of of transforming the
@@ -108,7 +108,7 @@ ev.filter(pred) = occs(ev).filter(pred)
 ev1.merge(ev2) = merge(ev1, ev2)
 \end{verbatim}   
 
- \subsection*{Companion Functions:}
+ \subsection*{Companion Concrete Members}
   \subsubsection*{def apply[T](value : T)}
     Returns an Event that occurs once at time 0:
   
@@ -124,7 +124,7 @@ occs(Event(value)).first = None
 \end{verbatim} 
 
    \section*{Switcher[T] extends Behaviour[T]}
-    \subsection*{Companion Functions:}
+    \subsection*{Companion Concrete Members}
       \subsubsection*{def apply[T](beh : Behaviour[T], ev : Event[Behaviour[T]])}
         Can be defined in terms of the FRP \emph{switcher}
         operation:
@@ -134,7 +134,7 @@ Switcher(beh, ev) = switcher(beh, ev)
 \end{verbatim}   
 
   \section*{Stepper[T] extends Behaviour[T]}
-    \subsection*{Companion Functions:}
+    \subsection*{Companion Concrete Members}
       \subsubsection*{def apply[T](ini : T, ev : Event[T])}
         Can be defined in terms of the FRP \emph{switcher} function:
 
