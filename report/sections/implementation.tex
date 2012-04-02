@@ -84,6 +84,28 @@ class Five extends EventSource[Int] {
 }
 \end{verbatim}
 
+  \section{Companion Instantiation}
+    One ugly aspect of Scala is its inheritance of the \emph{new} keyword from Java as the standard
+    method of calling class constructors.
+    We can however avoid using this in an attempt to lower the density of code written with Echo. For instance, Behaviours and other objects can be instantiated in the following way:
+
+\begin{verbatim}
+val beh = Behaviour(time => 5)
+\end{verbatim}
+
+    This is accomplishable using a combination of two Scala features: Companion objects and \emph{apply} functions
+    \cite{Typesafe}. Using these features we can implement a static function that is executed whenever function
+    arguments are applied to the class name. We can then simply call the the class' constructor from this. An implementation
+    that allows for the above example is as follows:
+
+\begin{verbatim}
+object Behaviour {
+  def apply[T](func : Time => T) = {
+    new Behaviour(func)
+  }
+}
+\end{verbatim}    
+    
   \section{Flat Time}
     Time in Echo is implemented as a flat value type defined exactly as it is in 
     chapter 2 of this report (as an alias of Double). The internal implementation does take advantage
@@ -111,7 +133,7 @@ def now() : Time = System.nanoTime() - startTime
 
 \begin{verbatim}
 implicit def liftConst[T](value : T) : Behaviour[T] = {
-  new Behaviour(time => value)
+  Behaviour(time => value)
 }
 \end{verbatim}              
     
@@ -119,7 +141,7 @@ implicit def liftConst[T](value : T) : Behaviour[T] = {
 
 \begin{verbatim}
 val beh : Behaviour[Int] = 0
-val switcher = new Switcher(false, eventBeh)
+val switcher = Switcher(false, eventBeh)
 \end{verbatim}       
 
     It can be seen that this allows the programmer to switch between static and more complex
