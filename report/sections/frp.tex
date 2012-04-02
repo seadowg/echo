@@ -149,7 +149,7 @@ occs(join(ev)) = occs(map(ev,
         
       \subsubsection{Reactivity}
         One of the most powerful aspects of FRP is the ability to use Events to punctuate or `switch' Behaviours.
-        The original Fran paper defined an \emph{untilB} function that was later renamed (more appropriately in the
+        The original Fran paper defined an \emph{untilB} function that was later renamed (more appropriately in this
         author's mind) to \emph{switcher} \cite{Elliott2009}:
 
 \begin{verbatim}
@@ -232,9 +232,9 @@ at(pos, 5)
 
       Now, suppose the time when this code executes is \emph{4}. We can see here
       is that we are going to be evaluating \emph{pos} at a time greater than `now'. This is a problem as we don't
-      actually know if the mouse will move in the future. To deal with this we could delay the return
-      result until we know the answer, raise an error or modify the original semantics. None of these solutions are
-      particularly useful however.
+      actually know if or when the mouse will move in the future. To deal with this we could delay the return
+      result until we know the answer, raise an error or modify the original semantics. However, none of these solutions are
+      particularly useful.
       
       What about the past? Evaluating \emph{pos} at times before `now' certainly makes sense. However, if arbitrary
       access is allowed to the past in this way then we would have to store every occurrence

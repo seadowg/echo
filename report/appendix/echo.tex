@@ -35,7 +35,8 @@ beh1.until(ev, beh2) = switcher(beh1, map(ev, (t, v) => beh2))
 \end{verbatim}      
       
     \subsubsection*{toggle[A](ev: Event[A], beh: Behaviour[T]): Behaviour[T]}
-      Lorem ipsum
+      Returns a Behaviour that toggles between behaving as the callee
+      and the passed Behaviour whenever the passed Event occurs.
       
     \subsubsection*{map[B](func: T =$>$ B): Behaviour[B]}
       Returns a Behaviour that transforms the callee's
@@ -48,7 +49,7 @@ beh.map(func) = lift1(func, beh)
       
     \subsubsection*{map2[U, V](beh: Behaviour[U])(func: (T, U) =$>$ V): Behaviour[V]}
       Returns a Behaviour that transforms the callee's
-      and passed Behavior's value with the passed function. This operation
+      and passed Behaviour's value with the passed function. This operation
       can be defined using \emph{lift2}:
 
 \begin{verbatim}
@@ -57,7 +58,7 @@ beh1.map2(beh2)(func) = lift2(func, beh1, beh2)
 
     \subsubsection*{map3[U, V, W](beh1: Behaviour[U], beh2: Behaviour[V])(func: (T, U, V) =$>$ W): Behaviour[W]}
       Returns a Behaviour that transforms the callee's
-      and passed Behaviors' value with the passed function. It cab
+      and passed Behaviours' value with the passed function. It cab
       be expressed with \emph{lift3}:
 
 \begin{verbatim}
