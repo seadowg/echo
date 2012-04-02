@@ -14,12 +14,12 @@
   \section{Efficiency}
     As stated at the beginning of this report one of the goals of this project was to create an efficient implementation
     of FRP. More specifically, one that doesn't require an unbounded level of memory use due to storing Event occurrences.
-    It is seen in section 4 that this problem is avoided in Echo as Events only need to store their last
+    It is seen in chapter 4 that this problem is avoided in Echo as Events only need to store their last
     occurrence. This not only means that Echo Events use a bounded amount of memory but it also means there is
     no overhead associated with throwing out old occurrences (the last occurrence is simply replaced with the new 
     one whenever the Event occurs).
     
-    As mentioned in section 4 Behaviour value caching is also used to prevent redundant reevaluation of Behaviours
+    Also mentioned in chapter 4 Behaviour value caching is also used to prevent redundant reevaluation of Behaviours
     and this further leads to a more optimised implementation of FRP.
     
     There is a minor inefficiency due to the choice to make the \emph{occur} and \emph{eval} objects atomic
@@ -49,7 +49,7 @@
     Additional work was carried out on a small network anagram guessing game. This involved a server that provided
     an anagram and a client application that would present the anagram and allow the user to guess the original
     word. The user's answers would be reported to the server and the server would reply with whether
-    the guess was correct or not. This application took advantage of the socket abstraction discussed in section 5
+    the guess was correct or not. This application took advantage of the socket abstraction discussed in chapter 5
     and was actually very easy to develop with the Sender and Receiver types. Again, due to the functional and
     declarative nature of FRP the code for this application (both the server and the client) was very simple
     and intuitive to both create and read.
