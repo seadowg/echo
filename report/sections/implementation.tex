@@ -324,20 +324,21 @@ val empty = Event()
     When considering different applications of the framework and also in an attempt to
     tackle the changes in expressiveness between Haskell and Scala some operations
     were added to the FRP contained in Echo.
-    
-    In Hudak and Elliott's original paper an example is constructed to create a Behaviour
+        
+    In Hudak and Elliott's original paper an example is constructed to create a recursively defined Behaviour
     that toggles back and forth between two given Behaviours whenever an Event occurs. This
     example took advantage of Haskell's lazy evaluation. While Scala is able to use lazy evaluation
     it is not particularly intuitive and requires some rather awkward syntax. To tackle this
     a \emph{toggle} function was added to Echo to provide the functionality shown in Elliott and Hudak example out of the box.
-    This is defined as part of Behaviour[T]:
+    This is defined as a member of Behaviour[T]:
     
 \begin{verbatim}
 def toggle(ev : Event[T], beh1 : Behaviour[T]) : Behaviour[T]
 \end{verbatim}        
     
     It was felt that another common use of combining Behaviours and Events would be
-    to switch from one Behaviour to another when an Event occurs (but not back again):
+    to switch from one Behaviour to another when an Event occurs (but not back again). Again, this
+    function is defined as a member of Behaviour[T]:
 
 \begin{verbatim}
 def until(ev : Event[T], beh1 : Behaviour[T]) : Behaviour[T]
@@ -347,7 +348,7 @@ at(beh.until(ev, beh1), t) = at(new Switcher(beh,
     
     It is also useful to be able to to filter Events to produce a new one that only
     contains occurrences matching a predicate. This allows a Behaviour to only react
-    to some occurrences from an Event. This is defined as part of Event[T]:
+    to some occurrences from an Event. This is defined as a member of Event[T]:
 
 \begin{verbatim}
 def filter(predicate : T => Boolean) : Event[T]
