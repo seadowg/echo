@@ -10,7 +10,7 @@
     \subsection{Reactive}
       Reactive was developed as a research project by Conal Elliott and was the feature
       of the paper ``Push-Pull Functional Reactive Programming'' \cite{Elliott2009}. As mentioned
-      in chapter 2 this paper dealt with clarifying and restructuring the denotational
+      in section~\ref{sec:origins} this paper dealt with clarifying and restructuring the denotational
       semantics of FRP
       to promote more efficient implementations without altering the overall semantic model.
       
@@ -28,7 +28,7 @@ type Behaviour[T] = Reactive[Time => T]
 \end{verbatim}      
 
       In other words a Behaviour can be seen as a stream of `phases' that exist between discrete
-      points in time (think of the \emph{switcher} operation in chapter 2). Of course, we
+      points in time (think of the \emph{switcher} operation in section~\ref{sec:semantics}). Of course, we
       still think of a Behaviour's value at a sample time as the result of evaluating a
       Time =$>$ T function but using the Reactive type
       does provide a clearer definition of Behaviours used reactively with Events.
@@ -42,7 +42,7 @@ type Behaviour[T] = Reactive[Time => T]
       is directly based on the on the FRP defined in Functional Reactive Animation \cite{Elliott1997}. 
       
       Reactive-Banana uses a form of Behaviour equivalent to the \emph{stepper}
-      (also similar to the Reactive[T] type discussed above) operation seen in chapter 2. This simplification of Behaviours 
+      (also similar to the Reactive[T] type discussed above) operation seen in section~\ref{sec:semantics}. This simplification of Behaviours 
       allows 
       Apfelmus to use a push
       based implementation where Behaviours don't need polling to keep output components (UI etc) up to date as changes in 
@@ -57,7 +57,7 @@ type Behaviour[T] = Reactive[Time => T]
       Apfelmus' framework also drops some functionality from FRP in the form of the \emph{switcher} function as
       he argues that in some cases it requires storing the entire history of an Event \cite{Apfelmus2011} (as discussed 
       previously
-      in chapter 2).
+      in section~\ref{sec:subtle}).
       
     It should be noted that both Reactive and Reactive-banana do not expose an \emph{at} or \emph{occs} function
     and treat Behaviours and Events as real-time changing values (with respect to the current time). They also both do not 
@@ -135,4 +135,4 @@ event.emit(())
    of them often is. In this report it will
    be shown that it is possible to implement all of these features in Scala without having to use unbounded levels
    of memory for Events. It should be noted that none of the frameworks explored here implement the \emph{timeTransform}
-   or \emph{predicate} operations described in chapter 2.
+   or \emph{predicate} operations described in section~\ref{sec:semantics}.

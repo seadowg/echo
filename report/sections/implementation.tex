@@ -1,7 +1,7 @@
 \chapter{Implementation}
   This section will explore various aspects of the implementation and choices made during the development
   of Echo. Any functions or concepts introduced or modified in this section will be expressed in terms
-  of the Fran semantics specified in chapter 2 where possible.
+  of the Fran semantics specified in section~\ref{sec:semantics} where possible.
   
   \section{Scala}
     Scala is a multi-paradigm programming language developed to run on the Java Virtual Machine \cite{Odersky2004}. Scala 
@@ -56,7 +56,7 @@ val switch = new Switcher(iniBeh, behEvent)
     to allow for Events to interact with this input they must be allowed to actually `occur'.
     It is noticeable that the original denotational semantics \cite{Elliott1997} do not explore how to achieve
     this and it is assumed that this is because the actual occurring of Events is really just an implementation
-    issue. As discussed earlier in chapter 3, previous implementations of Events in Scala add an operation to Event's
+    issue. As discussed earlier in section~\ref{sec:semantics}, previous implementations of Events in Scala add an operation to Event's
     public API to allow it to occur. Here we will show an alternative approach.
     
     When observing how Events are composed (using \emph{merge} and \emph{map} operations) it can be seen that
@@ -108,10 +108,10 @@ object Behaviour {
     
   \section{Flat Time}
     Time in Echo is implemented as a flat value type defined exactly as it is in 
-    chapter 2 of this report (as an alias of Double). The internal implementation does take advantage
+    section~\ref{sec:semantics} of this report (as an alias of Double). The internal implementation does take advantage
     of general assumptions about Time. For instance, the \emph{merge} function for Events takes advantage
     of the fact that an Event without occurrences still has a has a lower bound of when it can occur (again described
-    in chapter 2). 
+    in section~\ref{sec:semantics}). 
     
     So we can refer the `present' we define a function for calculating this in Echo:
     
@@ -172,7 +172,8 @@ at(beh.map2(beh1)(func), t) = func(at(beh, t), at(beh1, t))
     normally applied to static values.
 
   \section{Time Travel is Dangerous}
-    Relating back to the discussion of interactive Behaviours in chapter 2 it can be seen
+    \label{sec:time}
+    Relating back to the discussion of interactive Behaviours in section~\ref{sec:subtle} it can be seen
     that there are problems when plugging FRP into the real world: the future is uncertain and
     arbitrary access to the past requires an unbounded level of memory. After much deliberation
     over different compromises it was decided that Echo would follow a set of rules:
@@ -354,6 +355,7 @@ occs(event.filter(predFunc)) = occs(event).filter(predFunc)
 \end{verbatim}  
 
   \section{Behaviour Caching}
+    \label{sec:caching}
     Behaviours possess quite a major inefficiency in the form of redundant evaluation:
 
 \begin{verbatim}

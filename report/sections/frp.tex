@@ -1,5 +1,6 @@
 \chapter{Functional Reactive Programming}
   \section{Origins}
+  \label{sec:origins}
     Functional Reactive Programming was originally proposed in the 1997 paper `Functional
     Reactive Animation' by Conal Elliott and Paul Hudak \cite{Elliott1997}. In this paper Elliott and Hudak
     set forth a ``collection of data types and functions'' designed for creating interactive 
@@ -16,6 +17,7 @@
     some of Elliott's later work to clarify certain points.
 
   \section{Semantics}
+    \label{sec:semantics}
     Within this section we will explore a selection of the basic denotational semantics defined in Fran
     that we hope to implement in Scala. The semantic definitions will
     be presented using Scala syntax so as to provide continuity throughout the report. Definitions will
@@ -188,6 +190,7 @@ at(beh, occs(predicate(beh, time)).first._1) = true
       it comes to implementation.
   
   \section{Subtleties}
+    \label{sec:subtle}
     FRP presents some subtle semantic problems and caveats that are not always immediately obvious.
     They will be explored here in an attempt to aid the reader's understanding.
      
