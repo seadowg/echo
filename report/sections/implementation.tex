@@ -69,7 +69,7 @@ val switch = new Switcher(iniBeh, behEvent)
     from Event[T] and additionally has a protected access concrete function \emph{occur}:
     
 \begin{verbatim}
-occur(value : T) : Unit
+def occur(value : T) : Unit
 \end{verbatim}  
 
     This function causes the EventSource[T] to `occur' with the given value (with the time the call was made). This allows 
@@ -161,10 +161,10 @@ val switcher = Switcher(false, eventBeh)
     here as part of Behaviour[T]:
 
 \begin{verbatim}
-map[U](func : T => U) : Behaviour[U]
+def map[U](func : T => U) : Behaviour[U]
 at(beh.map(func), t) = func(at(beh, t))
 
-map2[U, V](beh1 : U)(func : (T, U) => V) : Behaviour[V]
+def map2[U, V](beh1 : U)(func : (T, U) => V) : Behaviour[V]
 at(beh.map2(beh1)(func), t) = func(at(beh, t), at(beh1, t))
 \end{verbatim}        
 
@@ -352,7 +352,7 @@ at(beh.until(ev, beh1), t) = at(new Switcher(beh,
 
 \begin{verbatim}
 def filter(predicate : T => Boolean) : Event[T]
-occs(event.filter(predFunc)) = occs(event).filter(predFunc)
+occs(event.filter(predicate)) = occs(event).filter(predicate)
 \end{verbatim}  
 
   \section{Behaviour Caching}
