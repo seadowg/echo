@@ -21,25 +21,6 @@
     this means that a function that defines a Behaviour could be impure and could therefore cause side effects
     whenever the Behaviour was evaluated. There has been some work into pure function verification in Scala but it has not materialised into an  
     implementation \cite{Nordenberg}. Due to this, we assume that Behaviours are defined using pure functions in Echo.
-
-  \section{Flat Time}
-    Time in Echo is implemented as a flat value type defined exactly as it is in 
-    chapter 2 of this report (as an alias of Double). The internal implementation does take advantage
-    of general assumptions about Time. For instance, the \emph{merge} function for Events takes advantage
-    of the fact that an Event without occurrences still has a has a lower bound of when it can occur (again described
-    in chapter 2). 
-    
-    So we can refer the `present' we define a function for calculating this in Echo:
-    
-\begin{verbatim}
-def now() : Time = System.nanoTime() - startTime
-\end{verbatim}      
-
-    Here \emph{startTime} refers to the time the current Echo program started executing. It should be noted that \emph{nanoTime} (returning current time in
-    nano seconds) is the most accurate value available for the current system time in Scala. But, due to the
-    implementation of the Java Virtual Machine \emph{now} will start to return incorrect results 
-    after a program has been running for around 292 years due to an overflow in the calculation (thought to be an allowable
-    problem).
     
   \section{Object Orientation}
     Behaviours and Events are implemented in
@@ -69,8 +50,60 @@ val switch = new Switcher(iniBeh, behEvent)
 \end{verbatim}
 
   We also define a type for the \emph{stepper} function in a similar manner.
+  
+  \section{Extendable Events}
+    FRP Events provide a very useful abstraction for external stimuli such as I/O and user input. Of course
+    to allow for Events to interact with this input they must be allowed to actually `occur'.
+    It is noticeable that the original denotational semantics \cite{Elliott1997} do not explore how to achieve
+    this and it is assumed that this is because the actual occurring of Events is really just an implementation
+    issue. As discussed earlier in chapter 3, previous implementations of Events in Scala add an operation to Event's
+    public API to allow it to occur. Here we will show an alternative approach.
+    
+    When observing how Events are composed (using \emph{merge} and \emph{map} operations) it can be seen that
+    only a subset of Events actually `occur' while others are simply views and combinations of these `source' Events.
+    This is modelled directly in the implementation of Echo. FRP Events are represented by two traits \footnote{Traits are abstract
+    classes that can possess concrete members. A class can extend from multiple Traits (like Java's interfaces)}: 
+    Event[T] and EventSource[T].
+    Event has concrete implementations of \emph{map} and \emph{merge} operations that
+    return concrete Event[T] instantiations. EventSource[T] extends
+    from Event[T] and additionally has a protected access concrete function \emph{occur}:
+    
+\begin{verbatim}
+occur(value : T) : Unit
+\end{verbatim}  
 
-  \section{Implicit Lifting of Constants}
+    This function causes the EventSource[T] to `occur' with the given value (with the time the call was made). This allows 
+    programmers
+    to easily build FRP Event abstractions for any form of input without exposing the \emph{occur} action externally.
+    As an example, Here is a simple implementation for an Event that occurs once with the value `5' when it 
+    is created:
+    
+\begin{verbatim}
+class Five extends EventSource[Int] {
+  occur(5)
+}
+\end{verbatim}
+
+  \section{Flat Time}
+    Time in Echo is implemented as a flat value type defined exactly as it is in 
+    chapter 2 of this report (as an alias of Double). The internal implementation does take advantage
+    of general assumptions about Time. For instance, the \emph{merge} function for Events takes advantage
+    of the fact that an Event without occurrences still has a has a lower bound of when it can occur (again described
+    in chapter 2). 
+    
+    So we can refer the `present' we define a function for calculating this in Echo:
+    
+\begin{verbatim}
+def now() : Time = System.nanoTime() - startTime
+\end{verbatim}      
+
+    Here \emph{startTime} refers to the time the current Echo program started executing. It should be noted that \emph{nanoTime} (returning current time in
+    nano seconds) is the most accurate value available for the current system time in Scala. But, due to the
+    implementation of the Java Virtual Machine \emph{now} will start to return incorrect results 
+    after a program has been running for around 292 years due to an overflow in the calculation (thought to be an allowable
+    problem).
+
+  \section{Lifting Constants}
     As mentioned earlier, one of the most powerful features of Scala is it's ability to implicitly convert between
     types at run time. This is facilitated by the \emph{implicit} key word allowing a function to be defined
     that is automatically executed when a corresponding type mismatch occurs. This functionality is used in Echo to allow 
@@ -115,39 +148,6 @@ at(beh.map2(beh1)(func), t) = func(at(beh, t), at(beh1, t))
 
     These functions allow Behaviours to be transformed and combined using functions
     normally applied to static values.
-    
-  \section{Extendable Events}
-    FRP Events provide a very useful abstraction for external stimuli such as I/O and user input. Of course
-    to allow for Events to interact with this input they must be allowed to actually `occur'.
-    It is noticeable that the original denotational semantics \cite{Elliott1997} do not explore how to achieve
-    this and it is assumed that this is because the actual occurring of Events is really just an implementation
-    issue. As discussed earlier in chapter 3, previous implementations of Events in Scala add an operation to Event's
-    public API to allow it to occur. Here we will show an alternative approach.
-    
-    When observing how Events are composed (using \emph{merge} and \emph{map} operations) it can be seen that
-    only a subset of Events actually `occur' while others are simply views and combinations of these `source' Events.
-    This is modelled directly in the implementation of Echo. FRP Events are represented by two traits \footnote{Traits are abstract
-    classes that can possess concrete members. A class can extend from multiple Traits (like Java's interfaces)}: 
-    Event[T] and EventSource[T].
-    Event has concrete implementations of \emph{map} and \emph{merge} operations that
-    return concrete Event[T] instantiations. EventSource[T] extends
-    from Event[T] and additionally has a protected access concrete function \emph{occur}:
-    
-\begin{verbatim}
-occur(value : T) : Unit
-\end{verbatim}  
-
-    This function causes the EventSource[T] to `occur' with the given value (with the time the call was made). This allows 
-    programmers
-    to easily build FRP Event abstractions for any form of input without exposing the \emph{occur} action externally.
-    As an example, Here is a simple implementation for an Event that occurs once with the value `5' when it 
-    is created:
-    
-\begin{verbatim}
-class Five extends EventSource[Int] {
-  occur(5)
-}
-\end{verbatim} 
 
   \section{Time Travel is Dangerous}
     Relating back to the discussion of interactive Behaviours in chapter 2 it can be seen
