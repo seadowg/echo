@@ -174,6 +174,18 @@ stepper(ini, ev) = switcher(lift0(0), map(ev, (t, v) => lift0(v)))
 def snapshot[T, U](beh : Behaviour[T], ev : Event[U]) : Event[(T, U)]
 occs(snapshot(beh, ev)(x)) = (occs(ev)(x)._1, at(beh, t))
 \end{verbatim} 
+
+    \subsubsection{Predicate}
+      Fran additionally included a function for creating an Event that would mark the first
+      time a Behaviour[Boolean]'s value became true after a given time:
+      
+\begin{verbatim}
+def predicate(beh : Behaviour[Boolean], time : Time) : Event[Unit]
+at(beh, occs(predicate(beh, time)).first._1) = true 
+\end{verbatim}
+
+      We will see later that this function (as it may appear) is very problematic when
+      it comes to implementation.
   
   \section{Subtleties}
     FRP presents some subtle semantic problems and caveats that are not always immediately obvious.

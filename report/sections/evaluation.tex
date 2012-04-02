@@ -11,6 +11,18 @@
     evaluation. However, many of the use cases of this functionality can still be accomplished using the
     \emph{map} operation on Behaviours (such as slowing down or speeding up an animation Behaviour).
     
+    The ability to use the \emph{predicate} operation is also removed. This function has not been included in any
+    recent implementations (as discussed in chapter 3), most likely because of the reasons discussed in section
+    4.8. Some of the functionality offered by this function can be provided by the new \emph{filter} function for
+    Events however:
+    
+\begin{verbatim}
+val predicate = beh.sample(someEvent).filter(v => v == 5)
+\end{verbatim}
+
+    Although this doesn't offer the ability to find the exact point a continuous value meets some predicate we can
+    use discrete sampling to provide similar, but far less accurate, functionality.
+    
   \section{Efficiency}
     As stated at the beginning of this report one of the goals of this project was to create an efficient implementation
     of FRP. More specifically, one that doesn't require an unbounded level of memory use due to storing Event occurrences.

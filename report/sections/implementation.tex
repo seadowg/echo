@@ -214,7 +214,11 @@ beh.eval() = at(beh, now())
     It should also be noted that restricting evaluation times for Behaviours forces us
     to remove the \emph{timeTransform} operation for Behaviours as this function allows
     a programmer to create a Behaviour that at a time \emph{t} would be evaluated in respect
-    to a time less than or greater than \emph{t}.
+    to a time less than or greater than \emph{t}. The restriction also means we are unable to implement
+    the \emph{predicate} operation included in Fran. This is because it would either require evaluating Behaviours
+    at future times (not allowed) or evaluating past intervals periodically. The former would provide a functional
+    implementation but it would mean that Events would be created in the past. This would cause 
+    inaccurate states in the internal FRP representation and so is not an acceptable compromise.
     
     These rules being the case allows Echo to circumvent the semantic problems of evaluating the future
     and also prevents it from having to store an Event's entire past. With only these restrictions we may still have to
