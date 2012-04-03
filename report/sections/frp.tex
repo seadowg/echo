@@ -186,7 +186,7 @@ def predicate(beh : Behaviour[Boolean], t : Time ) : Event[Unit]
 occs(predicate(beh, t)).first = (lowestAfter(beh, t), ())
 \end{verbatim}  
 
-      By \emph{lowestAfter(beh, t)} it is mean the lowest value of time after \emph{t} for which 
+      By \emph{lowestAfter(beh, t)} it is meant the lowest value of time after \emph{t} for which 
       \emph{beh}'s value is true. We will see later that this function (as it may appear) is very problematic when
       it comes to implementation.
   
@@ -232,7 +232,7 @@ val event2 = dangerMap(event1, (t, v) => (t - 1, v))
       call \emph{merge} as it would never finish! This also means that there are some things we
       can't express for an Event such as its `length' or its `last' element.
       
-      It should be noted however that as the times in Event occurrence times are monotonically increasing
+      It should be noted however that as the times in Event occurrences are monotonically increasing
       we are able to express the occurrences before some specified time as a finite set. We will
       define a notation for this here:
 
@@ -257,7 +257,7 @@ at(pos, 5)
 \end{verbatim}    
 
       Now, suppose the time when this code executes is \emph{4}. We can see here
-      is that we are going to be evaluating \emph{pos} at a time greater than `now'. This is a problem as we don't
+      that we are going to be evaluating \emph{pos} at a time greater than `now'. This is a problem as we don't
       actually know if or when the mouse will move in the future. To deal with this we could delay the return
       result until we know the answer, raise an error or modify the original semantics. However, none of these solutions are
       particularly useful.

@@ -160,13 +160,13 @@ val switcher = Switcher(false, eventBeh)
     types have a \emph{+} function defined in their class declarations (how Scala actually performs additions
     is a topic for discussion elsewhere). This means that we cannot `lift' many of the operations we
     would want to. To solve this problem we can use a series of map functions. We can define these
-    here as part of Behaviour[T]:
+    here as members of Behaviour[T]:
 
 \begin{verbatim}
 def map[U](func : T => U) : Behaviour[U]
 at(beh.map(func), t) = func(at(beh, t))
 
-def map2[U, V](beh1 : U)(func : (T, U) => V) : Behaviour[V]
+def map2[U, V](beh1 : Behaviour[U])(func : (T, U) => V) : Behaviour[V]
 at(beh.map2(beh1)(func), t) = func(at(beh, t), at(beh1, t))
 \end{verbatim}        
 
