@@ -159,7 +159,38 @@
         <div class="step">
           <h3>5. Adding Graphics</h3>
           <p>
-            Lorem ipsum
+            There is also a simple UI framework in echo so you make funky GUI apps for your users.
+            What's cool about this is that you can set GUI components attributes to be Behaviours
+            Before we launch into all that though lets make a small little app with a button and
+            some text:
+          </p>
+            
+            <pre>
+  val frame = Frame(200, 200, List(
+    Text("Hello you!"),
+    Button("Click Me!")
+  ))</pre>
+          </p>
+          
+          <p>
+            This creates a Frame with a size of 200 x 200. It should be noted that these
+            dimensions are Behaviours so if we set them to change over time the window
+            size would stay up to date with the Behaviour's value. So lets do something with FRP:
+          </p>
+          
+          <pre>
+  val button = Button("Click Me!")
+  val text = "Hello".until(button.click, "Goodbye")
+  
+  val frame = Frame(200, 200, List(
+    text,
+    button
+  ))</pre>
+  
+          <p>
+            When this app runs the text component will say "Hello" but when a user hits the button
+            it will change to saying "Goodbye". You can see pretty immediately that this allows us
+            to build our GUI's in a much nicer way. No ActionEventListener here.
           </p>
         </div>
       
