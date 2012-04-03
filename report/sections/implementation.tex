@@ -17,7 +17,7 @@
     incredibly expressive and powerful ways to embed FRP into Scala as will be demonstrated later.
     
     One slight problem with implementing FRP in Scala was that, unlike Haskell, it is an `impure'
-    language. In terms of functional programming, `purity' refers to a languages ability to write functions
+    language. In terms of functional programming, `impurity' refers to a languages ability to write functions
     thats results are affected by some external estate or in turn effect some external state. For instance,
     this means that a function that defines a Behaviour could be impure and could therefore cause side effects
     whenever the Behaviour was evaluated. There has been some work into pure function verification in Scala but it has not 
@@ -55,7 +55,7 @@ val switch = new Switcher(iniBeh, behEvent)
   
   \section{Extendable Events}
     FRP Events provide a very useful abstraction for external stimuli such as I/O and user input. Of course
-    to allow for Events to interact with this input they must be allowed to actually `occur'.
+    to so Events can interact with this input they must be allowed to actually `occur'.
     It is noticeable that the original denotational semantics \cite{Elliott1997} do not explore how to achieve
     this and it is assumed that this is because the actual occurring of Events is really just an implementation
     issue. As discussed earlier in section~\ref{sec:semantics}, previous implementations of Events in Scala add an operation to Event's
@@ -64,7 +64,7 @@ val switch = new Switcher(iniBeh, behEvent)
     When observing how Events are composed (using \emph{merge} and \emph{map} operations) it can be seen that
     only a subset of Events actually `occur' while others are simply views and combinations of these `source' Events.
     This is modelled directly in the implementation of Echo. FRP Events are represented by two traits \footnote{Traits are abstract
-    classes that can possess concrete members. A class can extend from multiple Traits (like Java's interfaces)}: 
+    classes that can possess concrete members. A class can extend from multiple Traits (like Java's interfaces).}: 
     Event[T] and EventSource[T].
     Event has concrete implementations of \emph{map} and \emph{merge} operations that
     return concrete Event[T] instantiations. EventSource[T] extends
@@ -77,7 +77,7 @@ def occur(value : T) : Unit
     This function causes the EventSource[T] to `occur' with the given value (with the time the call was made). This allows 
     programmers
     to easily build FRP Event abstractions for any form of input without exposing the \emph{occur} action externally.
-    As an example, Here is a simple implementation for an Event that occurs once with the value `5' when it 
+    As an example, here is a simple implementation for an Event that occurs once with the value `5' when it 
     is created:
     
 \begin{verbatim}
@@ -96,7 +96,7 @@ val beh = Behaviour(time => 5)
 \end{verbatim}
 
     This is accomplishable using a combination of two Scala features: Companion objects and \emph{apply} functions
-    \cite{Typesafe}. Using these features we can implement a static function that is executed whenever function
+    \footnote{Please see http://docs.scala-lang.org/glossary/ for description of these features.}. Using these features we can implement a static function that is executed whenever function
     arguments are applied to the class name. We can then simply call the the class' constructor from this. An implementation
     that allows for the above example is as follows:
 
@@ -106,7 +106,7 @@ object Behaviour {
     new Behaviour(func)
   }
 }
-\end{verbatim}    
+\end{verbatim}
     
   \section{Flat Time}
     Time in Echo is implemented as a flat value type defined exactly as it is in 
@@ -115,7 +115,7 @@ object Behaviour {
     of the fact that an Event without occurrences still has a has a lower bound of when it can occur (again described
     in section~\ref{sec:semantics}). 
     
-    So we can refer the `present' we define a function for calculating this in Echo:
+    So we can refer to the `present' we define a function for calculating this in Echo:
     
 \begin{verbatim}
 def now() : Time = System.nanoTime() - startTime

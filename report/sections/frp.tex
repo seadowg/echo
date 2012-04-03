@@ -25,7 +25,7 @@
   
     \subsection{Types}
       The concepts introduced in the Fran paper and in following FRP work are based around two key data types: 
-      Behaviours and Events. These are often described in terms of Time so this will also be defined here
+      Behaviours and Events. These are often described in terms of Time so this will also be defined here.
       
       \subsubsection{Time}
         We often think of
@@ -78,22 +78,19 @@ def occs[T](ev : Event[T]) : Stream[(Time, T)]
         and Elliott define a series functions for accomplishing this:
         
 \begin{verbatim}
-def liftn[T1,..,Tn U](a1 : T1,..,an : Tn => U, 
-b1 : Behaviour[T1],..., bn : Behaviour[Tn]) : Behaviour[U]
-at(lift(func, b1,...,bn), t) = func (at(b1, t),..., at(bn, t))
-\end{verbatim}
-
-      In the original paper it was noted that this was intended to also lift constants to Behaviours
-      as in \emph{lift0(42)} for example. This functionality is not captured in the above function \footnote{It would
-      be in Haskell}. To achieve this we can simply define a function explicitly:
-
-\begin{verbatim}
 def lift0[T](t : T) : Behaviour[T]
-at(lift0(v), t) = v
+at(lift0(v), t) = v  
+  
+def lift1[T, U](func : T => U, beh) : Behaviour[U]
+at(lift1(func, beh), t) = func(at(beh))
+
+def lift2[T, U, V](func : (T, U) => V, beh1 : T, beh2 : U) : Behaviour[V]
+at(lift2(func, beh1, beh2), t) = func(at(beh1, t), at(beh2, t))
 \end{verbatim}
-        
-       It also may be useful to evaluate Behaviours in a modified time frame. For example, this allows
-       slowing down or speeding up a Behaviour. We define this function like so:
+
+      It can be seen that we can extend this concept to cover functions with any number of input arguments.
+      It also may be useful to evaluate Behaviours in a modified time frame. For example, this allows
+      slowing down or speeding up a Behaviour. We define this function like so:
 
 \begin{verbatim}
 def timeTransform[T](beh : Behaviour[T], 

@@ -92,7 +92,7 @@ type Behaviour[T] = Reactive[Time => T]
       paper `Deprecating the Observer Pattern' \cite{Maier2010} does utilise a notion of Events that, as cited in the paper,
       has its routes in FRP.
 
-      The Event's in React are very similar to the Events in Fran \cite{Elliott1997}: they are conceptually infinite
+      The Events in React are very similar to the Events in Fran \cite{Elliott1997}: they are conceptually infinite
       and have the \emph{merge} and \emph{map} operations defined on them. One slight difference is that React's
       Events expose an operation to allow them to `occur' with a public \emph{emit} function. This disrupts
       the abstraction of Events somewhat. For instance, imagine we have an Event \emph{mouseB} that occurs
@@ -116,8 +116,8 @@ event.emit(())
       
 \section{Comparison}
   We can compare these frameworks with respect to the presence of various key features. These are Behaviours, Events, 
-  \emph{stepper} - discretely 
-  changing value and \emph{switcher} - continuous value that switches to other continuous values at discrete points in time.
+  \emph{stepper} (discretely 
+  changing value) and \emph{switcher} (continuous value that switches to other continuous values at discrete points in time).
   
   \begin{center}
      \begin{tabular}{ | l | l | l | l | l | }
