@@ -8,6 +8,8 @@ import collection.mutable.ArrayBuffer
 /** Event provides an implementation of FRP Events.
  */
 trait Event[T] {
+  /** Returns the last occurrence for this Event
+   */
   protected def occs(): Occurrence[T]
   
   /** Causes the passed function to execute every time this
@@ -120,7 +122,10 @@ trait Event[T] {
       }
     }
   }
-
+  
+  /** Returns the result of calling occs wrapped
+    * in an Option[Occurrence[T]] instance.
+   */
   private[core] def top(): Option[Occurrence[T]] = {
     val top = occs()
 

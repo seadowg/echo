@@ -6,6 +6,10 @@ import com.github.oetzi.echo.Control._
 /** Behaviour provides an implementation of FRP Behaviours.
  */
 sealed class Behaviour[T](private val rule: Time => T) {
+  
+  /** Holds last computed value and time it was computed at
+    * to prevent redundant evaluation.
+   */
   var last: (Time, T) = null
   
   /** Evaluates the Behaviour at the current time. The function is atomic
@@ -130,6 +134,8 @@ sealed class Behaviour[T](private val rule: Time => T) {
     }
   }
   
+  /** Evaluates the Behaviour at the specified time.
+    */
   private[core] def at(time: Time): T = {
     if (last == null || time != last._1) {
       last = (time, rule(time))
