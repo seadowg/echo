@@ -26,7 +26,7 @@ You can also use standard buildr commands to work with echo in various IDEs. The
 
 ## Hacking
 
-Please feel free to hack on the echo source: Fork me, hack me then make a [pull request](http://help.github.com/send-pull-requests/).
+Please feel free to hack on the echo source: [Fork](http://help.github.com/fork-a-repo/) it, hack it then make a [pull request](http://help.github.com/send-pull-requests/).
 
 ### Packages
 
