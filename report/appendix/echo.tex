@@ -36,8 +36,15 @@ beh1.until(ev, beh2) = switcher(beh1, map(ev, (t, v) => beh2))
       
     \subsubsection*{def toggle[A](ev: Event[A], beh: Behaviour[T]): Behaviour[T]}
       Returns a Behaviour that toggles between behaving as the callee
-      and the passed Behaviour whenever the passed Event occurs.
-      
+      and the passed Behaviour whenever the passed Event occurs. This function
+      can be defined using the \emph{finite} function defined in chapter 2:
+
+\begin{verbatim}      
+def toggle(ev : Event[T], beh1 : Behaviour[T]) : Behaviour[T]
+at(beh1.toggle(ev, beh2), t) = if (finite(ev, t).length % 2 == 0)
+  { at(beh1, t) } else { at(beh2, t) }
+\end{verbatim}
+
     \subsubsection*{def map[B](func: T =$>$ B): Behaviour[B]}
       Returns a Behaviour that transforms the callee's
       value with the passed function.
