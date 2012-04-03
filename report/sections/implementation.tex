@@ -1,7 +1,8 @@
 \chapter{Implementation}
   This section will explore various aspects of the implementation and choices made during the development
   of Echo. Any functions or concepts introduced or modified in this section will be expressed in terms
-  of the Fran semantics specified in section~\ref{sec:semantics} where possible.
+  of the Fran semantics specified in section~\ref{sec:semantics} where possible. The source code for
+  the implemented framework can be viewed on Echo's source repository \cite{Stott}.
   
   \section{Scala}
     Scala is a multi-paradigm programming language developed to run on the Java Virtual Machine \cite{Odersky2004}. Scala 
@@ -394,3 +395,17 @@ at(beh, t)
     to verify that code did not only compile and run but that implementations matched the original denotational 
     semantics. In other words, developing Echo with TDD allowed for verification that the implementation
     was correct throughout the development process.
+    
+  \section{Documentation}
+    Of course for any programming language framework to be useful it must be documented for both potential users
+    and developers who may want to expand the framework itself. 
+    
+    For user programmers two pieces of documentation
+    are provided. The first of these is a specification for the core FRP package (Behaviour, Event, Stepper and Switcher
+    types) that is provided in Appendix C of this report. Furthermore a tutorial on how to
+    create Echo programs is provided on Echo's website \cite{Stotta}.
+    
+    Anyone wanting to expand Echo in any way is also provided with two pieces of documentation. Firstly, a Readme file exists
+    in Echo's source that details how to compile the project, set the source up in various IDE's and describes the package
+    layout for the code. There are also comments throughout the source that detail different aspects of the 
+    implementation allowing programmer to gain an insight into the current implementation.
