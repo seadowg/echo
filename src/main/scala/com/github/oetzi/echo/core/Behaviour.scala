@@ -23,11 +23,11 @@ sealed class Behaviour[T](private val rule: Time => T) {
   /** Returns a Event[T] that occurs every time the given
     * Event occurs with the value of the Behaviour at that time.
    */
-  def sample[A](sourceEvent: Event[A]): Event[T] = {
+  def sample[A](sourceEvent: Event[A]): Event[(A, T)] = {
     frp {
-      val source = new EventSource[T] {
+      val source = new EventSource[(A, T)] {
         sourceEvent.hook {
-          occ => occur(Behaviour.this.at(occ.time))
+          occ => occur((occ.value, Behaviour.this.at(occ.time)))
         }
       }
 

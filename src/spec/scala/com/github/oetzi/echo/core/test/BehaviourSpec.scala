@@ -177,7 +177,7 @@ object BehaviourSpec extends Specification {
         }
 
         sampler.top().get.time mustEqual 1
-        sampler.top().get.value mustEqual 1
+        sampler.top().get.value mustEqual ((), 1)
       }
     }
   }
