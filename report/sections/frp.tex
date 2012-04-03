@@ -230,8 +230,18 @@ val event2 = dangerMap(event1, (t, v) => (t - 1, v))
       that they must be evaluated lazily: we can't merge two infinite streams when we actually
       call \emph{merge} as it would never finish! This also means that there are some things we
       can't express for an Event such as its `length' or its `last' element.
-    
       
+      It should be noted however that as the times in Event occurrence times are monotonically increasing
+      we are able to express the occurrences before some specified time as a finite set. We will
+      define a notation for this here:
+
+\begin{verbatim}
+def finite[T](ev : Event[T], t : Time) : Stream[(Time, T)]
+finite(ev, t) = occs(ev).takeWhile((te, v) => te <= t)
+\end{verbatim}
+
+      We will use this function in later definitions.
+    
     \subsection{Interactive Behaviour}
       FRP runs into some of its most significant problems when it is combined with any
       sort of interactivity - unfortunately an area of programming it initially seems

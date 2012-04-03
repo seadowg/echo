@@ -327,15 +327,17 @@ val empty = Event()
     tackle the changes in expressiveness between Haskell and Scala some operations
     were added to the FRP contained in Echo.
         
-    In Hudak and Elliott's original paper an example is constructed to create a recursively defined Behaviour
+    In Hudak and Elliott's original paper an example is constructed to create a defined Behaviour
     that toggles back and forth between two given Behaviours whenever an Event occurs. This
     example took advantage of Haskell's lazy evaluation. While Scala is able to use lazy evaluation
     it is not particularly intuitive and requires some rather awkward syntax. To tackle this
     a \emph{toggle} function was added to Echo to provide the functionality shown in Elliott and Hudak example out of the box.
-    This is defined as a member of Behaviour[T]:
+    We define this function here as a member of Behaviour[T] in a simpler manner than that used by Elliott and Hudak:
     
 \begin{verbatim}
 def toggle(ev : Event[T], beh1 : Behaviour[T]) : Behaviour[T]
+at(beh1.toggle(ev, beh2), t) = if (finite(ev, t).length % 2 == 0)
+  { at(beh1, t) } else { at(beh2, t) }
 \end{verbatim}        
     
     It was felt that another common use of combining Behaviours and Events would be
