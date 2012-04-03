@@ -14,14 +14,15 @@
       semantics of FRP
       to promote more efficient implementations without altering the overall semantic model.
       
-      Reactive introduces a new type that can be used to simplify what he referred to as
+      Reactive introduces a new way to represent what he referred to as
       `reactive' values (such as lifted static values and \emph{stepper} Behaviours):
     
 \begin{verbatim}
 type Reactive[T] = Stream[(Time, T)]
 \end{verbatim}
 
-      Elliott also presents a way to express Behaviours using this new type:
+      We can then think of a Reactive's as a value that changes at discrete points in time (denoted by the
+      elements of the stream). Elliott points out that we can also express Behaviour's implementation in this way also:
       
 \begin{verbatim}
 type Behaviour[T] = Reactive[Time => T]
