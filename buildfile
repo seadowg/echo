@@ -35,8 +35,7 @@ COPYRIGHT = "Callum Stott 2012"
 repositories.remote << "http://www.ibiblio.org/maven2/"
 
 # Project setup
-Project.local_task :typeset
-Project.local_task :tcc
+Project.local_task :docs
 Project.local_task :console
 
 define "echo" do
@@ -49,5 +48,9 @@ define "echo" do
   
   task :console => :compile do
     system 'scala -classpath target:target/classes'
+  end
+  
+  task :docs => :compile do
+    system 'scaladoc -classpath target:target/classes -d target/doc $(find . -name "*.scala" | grep -v "test")'
   end
 end
