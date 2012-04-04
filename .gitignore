@@ -1,5 +1,8 @@
+report/*
 reports/*
-target/*
+target/*.jar
+target/classes/*
+target/spec/*
 examples/*/target
 examples/example_lib/*
 echo.iml
