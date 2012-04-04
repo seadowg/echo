@@ -1,26 +1,36 @@
 package com.github.oetzi.echo.io
 
 import com.github.oetzi.echo.core.EventSource
-import com.github.oetzi.echo.Echo._
 
-
+/**Trait for allowing failure tolerant FRP
+ * components.
+ */
 trait Breakable {
+  /**An Event that represents Exceptions
+   * thrown while executing code within this
+   * Breakable object.
+   */
   val errors = new EventSource[Exception] {
-    def apply[T](block : () => T) : Option[T] = {
+    def apply[T](block: => T): Option[T] = {
       try {
-        Some(block())
+        Some(block)
       }
 
       catch {
         case e: Exception => {
-          this.occur(now, e)
+          this.occur(e)
           None
         }
       }
     }
   }
 
-  protected def dangerous[T](block: () => T): Option[T] = {
+  /**All code that can cause an exception
+   * should be passed to this function in a Breakable
+   * implementation. Any Exceptions thrown will occur
+   * as part of the errors Event.
+   */
+  protected def dangerous[T](block: => T): Option[T] = {
     errors(block)
   }
 }

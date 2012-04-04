@@ -1,0 +1,274 @@
+\chapter{Functional Reactive Programming}
+  \section{Origins}
+  \label{sec:origins}
+    Functional Reactive Programming was originally proposed in the 1997 paper `Functional
+    Reactive Animation' by Conal Elliott and Paul Hudak \cite{Elliott1997}. In this paper Elliott and Hudak
+    set forth a ``collection of data types and functions'' designed for creating interactive 
+    animations in the form of a framework for Haskell named `Fran'. The paper eventually went on to
+    win an award distinguishing it as the most influential paper of ICFP97 \cite{SIGPLAN}. 
+    
+    Since the original proposal of the paradigm there has been a great amount of research
+    into implementation and modification of FRP. Hudak has mainly focused on experimenting with various
+    implementation methods and a modification to the original semantics categorised as ``Arrow FRP''. Elliot's
+    work has dealt with FRP on a more conceptual level. This work culminated in a further significant paper
+    ``Push-Pull FRP'' \cite{Elliott2009}. In this paper Elliott attempted to clarify much of the semantics in a way that encouraged more efficient 
+    and
+    structured implementations. This report will focus on the FRP defined in the original 1997 paper using
+    some of Elliott's later work to clarify certain points.
+
+  \section{Semantics}
+    \label{sec:semantics}
+    Within this section we will explore a selection of the basic denotational semantics defined in Fran
+    that we hope to implement in Scala. The semantic definitions will
+    be presented using Scala syntax so as to provide continuity throughout the report. Definitions will
+    be in the form of a function signature followed by an expression that denotes its operation. This style
+    is based on that found in the Fran paper itself.
+  
+    \subsection{Types}
+      The concepts introduced in the Fran paper and in following FRP work are based around two key data types: 
+      Behaviours and Events. These are often described in terms of Time so this will also be defined here.
+      
+      \subsubsection{Time}
+        We often think of
+        Time as a continuous value and so in in numerical terms this is best modelled by the
+        Scala type Double. This is the definition we will use throughout this report:
+
+\begin{verbatim}
+type Time = Double
+\end{verbatim}    
+
+        There are some interesting properties of Time that we can utilise in FRP. For instance,
+        conceptually there is no minimum Double value but with Time we can say that a given Time is `at least'
+        some value. For instance, imagine we are recording the times at which a person claps: even though we
+        may not know the time of the next clap we can always say that it is greater than `now'. This idea is explored 
+        in great detail within two of Conal Elliott's papers \cite{Elliott1997}, \cite{Elliott2009} but will not feature
+        heavily in this report for the sake of simplicity.
+   
+      \subsubsection{Behaviour}
+        Behaviours are essentially values that change over time. Semantically we think of them as
+        a function from Time to some type T:
+
+\begin{verbatim}
+type Behaviour[T] = Time => T
+\end{verbatim}
+        
+        We can access a Behaviour's value at some time \emph{t} with the \emph{at} function:
+
+\begin{verbatim}
+def at[T](beh : Behaviour[T], t  : Time) : T
+\end{verbatim}
+      
+      \subsubsection{Event}
+        Events can be thought of as an infinite stream of Time-value pairs:
+
+\begin{verbatim}
+type Event[T] = Stream[(Time, T)]
+\end{verbatim}
+        
+        As with Behaviours, we define a function to access an Event's data:
+        
+\begin{verbatim}
+def occs[T](ev : Event[T]) : Stream[(Time, T)]
+\end{verbatim}
+
+        As this stream is seen as a list of occurrences in Time it is monotonically
+        increasing with respect to time: the time of each occurrence is greater than
+        or equal to the occurrence's before it.
+       
+    \subsection{Operations}
+      Elliott and Hudak additionally define a set of actions on Behaviours and Events.
+      
+      \subsubsection{Behaviours}
+        We would like functions defined on static values to also be available to Behaviours. Hudak
+        and Elliott define a series of functions for accomplishing this:
+        
+\begin{verbatim}
+def lift0[T](t : T) : Behaviour[T]
+at(lift0(v), t) = v  
+  
+def lift1[T, U](func : T => U, beh : Behaviour[T]) : Behaviour[U]
+at(lift1(func, beh), t) = func(at(beh, t))
+
+def lift2[T, U, V](func : (T, U) => V, beh1 : Behaviour[T], 
+  beh2 : Behaviour[U]) : Behaviour[V]
+at(lift2(func, beh1, beh2), t) = func(at(beh1, t), at(beh2, t))
+\end{verbatim}
+
+      It can be seen that we can extend this concept to cover functions with any number of input arguments.
+      It also may be useful to evaluate Behaviours in a modified time frame. For example, this allows
+      slowing down or speeding up a Behaviour. We define this function like so:
+
+\begin{verbatim}
+def timeTransform[T](beh : Behaviour[T], 
+  time : Behaviour[Time]) : Behaviour[T]
+at(timeTransform(beh, timeBeh), t) = at(beh, at(timeBeh, t))
+\end{verbatim}
+        
+      \subsubsection{Events}
+        It is useful to be able to merge two Events into one. We can achieve this with the \emph{merge} function:
+
+\begin{verbatim}
+def merge[T](ev1 : Event[T], ev2 : Event[T]) : Event[T]
+def mergeStr[T](str1 : Stream[Time, T], 
+  str1 : Stream[Time, T]) = {
+  if (str1.first.time <= str2.first.time) {
+    new Stream(str1.first, mergeStr(str1.drop(1), str2))
+  } else {
+    new Stream(str2.first, mergeStr(str1, str2.drop(1)))
+  }
+}
+occs(merge(ev1, ev2)) = mergeStr(occs(ev1), occs(ev2))
+\end{verbatim}            
+
+      It should be noted that if if an occurrence from \emph{ev1} and \emph{ev2} occur `simultaneously' (have the same time) 
+      then
+      the occurrence from \emph{ev2} will be placed after in the merged stream. Another interesting point to explore
+      here is that often we can't evaluate which Event occurred first. Imagine one Event has one occurrence in
+      the future but the other has no occurrences: the second still might occur before the first, we just don't know it
+      yet. In this situation we can take advantage of the fact that the compared values are values in Time. Assuming
+      Events cannot occur in the past we know that the second one will not occur until after the time `now' (the
+      present time). Again, this concept is discussed at length by Conal Elliott \cite{Elliott2009}.
+       
+      Elliott and Hudak's paper also defined a series of transformer functions for Events. Here we define a
+     \emph{map} function for allowing the same functionality:
+
+\begin{verbatim}
+def map[T, U](ev : Event[T], func : (Time, T) => U)  : Event[U]
+occs(map(ev, func)) = occs(event).map(func)
+\end{verbatim}     
+
+      A function for flattening Event[Event[T]] to an Event[T] is also defined:
+
+\begin{verbatim}
+def delayOccs[T](t : Time, ev : Event[T]) : Event[T]
+occs(delayOccs(t, ev)) = occs(ev).map(o => (max(o._1, t), o._2))
+\end{verbatim}
+
+\begin{verbatim}
+def join[T](ev : Event[Event[T]])  : Event[T]
+occs(join(ev)) = occs(map(ev, 
+  e => delayOccs(e._1, e._2))).foldLeft(emptEv,
+    (e, o) => merge(e, o))
+\end{verbatim}        
+
+      One caveat to this function is that any occurrences of Events that occur in \emph{ev} are delayed
+      so their occurrence times are at least that of the time that their parent Event occurred.
+      
+      It should be noted that as the times in Event occurrences are monotonically increasing
+      we are able to express the occurrences before some specified time as a finite set. We will
+      define a notation for this here:
+
+\begin{verbatim}
+def finite[T](ev : Event[T], t : Time) : Stream[(Time, T)]
+finite(ev, t) = occs(ev).takeWhile((te, v) => te <= t)
+\end{verbatim}
+        
+      \subsubsection{Reactivity}
+        One of the most powerful aspects of FRP is the ability to use Events to punctuate or `switch' Behaviours.
+        The original Fran paper defined an \emph{untilB} function that was later renamed (more appropriately in this
+        author's mind) to \emph{switcher} \cite{Elliott2009}:
+
+\begin{verbatim}
+def switcher[T](ini : Behaviour[T], ev : Event[Behaviour[T]])
+at(switcher(ini, ev), t) = at(finite(ev, t).last._2.at(t))
+\end{verbatim}
+
+        We can also extend this concept to static values which is very useful in practice:
+      
+\begin{verbatim}  
+def stepper[T](ini : T, ev : Event[T])
+stepper(ini, ev) = switcher(lift0(0), map(ev, (t, v) => lift0(v)))    
+\end{verbatim}
+
+        Another useful interaction between Behaviours and Events is to be able to sample
+        a Behaviour at the exact moment an Event occurs. This functionality was originally defined in the
+        form of the \emph{snapshot} operation:
+
+\begin{verbatim}
+def snapshot[T, U](beh : Behaviour[T], 
+  ev : Event[U]) : Event[(U, T)]
+occs(snapshot(beh, ev)) = occs(ev).map((t, v) => (v, at(beh, t)))
+\end{verbatim} 
+
+    \subsubsection{Predicate}
+      Fran additionally included a function for creating an Event that would mark the first
+      time a Behaviour[Boolean]'s value became true after a given time:
+      
+\begin{verbatim}
+def predicate(beh : Behaviour[Boolean], t : Time ) : Event[Unit]
+occs(predicate(beh, t)).first = (lowestAfter(beh, t), ())
+\end{verbatim}  
+
+      By \emph{lowestAfter(beh, t)} it is meant the lowest value of time after \emph{t} for which 
+      \emph{beh}'s value is true. We will see later that this function (as it may appear) is very problematic when
+      it comes to implementation.
+  
+  \section{Subtleties}
+    \label{sec:subtle}
+    FRP presents some subtle semantic problems and caveats that are not always immediately obvious.
+    They will be explored here in an attempt to aid the reader's understanding.
+     
+    \subsection{Events as Monotonic Streams}
+      As stated earlier, we think of Events as streams of Time-value pairs. What isn't immediately
+      obvious is that we think of this stream as real-time data: each occurrence is a value that
+      `occurs' at the time stated. As stated earlier, this means that the stream is monotonic in
+      respect to occurrence times.
+      
+      With the previous observations in mind it it can be seen that Events should not be treated as a
+      standard data structure. Its noticeable that the earlier definition of the \emph{map} operation for
+      Events does not provide a way to modify occurrence times. Here we will show why this is
+      the case using a modified version of this function.
+      
+      First we define the new function:
+      
+\begin{verbatim}
+def dangerMap[T, U](ev : Event[T], 
+  func : (Time, T) => (Time, U))  : Event[U]
+occs(map(ev, func)) = occs(event).map(func)
+\end{verbatim}
+
+      Now we can do the following:
+      
+\begin{verbatim}
+val event2 = dangerMap(event1, (t, v) => (t - 1, v))
+\end{verbatim}
+
+      \emph{event2} makes no sense as when there is a new occurrence in \emph{event1} at time 
+      \emph{t} a corresponding occurrence will be generated for \emph{event2} but at time 
+      \emph{t - 1}. This means occurrences of this Event are happening in the past! We must
+      be careful to avoid allowing situations like these to happen when implementing FRP.
+      
+    \subsection{Events are Infinite}  
+      It is also important to highlight that an Event is conceptually \emph{infinite}. This means
+      that they must be evaluated lazily: we can't merge two infinite streams when we actually
+      call \emph{merge} as it would never finish! This also means that there are some things we
+      can't express for an Event such as its `length' or its `last' element.
+    
+    \subsection{Interactive Behaviour}
+      FRP runs into some of its most significant problems when it is combined with any
+      sort of interactivity - unfortunately an area of programming it initially seems
+      well equipped for. This is best explained with an example. For this we will use an 
+      Event[(Int, Int)] \emph{mousePos} that occurs every time the user's mouse moves with the new position:
+
+\begin{verbatim}
+val pos = switcher(lift0((0, 0)), 
+  map(mousePos, (t, pos) => lift0(t, pos)))
+at(pos, 2)
+at(pos, 5)
+\end{verbatim}    
+
+      Now, suppose the time when this code executes is \emph{4}. We can see here
+      that we are going to be evaluating \emph{pos} at a time greater than `now'. This is a problem as we don't
+      actually know if or when the mouse will move in the future. To deal with this we could delay the return
+      result until we know the answer, raise an error or modify the original semantics. However, none of these solutions are
+      particularly useful.
+      
+      What about the past? Evaluating \emph{pos} at times before `now' certainly makes sense. However, if arbitrary
+      access is allowed to the past in this way then we would have to store every occurrence
+      of an Event. It may be the case that this is how Events must be implemented but it does
+      mean that any FRP program would use an increasing amount of memory as its run time increased (not a 
+      desirable property of any piece of code). This will also result in very large Event data sets which
+      may be impossible to traverse quickly for performing operations such as \emph{at} in real-time.
+      
+      These examples shows that implementing FRP without some restriction might either involve modifying the
+      semantics or sacrificing efficiency.

@@ -2,16 +2,17 @@
 require 'buildr/scala'
 
 # Version number for this release
-VERSION_NUMBER = "0.12.0"
+VERSION_NUMBER = "1.0.0"
 
 # Group identifier for your projects
 GROUP = "echo"
-COPYRIGHT = "Callum Stott 2011"
+COPYRIGHT = "Callum Stott 2012"
 
 # Specify Maven 2.0 remote repositories here, like this:
 repositories.remote << "http://www.ibiblio.org/maven2/"
 
-Project.local_task :typeset
+# Project setup
+Project.local_task :docs
 Project.local_task :console
 
 define "echo" do
@@ -22,12 +23,11 @@ define "echo" do
   package :jar
   test.using :specs
   
-  task :typeset do
-    FileUtils.makedirs('target/pdfs') unless File.exists?('target/pdfs')
-    system 'xelatex -output-directory=target/pdfs src/report/*.tex'
-  end
-  
   task :console => :compile do
     system 'scala -classpath target:target/classes'
+  end
+  
+  task :docs => :compile do
+    system 'scaladoc -classpath target:target/classes -d target/doc $(find . -name "*.scala" | grep -v "test")'
   end
 end

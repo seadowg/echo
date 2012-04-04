@@ -1,31 +1,36 @@
 package com.github.oetzi.echo.display
 
 import javax.swing.JLabel
-import com.github.oetzi.echo.core.{Behaviour, Occurrence}
-import com.github.oetzi.echo.Echo._
+import java.awt.Component
+import com.github.oetzi.echo.core.Behaviour
 
-class Text private(private val textBeh : Behaviour[String]) extends Canvas {
-  val internal : JLabel = new JLabel() {
+/**Allows for simply text blocks in UIs. Utilises a JLabel internally.
+ */
+class Text private(private val textBeh: Behaviour[String]) extends Canvas {
+  protected[echo] val internal: JLabel = new JLabel() {
     override def repaint() {
-      Text.this.update(now())
       super.repaint()
     }
   }
 
-  def update(time: Time) {
-
-  }
-
-  def draw(time: Time) {
-    this.internal.setSize(widthBeh.at(time), heightBeh.at(time))
-    this.internal.setText(textBeh.at(time))
+  protected[display] def draw() {
+    this.internal.setSize(widthBeh.eval(), heightBeh.eval())
+    this.internal.setText(textBeh.eval())
 
     this.internal.repaint()
+  }
+
+  protected[display] def swingComponent(): Component = {
+    internal
   }
 }
 
 object Text {
-  def apply(text : Behaviour[String]) : Text = {
+
+  /**Creates a Text object displaying the specified
+   * text.
+   */
+  def apply(text: Behaviour[String]): Text = {
     new Text(text)
   }
 }

@@ -1,0 +1,47 @@
+\chapter{Music Player Code}
+
+MusicPlayer.scala
+
+\begin{verbatim}
+object MusicPlayer extends EchoApp {
+  def setup(args : Array[String]) {
+    val width = 200
+    val height = 200
+
+    val playButton = Button(
+      button => "Play".toggle(button.click, "Pause"))
+    val slider = Slider()
+
+    val playing = false.toggle(playButton.click, true)
+    val song = new Song(
+      new File("music/running.aif"), 
+        playing, slider.value)
+
+    val distortedColor = slider.value.map { s =>
+      s match {
+        case s if s > 70  => Color.red
+        case s if s > 50 => Color.orange
+        case _ => Color.green 
+      }
+    }
+
+    val anim = song.volume.map2(width) {
+      (v, w) => math.min(v * (w / 50F), w)
+    }
+
+    val frame = Frame(width, height, List(
+      Block(anim.map(a => a.toInt), 
+        height.map(h => h - 70), distortedColor),
+      slider,
+      playButton
+    ), true.until(song.errors, false))
+
+
+    val popup = Frame(200, 50, List(
+      Text("Error:"),
+      Text(new Stepper("None", 
+        song.errors.map(e => e.toString)))
+    ), false.until(song.errors, true))
+  }
+}
+\end{verbatim}

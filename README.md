@@ -1,28 +1,14 @@
 # echo
 
-## Mission Statement
+## Using
 
-'echo' is a functional reactive programming framework that I am creating for my undergraduate project. Scala was
-chosen as the implementation because: its nice, it allows for proper FP and it also has some nice features for writing
-DSLs (implicit functions etc). How is this going work? What are you asking me for?
-
-## The Basic Spec
-
-I'm wanting echo to work a bit like this (requires knowledge of FRP to understand):
-
-* Pure Behaviours - time varying continuous values that are essentially a function with respect to time. By this I mean 
-that a Behaviours value is lazily calculated and is done so recursively (not updated at an interval).
-* Pureish Events that work in the way that Haskellers define them but also work as collections (ie have each, map, filter 
-functions)
-* Graph like model where as much of the control flow is modelled in one stream as possible (less threading)
-* A focus on actual practical industrial usage. This means implementing Behaviours and Events to abstract networking, IO 
-components etc. The graphical stuff is already done to death so it doesn't interest me as much.
-* An additional focus on the framework being as DSLie as possible. I want to put a lot of thought into how naturally and 
-intuitively echo can be used.
+If you're just wanting to use echo to build something there is a rather informal tutorial and a documentation for
+the various types and functions [here](http://www.seadowg.com/echo). The remainder of this document will mainly deal 
+with working on the echo source code.
 
 ## Building
 
-The project uses [buildr](http://buildr.apache.org/) for building. If you haven't used this before it is a ruby tool for 
+The framework uses [buildr](http://buildr.apache.org/) for building. If you haven't used this before it is a ruby tool for 
 building JVM languages. To build the project simply do:
 
     buildr
@@ -33,15 +19,45 @@ This will compile the project into `target/classes` and run all tests. You can a
     
 There are a few other tasks added to buildfile:
 
-* `typeset` - this will typeset my dissertation that surrounds the project
-* `console` - this builds everything then fires up a scala console with the built classes included in the classpath
+* `docs` - builds the documentation for the source code.
+* `console` - this builds everything then fires up a scala console with the built classes included in the classpath.
 
-## Including
+You can also use standard buildr commands to work with echo in various IDEs. These are documented [here](http://buildr.apache.org/more_stuff.html#eclipse).
 
-To include echo in a project make sure the .jar is in the classpath for your project and import it like so:
+## Hacking
 
-    import com.github.oetzi.echo.Echo._
-    import com.github.oetzi.echo.core._
+Please feel free to hack on the echo source: [Fork](http://help.github.com/fork-a-repo/) it, hack it then make a [pull request](http://help.github.com/send-pull-requests/).
+
+### Packages
+
+The echo framework currently has four packages:
+
+* root - contains EchoApp and Echo class.
+* core - contains implementation of core FRP types and operations
+* ui - simple UI framework classes
+* io - currently contains network classes and code to deal with exceptions
+
+### Testing
+
+Testing for echo is written using Specs. The tests are contained in src/spec/scala and are part of the
+`core.test` package so they can access package level function of FRP types. To run the tests you can simply do:
+
+    buildr test
     
-You need to include `Echo._` as it contains the implicit functions etc needed for echo's DSL elements (such as combining 
-Behaviours with values).
+Remember: tests are good. You should write them.
+
+### FRP Block
+
+Much of the code in echo is implemented with respect to the original semantics of FRP. This means
+that many of the operations are restricted so they can only be executed during the 'setup' phase
+of an Echo application (see tutorial [here](http://www.seadowg.com/echo)) as otherwise they exhibit
+unusual behaviour. Any member functions of FRP types or functions that operate on FRP types should most likely
+have their code executed in an FRP block like so:
+
+    frp {
+      //code
+    }
+    
+This allows you to guarantee that you code will only ever execute on empty Events at time 0. Of course
+you may be able to argue that their are use cases for an operation outside of these restrictions and if
+so fair enough: argue it!

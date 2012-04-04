@@ -5,3 +5,7 @@ examples/example_lib/*
 echo.iml
 echo.ipr
 echo.iws
+*.pyg
+*.log
+.DS_Store
+*.pdf

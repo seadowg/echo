@@ -1,45 +1,56 @@
 package com.github.oetzi.echo.display
 
 import javax.swing.JButton
-import com.github.oetzi.echo.core.{Occurrence, Behaviour, Event, EventSource}
-import com.github.oetzi.echo.Echo._
+import java.awt.Component
+import com.github.oetzi.echo.core.{Behaviour, Event, EventSource}
 import java.awt.event.{ActionEvent, ActionListener}
 
+/** Clickable button type. Utilises Swing JButton.
+ */
 class Button private() extends Canvas {
-  val internal: JButton = new JButton() with EventSource[Unit] {
+  protected[echo] val internal: JButton = new JButton() with EventSource[Unit] {
     this.addActionListener(new ActionListener() {
       def actionPerformed(event: ActionEvent) {
-        occur(event.getWhen(), ())
+        occur(())
       }
     })
 
     override def repaint() {
-      Button.this.update(now())
       super.repaint()
     }
   }
-  
-  val click: Event[Unit] = internal.asInstanceOf[EventSource[Unit]].event
+
+  /**Returns an Event that occurs whenever this Button is
+   * is clicked.
+   */
+  val click: Event[Unit] = internal.asInstanceOf[EventSource[Unit]].event()
 
   private var textBeh: Behaviour[String] = new Behaviour(t => this.internal.getText)
 
+  /**Returns the text displayed on this
+   * Button.
+   */
   def text(): Behaviour[String] = {
     this.textBeh
   }
 
-  def update(time: Time) {
-    
-  }
-
-  def draw(time : Time) {
-    this.internal.setSize(widthBeh.at(time), heightBeh.at(time))
-    this.internal.setText(textBeh.at(time))
+  def draw() {
+    this.internal.setSize(widthBeh.eval(), heightBeh.eval())
+    this.internal.setText(textBeh.eval())
 
     this.internal.repaint()
+  }
+
+  protected[display] def swingComponent(): Component = {
+    internal
   }
 }
 
 object Button {
+
+  /**Creates a Button that is displayed with
+   * the specified text.
+   */
   def apply(text: Behaviour[String]): Button = {
     val button = new Button()
     button.textBeh = text
@@ -47,6 +58,11 @@ object Button {
     button
   }
 
+  /**Creates a Button that is displayed with the
+   * text produced from the given function executed
+   * with respect to itself. Allows creation of Button
+   * that's text is altered by its own clicks.
+   */
   def apply(func: Button => Behaviour[String]) = {
     val button = new Button()
     button.textBeh = func(button)

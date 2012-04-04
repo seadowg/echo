@@ -1,0 +1,25 @@
+\chapter{Introduction}
+
+  Dealing with animations, user interactions and I/O are often thought of as monotonous imperative tasks
+  in programming. Even in higher level languages programmers often use imperative
+  styles within more declarative code. This is somewhat counter intuitive as often many of these tasks are possible to generalise: adding
+  some action to a button click or looping through some animation for instance. Functional Reactive Programming
+  is a programming paradigm that aims to provide programmers with the tools to create high level,
+  declarative abstractions of these kinds of tasks. This report is concerned with a project to
+  implement Functional Reactive Programming as a framework dubbed `Echo' \cite{Stott} for the multi-paradigm programming language
+  Scala.
+
+  Past implementations of FRP have had problems for various reasons: many have had to sacrifice the original semantics or functionality in some way to avoid
+  memory leaks (often referred to as ``time leaks'') or other inefficiencies. One of the goals
+  of this project was to try and implement FRP in a way that allowed for a controlled usage of memory while also
+  adhering to the original denotational semantics. 
+  
+  FRP
+  has also commonly been implemented in Haskell. Implementing FRP in a more industrial language such as Scala allows
+  further exploration of the paradigm in a different setting. Additionally, Scala's portability and interoperability with
+  languages such as Java, JRuby, Closure and and Groovy should hopefully allow for easy wide spread use across many platforms and languages. 
+
+  This report will first deal with an introduction to the formal semantics of FRP. There will also be a discussion of previous    
+  work carried out using FRP and Scala.
+  Finally, an exploration of the implementation of Echo itself and its surrounding work will be carried out with an
+  evaluation of its current functionality and adherence to the project goals.

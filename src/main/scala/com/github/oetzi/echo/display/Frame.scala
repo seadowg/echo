@@ -5,71 +5,59 @@ import java.util.{TimerTask, Timer}
 import javax.swing.{BoxLayout, JFrame}
 import java.awt.event.{MouseEvent, MouseMotionListener}
 import java.awt.Point
-import com.github.oetzi.echo.core.{EventSource, Occurrence, Behaviour}
-import com.github.oetzi.echo.types.Stepper
+import java.awt.Component
+import com.github.oetzi.echo.core.{Stepper, EventSource, Behaviour}
 
+/**Class for drawing windows and holding other Canvas objects. Uses
+ * a JFrame internally. Frame objects keep all nested component's attributes
+ * up to date.
+ */
 class Frame private(private val visibleBeh: Behaviour[Boolean]) extends Canvas {
   private var components: List[Canvas] = List[Canvas]()
+  private var lastVis = false
 
-  val internal: JFrame = new JFrame() {
+  private val internal: JFrame = new JFrame() {
     setLocationRelativeTo(null)
 
     override def repaint() {
-      Frame.this.update(now())
       super.repaint()
     }
   }
 
-  startClock()
+  private val mouseListener = new MouseMotionListener with EventSource[Point] {
+    def mouseDragged(event: MouseEvent) {}
 
-  def startClock() {
-    new Timer().schedule(new TimerTask() {
-      override def run() {
-        val time = now()
-        Frame.this.update(time)
-        Frame.this.draw(time)
-      }
-    }, 0, 40)
+    def mouseMoved(event: MouseEvent) {
+      occur(event.getPoint)
+    }
   }
 
-  private var mouseBeh: Behaviour[Point] = null
+  private val mouseBeh: Behaviour[Point] = new Stepper(new Point(0, 0), mouseListener)
 
+  startClock()
+
+  /**Returns a Behaviour that represents the mouse's
+   * position on this Frame.
+   */
   def mouse(): Behaviour[Point] = {
-    if (this.mouseBeh == null) {
-      val mouseListener = new MouseMotionListener with EventSource[Point] {
-        def mouseDragged(event: MouseEvent) {
-          //nothing  
-        }
-
-        def mouseMoved(event: MouseEvent) {
-          occur(event.getWhen, event.getPoint)
-        }
-      }
-      
-      this.mouseBeh = new Stepper(new Point(0, 0), mouseListener)
+    if (this.internal.getMouseMotionListeners.length < 1) {
       this.internal.addMouseMotionListener(mouseListener)
     }
 
     mouseBeh
   }
 
+  /**Returns the Behaviour that determines
+   * whether this frame is visible or not.
+   */
   def visible(): Behaviour[Boolean] = {
     visibleBeh
   }
 
-  def update(time : Time) {
-    this.components.foreach {
-      canvas =>
-        canvas.update(time)
-    }
-  }
+  protected[display] def draw() {
+    this.internal.setSize(widthBeh.eval(), heightBeh.eval())
 
-  private var lastVis = false
-
-  def draw(time : Time) {
-    this.internal.setSize(widthBeh.at(time), heightBeh.at(time))
-
-    val vis = visibleBeh.at(time)
+    val vis = visibleBeh.eval()
     if (vis != lastVis) {
       this.internal.setVisible(vis)
       lastVis = vis
@@ -79,12 +67,31 @@ class Frame private(private val visibleBeh: Behaviour[Boolean]) extends Canvas {
 
     this.components.foreach {
       canvas =>
-        canvas.draw(time)
+        canvas.draw()
     }
+  }
+
+  protected[display] def swingComponent(): Component = {
+    internal
+  }
+
+  /**Starts a thread that draws this Frame and its component
+   * Canvases every 20ms (with respect to new attribute values).
+   */
+  private def startClock() {
+    new Timer().schedule(new TimerTask() {
+      override def run() {
+        val time = now()
+        Frame.this.draw()
+      }
+    }, 0, 20)
   }
 }
 
 object Frame {
+  /**Creates a new Frame with the specified width, height, components
+   * and visibility.
+   */
   def apply(width: Behaviour[Int], height: Behaviour[Int], components: List[Canvas] = List(),
             visible: Behaviour[Boolean] = true): Frame = {
     val frame = new Frame(visible)
@@ -98,7 +105,7 @@ object Frame {
 
     components.foreach {
       component =>
-        frame.internal.getContentPane.add(component.internal)
+        frame.internal.getContentPane.add(component.swingComponent())
         frame.components = frame.components ++ List(component)
     }
 
