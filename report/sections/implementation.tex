@@ -338,7 +338,8 @@ val empty = Event()
 \begin{verbatim}
 def toggle(ev : Event[T], beh1 : Behaviour[T]) : Behaviour[T]
 at(beh1.toggle(ev, beh2), t) = if (finite(ev, t).length % 2 == 0)
-  { at(beh1, t) } else { at(beh2, t) }
+                               { at(beh1, t) } 
+                               else { at(beh2, t) }
 \end{verbatim}        
     
     It was felt that another common use of combining Behaviours and Events would be

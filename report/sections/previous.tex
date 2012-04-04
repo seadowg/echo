@@ -21,14 +21,14 @@
 def stepper[T](ini : T, ev : Event[T]) : Reactive[T]
 \end{verbatim}
 
-      Like with a Behaviour a Reactive's value changes over time but it does so discretely. Elliot
-      observes that we can then extend this concept to Behaviours. Elliott goes on to observe that
-      a Behaviours internal representation can be modelled as a Reactive[Time => T]. In other words a 
-      Behaviour can be seen as a stream of `phases' that exist between discrete
+      Like with a Behaviour a Reactive's value changes over time but it does so discretely. 
+      Elliott goes on to observe that
+      a Behaviour's internal representation can be modelled as a Reactive[Time =$>$ T]. In other words a 
+      Behaviour can be seen as a stream of `phases' \footnote{Even a Behaviour with only one phase could be composed using the \emph{switcher} and a never occurring Event.} that exist between discrete
       points in time (think of the \emph{switcher} operation in section~\ref{sec:semantics}). Of course, we
       still think of a Behaviour's value at a sample time as the result of evaluating a
       Time =$>$ T function (the current phase) but using the Reactive type
-      does provide a clearer definition of Behaviours used reactively with Events.
+      does provide a clearer definition of how Behaviours are `punctuated' by Events. 
       
       As one might expect from a framework created by Elliott, Reactive has all the other major features
       of Fran: Events and \emph{switcher} etc. However, Reactive was mainly intended as an experiment

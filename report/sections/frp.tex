@@ -75,14 +75,14 @@ def occs[T](ev : Event[T]) : Stream[(Time, T)]
       
       \subsubsection{Behaviours}
         We would like functions defined on static values to also be available to Behaviours. Hudak
-        and Elliott define a series functions for accomplishing this:
+        and Elliott define a series of functions for accomplishing this:
         
 \begin{verbatim}
 def lift0[T](t : T) : Behaviour[T]
 at(lift0(v), t) = v  
   
 def lift1[T, U](func : T => U, beh : Behaviour[T]) : Behaviour[U]
-at(lift1(func, beh), t) = func(at(beh))
+at(lift1(func, beh), t) = func(at(beh, t))
 
 def lift2[T, U, V](func : (T, U) => V, beh1 : Behaviour[T], 
   beh2 : Behaviour[U]) : Behaviour[V]
