@@ -5,7 +5,9 @@ import javax.swing.event.{ChangeEvent, ChangeListener}
 import java.awt.Component
 import javax.swing.JSlider
 
-
+/** Class for creating variable slider controls. Wrapper
+  * around Swing's JSlider.
+ */
 class Slider private() extends Canvas {
   protected[echo] val internal: JSlider = new JSlider() with EventSource[Int] {
     this.addChangeListener(new ChangeListener() {
@@ -19,6 +21,8 @@ class Slider private() extends Canvas {
     }
   }
 
+  /** Returns the value of the Slider (the bar's position).
+   */
   val value: Behaviour[Int] = new Stepper(internal.getValue, internal.asInstanceOf[EventSource[Int]])
 
   protected[display] def draw() {
@@ -33,6 +37,9 @@ class Slider private() extends Canvas {
 }
 
 object Slider {
+  
+  /** Returns a Slider with the bar positioned in the center.
+   */
   def apply() = {
     new Slider()
   }

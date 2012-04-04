@@ -8,6 +8,10 @@ import java.awt.Point
 import java.awt.Component
 import com.github.oetzi.echo.core.{Stepper, EventSource, Behaviour}
 
+/** Class for drawing windows and holding other Canvas objects. Uses
+  * a JFrame internally. Frame objects keep all nested component's attributes
+  * up to date.
+ */
 class Frame private(private val visibleBeh: Behaviour[Boolean]) extends Canvas {
   private var components: List[Canvas] = List[Canvas]()
   private var lastVis = false
@@ -32,6 +36,9 @@ class Frame private(private val visibleBeh: Behaviour[Boolean]) extends Canvas {
 
   startClock()
 
+  /** Returns a Behaviour that represents the mouse's
+    * position on this Frame.
+   */
   def mouse(): Behaviour[Point] = {
     if (this.internal.getMouseMotionListeners.length < 1) {
       this.internal.addMouseMotionListener(mouseListener)
@@ -40,6 +47,9 @@ class Frame private(private val visibleBeh: Behaviour[Boolean]) extends Canvas {
     mouseBeh
   }
 
+  /** Returns the Behaviour that determines
+    * whether this frame is visible or not.
+   */
   def visible(): Behaviour[Boolean] = {
     visibleBeh
   }
@@ -65,7 +75,7 @@ class Frame private(private val visibleBeh: Behaviour[Boolean]) extends Canvas {
     internal
   }
 
-  def startClock() {
+  private def startClock() {
     new Timer().schedule(new TimerTask() {
       override def run() {
         val time = now()
@@ -76,6 +86,9 @@ class Frame private(private val visibleBeh: Behaviour[Boolean]) extends Canvas {
 }
 
 object Frame {
+  /** Creates a new Frame with the specified width, height, components
+    * and visibility.
+   */
   def apply(width: Behaviour[Int], height: Behaviour[Int], components: List[Canvas] = List(),
             visible: Behaviour[Boolean] = true): Frame = {
     val frame = new Frame(visible)

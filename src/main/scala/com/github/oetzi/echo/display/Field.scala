@@ -5,6 +5,9 @@ import java.awt.Component
 import com.github.oetzi.echo.core.{Behaviour, Stepper, EventSource}
 import java.awt.event.{KeyEvent, KeyListener}
 
+/** Represents a standard text field. Internall uses a Swing
+  * JTextField.
+ */
 class Field private() extends Canvas {
   private[echo] val internal = new JTextField with EventSource[String] {
     this.addKeyListener(new KeyListener() {
@@ -24,6 +27,8 @@ class Field private() extends Canvas {
 
   private val textBeh = new Stepper("", internal.asInstanceOf[EventSource[String]].event())
 
+  /** Returns the text in the field.
+   */
   def text(): Behaviour[String] = {
     textBeh
   }
@@ -38,6 +43,9 @@ class Field private() extends Canvas {
 }
 
 object Field {
+  
+  /** Returns a new empty Field.
+   */
   def apply(): Field = {
     new Field()
   }

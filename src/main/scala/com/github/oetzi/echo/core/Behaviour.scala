@@ -10,7 +10,7 @@ sealed class Behaviour[T](private val rule: Time => T) {
   /** Holds last computed value and time it was computed at
     * to prevent redundant evaluation.
    */
-  var last: (Time, T) = null
+  private var last: (Time, T) = null
   
   /** Evaluates the Behaviour at the current time. The function is atomic
     * with respect to the run-time group of FRP objects so evaluation times
