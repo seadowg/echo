@@ -248,7 +248,7 @@ val ev = beh.snapshot(someEvent)
       last occurrence and so we would effectively be returning an incorrect result. Dealing with this
       presented an interesting problem. It was decided that FRP
       code (FRP operations on FRP types) could only be performed in an initial setup phase of a program.
-      This setup phase would happen `instantly' as the internal notion of time is frozen and Event
+      This setup phase happens `instantly' as the internal notion of time is frozen and Event
       occurrences are not processed by the framework during this phase. As Scala programs are defined inside a singleton
       object it was decided that a user would simply be able to extend a class with this object and then
       write their FRP code in a \emph{setup} function:
@@ -270,7 +270,7 @@ object App extends EchoApp {
     dynamically.
     
   \section{Atomic Input \& Output}
-
+    \label{sec:atomic}
      By this point it is noticeable that the FRP world that Echo builds only really has one form of input and one
      form of output action: \emph{occur} and \emph{eval} respectively. Conceptually we think of both of these
      actions happening instantly. For instance, when a Behaviour is sampled it will need to do some evaluation

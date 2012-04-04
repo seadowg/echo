@@ -1,6 +1,6 @@
 \chapter{Evaluation}    
   \section{Limitations}
-    There are of course several limitations in Echo when compared the original denotational semantics of FRP. Firstly, we are 
+    There are of course several limitations in Echo when compared to the original denotational semantics of FRP. Firstly, we are 
     unable to evaluate Behaviours at any time we choose.
     Although this does not limit much of the development of real-time, interactive applications there is some functionality
     lost. For instance it would be nice to be able to chart a Behaviour's value between certain bounds such as
@@ -26,7 +26,7 @@ val predicate = beh.sample(someEvent).filter(v => v == 5)
     \label{sec:eff}
     As stated at the beginning of this report one of the goals of this project was to create an efficient implementation
     of FRP. More specifically, one that doesn't require an unbounded level of memory use due to storing Event occurrences.
-    It is seen in section~\ref{sec:time} that this problem is avoided in Echo as Events only need to store their last
+    It is seen in section~\ref{sec:atomic} that this problem is avoided in Echo as Events only need to store their last
     occurrence. This not only means that Echo Events use a bounded amount of memory but it also means there is
     no overhead associated with throwing out old occurrences (the last occurrence is simply replaced with the new 
     one whenever the Event occurs).

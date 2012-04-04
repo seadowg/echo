@@ -69,10 +69,10 @@ val rec = Receiver(1997) {
 
   One interesting problem encountered while developing the Socket abstraction was that of Exceptions. 
   Sockets can fail in many ways and in a JVM language this causes an Exception which will cause the program to exit. 
-  The simplest way to deal with the problem would of course be to simply catch the exceptions and ignore them (if they 
+  The simplest way to deal with the problem would of course be to simply catch the Exceptions and ignore them (if they 
   occur) but this would mean any code written with FRP would be intolerant of external failure (disconnection to the 
   internet etc). An elegant solution was to abstract over Exceptions with Events}. To do this the socket types 
-  have an `errors' Event that occurs every time an exception is thrown within their execution. For instance, in this 
+  have an \emph{errors} Event that occurs every time an Exception is thrown within their execution. For instance, in this 
   setup there is nothing for the program to connect to on port \emph{1997}:
 
 \begin{verbatim}
