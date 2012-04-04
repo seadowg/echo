@@ -140,7 +140,7 @@ occs(map(ev, func)) = occs(event).map(func)
       A function for flattening Event[Event[T]] to an Event[T] is also defined:
 
 \begin{verbatim}
-def delayOccs[T](t : Time, ev : Event[T])
+def delayOccs[T](t : Time, ev : Event[T]) : Event[T]
 occs(delayOccs(t, ev)) = occs(ev).map(o => (max(o._1, t), o._2))
 \end{verbatim}
 
