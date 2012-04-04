@@ -14,24 +14,20 @@
       semantics of FRP
       to promote more efficient implementations without altering the overall semantic model.
       
-      Reactive introduces a new way to represent what he referred to as
-      `reactive' values (such as lifted static values and \emph{stepper} Behaviours):
-    
-\begin{verbatim}
-type Reactive[T] = Stream[(Time, T)]
-\end{verbatim}
-
-      We can then think of a Reactive's as a value that changes at discrete points in time (denoted by the
-      elements of the stream). Elliott points out that we can also express Behaviour's implementation in this way also:
+      Elliott suggests that we think of the result of the \emph{stepper} operations discussed in
+      section~\ref{sec:semantics} as a type Reactive[T]:
       
 \begin{verbatim}
-type Behaviour[T] = Reactive[Time => T]
-\end{verbatim}      
+def stepper[T](ini : T, ev : Event[T]) : Reactive[T]
+\end{verbatim}
 
-      In other words a Behaviour can be seen as a stream of `phases' that exist between discrete
+      Like with a Behaviour a Reactive's value changes over time but it does so discretely. Elliot
+      observes that we can then extend this concept to Behaviours. Elliott goes on to observe that
+      a Behaviours internal representation can be modelled as a Reactive[Time => T]. In other words a 
+      Behaviour can be seen as a stream of `phases' that exist between discrete
       points in time (think of the \emph{switcher} operation in section~\ref{sec:semantics}). Of course, we
       still think of a Behaviour's value at a sample time as the result of evaluating a
-      Time =$>$ T function but using the Reactive type
+      Time =$>$ T function (the current phase) but using the Reactive type
       does provide a clearer definition of Behaviours used reactively with Events.
       
       As one might expect from a framework created by Elliott, Reactive has all the other major features
