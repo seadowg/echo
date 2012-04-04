@@ -2,6 +2,7 @@ package com.github.oetzi.echo.io
 
 import actors.Actor
 import com.github.oetzi.echo.core._
+import com.github.oetzi.echo.Control._
 import java.io.{InputStreamReader, BufferedReader, PrintWriter}
 
 /** Represents an output network connection. Sends each occurrence value from the specified
