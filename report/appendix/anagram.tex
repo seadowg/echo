@@ -38,7 +38,7 @@ object Anagram extends EchoApp {
 		  
 		  val anagram = Sender("localhost", 1996, Event("Anagram"))
 		  val replies = Sender("localhost", 1997, 
-		    field.text.sample(sendButton.click))
+		    field.text.sample(sendButton.click).map((t, tup) => tup._2))
 		  val messages = replies.errors.map(
 		    (t, v) => "Can't connect to server!").merge(replies)
 
