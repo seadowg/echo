@@ -46,46 +46,6 @@ object BehaviourSpec extends Specification {
       }
     }
 
-    "provide an until(relative) function" >> {
-      "returning a new Behaviour" in {
-        val beh = new Behaviour(time => 5)
-
-        beh.until(0L, new TestEvent[Int], new Behaviour(time => 5)) must_!= beh
-      }
-
-      "returning a new Behaviour with the current rule when the Event hasn't occured" in {
-        val beh = new Behaviour(time => 5)
-
-        freezeTime(1) {
-          beh.until(0L, new TestEvent[Int], new Behaviour(time => 10)).eval()
-        }.mustEqual(5)
-      }
-
-      "returning a new Behaviour with the current rule when the Event has occurred before the time" in {
-        val beh = new Behaviour(time => 5)
-        val event = new TestEvent[Int]
-
-        freezeTime(0) {
-          event.pubOccur(0)
-        }
-
-        freezeTime(1) {
-          beh.until(1L, event, new Behaviour(time => 10)).eval()
-        }.mustBe(5)
-      }
-
-      "returning a new Behaviour with the current rule when the Event has occurred after/on the time" in {
-        val beh = new Behaviour(time => 5)
-        val event = new TestEvent[Int]
-        val untilBeh = beh.until(1L, event, new Behaviour(time => 10))
-
-        freezeTime(1) {
-          event.pubOccur(0)
-          untilBeh.eval()
-        }.mustBe(10)
-      }
-    }
-
     "provide a map function" >> {
       "returning a new Behaviour thats rule is func(this.at(t))" in {
         val beh = new Behaviour(time => 5)

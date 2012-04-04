@@ -38,7 +38,7 @@ val beh = new Behaviour[Double](time => sin(time))
     
     It would be possible to implement the original FRP operations as standalone functions. However, so
     as to conform to Scala's object oriented style the operations will be attached to their respective
-    classes. For instance, the \emph{merge} operation will be used in the following way in Echo:
+    classes as member functions. For instance, the \emph{merge} operation will be used in the following way in Echo:
     
 \begin{verbatim}
 val merged = event1.merge(event2)

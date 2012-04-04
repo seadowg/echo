@@ -27,9 +27,9 @@ sealed class Behaviour[T](private val rule: Time => T) {
   /** Returns a Event[T] that occurs every time the given
     * Event occurs with the value of the Behaviour at that time.
    */
-  def sample[A](sourceEvent: Event[A]): Event[(A, T)] = {
+  def sample[U](sourceEvent: Event[U]): Event[(U, T)] = {
     frp {
-      val source = new EventSource[(A, T)] {
+      val source = new EventSource[(U, T)] {
         sourceEvent.hook {
           occ => occur((occ.value, Behaviour.this.at(occ.time)))
         }
@@ -43,36 +43,13 @@ sealed class Behaviour[T](private val rule: Time => T) {
     * Event occurs. It then switches to behaving as the passed
     * Behaviour.
     */
-  def until[A](event: Event[A], behaviour: Behaviour[T]): Behaviour[T] = {
+  def until[U](event: Event[U], behaviour: Behaviour[T]): Behaviour[T] = {
     frp {
       val rule: Time => T = {
         time =>
           val occ = event.top()
 
           if (occ == None) {
-            this.at(time)
-          }
-
-          else {
-            behaviour.at(time)
-          }
-      }
-
-      new Behaviour(rule)
-    }
-  }
-
-  /** Similar to the previous until function except for the Event must
-    * have occurred on or after the specified time for the Behaviour to
-    * switch.
-   */
-  def until[A](after: Time, event: Event[A], behaviour: Behaviour[T]): Behaviour[T] = {
-    frp {
-      val rule: Time => T = {
-        time =>
-          val occ = event.top()
-
-          if (occ == None || occ.get.time < time) {
             this.at(time)
           }
 
