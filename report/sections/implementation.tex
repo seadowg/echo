@@ -128,6 +128,7 @@ def now() : Time = System.nanoTime() - startTime
     problem).
 
   \section{Lifting Constants}
+    \label{sec:lift}
     As mentioned earlier, one of the most powerful features of Scala is it's ability to implicitly convert between
     types at run time. This is facilitated by the \emph{implicit} key word allowing a function to be defined
     that is automatically executed when a corresponding type mismatch occurs. This functionality is used in Echo to allow 
