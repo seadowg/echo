@@ -160,7 +160,7 @@
           <h3>5. Adding Graphics</h3>
           <p>
             There is also a simple UI framework in echo so you make funky GUI apps for your users.
-            What's cool about this is that you can set GUI components attributes to be Behaviours
+            What's cool about this is that you can set GUI components attributes to be Behaviours.
             Before we launch into all that though lets make a small little app with a button and
             some text:
           </p>
@@ -188,8 +188,8 @@
   ))</pre>
   
           <p>
-            When this app runs the text component will say "Hello" but when a user hits the button
-            it will change to saying "Goodbye". You can see pretty immediately that this allows us
+            When this app runs the text component will say <code>"Hello"</code> but when a user hits the button
+            it will change to saying <code>"Goodbye"</code>. You can see pretty immediately that this allows us
             to build our GUI's in a much nicer way. No ActionEventListener here. Its hard to cover
             all the different components and attributes for the UI framework here but the 
             <a href="target/doc/index.html">docs</a>
@@ -200,7 +200,7 @@
         <div class="step">
           <h3>6. Over the Interwebs...</h3>
           <p>
-            Lets face it? These days its all about talking to other computers or connecting to the
+            Lets face it. These days its all about talking to other computers or connecting to the
             'internet'. We build a couple of types to allow you to do this in Echo if you are that
             way inclined. These are Sender and Receiver. A Sender sends messages whenever a given
             Event occurs and a Receiver occurs whenever it receives a message. Lets build an example:
@@ -213,7 +213,7 @@
   val receiver = Receiver(1997)</pre>
   
           <p>
-            Here we create a Sender that will send the message "Ping" out to the specified
+            Here we create a Sender that will send the message <code>"Ping"</code> out to the specified
             IP and port number. You can see the Receiver uses the same port and as we are on
             the same computer the messages the messages will be received by the Receiver we created.
           </p>
@@ -221,7 +221,7 @@
           <p>
             Of course now we are communicating over a network we've started writing FRP code that
             might fail due to something out of our control. Luckily we can deal with this. Remember Exceptions?
-            Well we can the Sender and Receiver types have an 'errors' Event that will occur whenever an Exception
+            Well we can the Sender and Receiver types have an <code>errors</code> Event that will occur whenever an Exception
             is thrown within their operation. So, if want a Behaviour that shows the last error message from our
             Sender:
           </p>
