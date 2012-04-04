@@ -6,8 +6,8 @@ import java.awt.Color
 import java.awt.Component
 import com.github.oetzi.echo.core.Behaviour
 
-/** Analogue for Swing JPanel. Has a width and height
-  * and can hold other Canvas objects.
+/**Analogue for Swing JPanel. Has a width and height
+ * and can hold other Canvas objects.
  */
 class Block private() extends Canvas {
   private var components: List[Canvas] = List[Canvas]()
@@ -17,10 +17,10 @@ class Block private() extends Canvas {
       super.repaint()
     }
   }
-  
+
   private var colorBeh: Behaviour[Color] = this.internal.getBackground
 
-  /** Returns the color of this Block.
+  /**Returns the color of this Block.
    */
   def color() {
     colorBeh
@@ -44,10 +44,10 @@ class Block private() extends Canvas {
 }
 
 object Block {
-  
-  /** Creates a block with the specified width, height, color
-    * and component Canvases. Defaults to grey background if
-    * no color is specified.
+
+  /**Creates a block with the specified width, height, color
+   * and component Canvases. Defaults to grey background if
+   * no color is specified.
    */
   def apply(width: Behaviour[Int], height: Behaviour[Int], color: Behaviour[Color] = Color.GRAY,
             components: List[Canvas] = List()): Block = {

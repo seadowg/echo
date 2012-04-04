@@ -5,8 +5,8 @@ import java.net.ServerSocket
 import com.github.oetzi.echo.core.{Behaviour, EventSource}
 import java.io.{PrintWriter, InputStreamReader, BufferedReader}
 
-/** Represents a network input. Network requests received occur
-  * as part of this Event.
+/**Represents a network input. Network requests received occur
+ * as part of this Event.
  */
 class Receiver private(val port: Int, val reply: String => Behaviour[String]) extends EventSource[String]
 with Breakable {
@@ -37,7 +37,7 @@ with Breakable {
   })
   thread.start()
 
-  /** Stop this Receiver listening for connections.
+  /**Stop this Receiver listening for connections.
    */
   protected[echo] def die() {
     this.running = false
@@ -45,10 +45,10 @@ with Breakable {
 }
 
 object Receiver {
-  /** Create a receiver that listens on the specified port
-    * and replies to requests with the value of the Behaviour[String]
-    * produced by the reply function (with each incoming message as
-    * input).
+  /**Create a receiver that listens on the specified port
+   * and replies to requests with the value of the Behaviour[String]
+   * produced by the reply function (with each incoming message as
+   * input).
    */
   def apply(port: Int)(reply: String => Behaviour[String]): Receiver = {
     new Receiver(port, reply)

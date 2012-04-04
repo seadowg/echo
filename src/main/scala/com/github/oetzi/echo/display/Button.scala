@@ -20,15 +20,15 @@ class Button private() extends Canvas {
     }
   }
 
-  /** Returns an Event that occurs whenever this Button is
-    * is clicked.
+  /**Returns an Event that occurs whenever this Button is
+   * is clicked.
    */
   val click: Event[Unit] = internal.asInstanceOf[EventSource[Unit]].event()
 
   private var textBeh: Behaviour[String] = new Behaviour(t => this.internal.getText)
 
-  /** Returns the text displayed on this
-    * Button.
+  /**Returns the text displayed on this
+   * Button.
    */
   def text(): Behaviour[String] = {
     this.textBeh
@@ -47,9 +47,9 @@ class Button private() extends Canvas {
 }
 
 object Button {
-  
-  /** Creates a Button that is displayed with
-    * the specified text.
+
+  /**Creates a Button that is displayed with
+   * the specified text.
    */
   def apply(text: Behaviour[String]): Button = {
     val button = new Button()
@@ -58,10 +58,10 @@ object Button {
     button
   }
 
-  /** Creates a Button that is displayed with the
-    * text produced from the given function executed
-    * with respect to itself. Allows creation of Button
-    * thats text is altered by its own clicks.
+  /**Creates a Button that is displayed with the
+   * text produced from the given function executed
+   * with respect to itself. Allows creation of Button
+   * that's text is altered by its own clicks.
    */
   def apply(func: Button => Behaviour[String]) = {
     val button = new Button()

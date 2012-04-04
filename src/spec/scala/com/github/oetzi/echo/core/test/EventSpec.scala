@@ -72,38 +72,38 @@ object EventSpec extends Specification {
       }
     }
 
-		"have a filter function" >> {
-			"returning an empty Event for an empty Event" in {
-				val event = new TestEvent[Int]
-				
-				event.filter(e => e == 5).top() mustEqual None
-			}
-			
-			"returning an Event that only includes matching occurrences" in {
-				val event = new TestEvent[Int]
-				val filter = event.filter(e => e == 5)
-				
-				event.pubOccur(5)
-				event.pubOccur(6)
-				
-				filter.top().get.value mustEqual 5
-			}
-			
-			"it only executes hooks for correct occurrences" in {
-				val event = new TestEvent[Int]
-				val filter = event.filter(e => e == 5)
-				var execed = 0
-				
-				filter.hook {
-					occ => execed += 1
-				}
-				
-				event.pubOccur(5)
-				event.pubOccur(6)
-				
-				execed mustEqual 1
-			}
-		}
+    "have a filter function" >> {
+      "returning an empty Event for an empty Event" in {
+        val event = new TestEvent[Int]
+
+        event.filter(e => e == 5).top() mustEqual None
+      }
+
+      "returning an Event that only includes matching occurrences" in {
+        val event = new TestEvent[Int]
+        val filter = event.filter(e => e == 5)
+
+        event.pubOccur(5)
+        event.pubOccur(6)
+
+        filter.top().get.value mustEqual 5
+      }
+
+      "it only executes hooks for correct occurrences" in {
+        val event = new TestEvent[Int]
+        val filter = event.filter(e => e == 5)
+        var execed = 0
+
+        filter.hook {
+          occ => execed += 1
+        }
+
+        event.pubOccur(5)
+        event.pubOccur(6)
+
+        execed mustEqual 1
+      }
+    }
 
 
     "have a merge function" >> {

@@ -8,9 +8,9 @@ import java.awt.Point
 import java.awt.Component
 import com.github.oetzi.echo.core.{Stepper, EventSource, Behaviour}
 
-/** Class for drawing windows and holding other Canvas objects. Uses
-  * a JFrame internally. Frame objects keep all nested component's attributes
-  * up to date.
+/**Class for drawing windows and holding other Canvas objects. Uses
+ * a JFrame internally. Frame objects keep all nested component's attributes
+ * up to date.
  */
 class Frame private(private val visibleBeh: Behaviour[Boolean]) extends Canvas {
   private var components: List[Canvas] = List[Canvas]()
@@ -36,8 +36,8 @@ class Frame private(private val visibleBeh: Behaviour[Boolean]) extends Canvas {
 
   startClock()
 
-  /** Returns a Behaviour that represents the mouse's
-    * position on this Frame.
+  /**Returns a Behaviour that represents the mouse's
+   * position on this Frame.
    */
   def mouse(): Behaviour[Point] = {
     if (this.internal.getMouseMotionListeners.length < 1) {
@@ -47,8 +47,8 @@ class Frame private(private val visibleBeh: Behaviour[Boolean]) extends Canvas {
     mouseBeh
   }
 
-  /** Returns the Behaviour that determines
-    * whether this frame is visible or not.
+  /**Returns the Behaviour that determines
+   * whether this frame is visible or not.
    */
   def visible(): Behaviour[Boolean] = {
     visibleBeh
@@ -75,8 +75,8 @@ class Frame private(private val visibleBeh: Behaviour[Boolean]) extends Canvas {
     internal
   }
 
-  /** Starts a thread that draws this Frame and its component
-    * Canvases every 20ms (with respect to new atrribute values).
+  /**Starts a thread that draws this Frame and its component
+   * Canvases every 20ms (with respect to new attribute values).
    */
   private def startClock() {
     new Timer().schedule(new TimerTask() {
@@ -89,8 +89,8 @@ class Frame private(private val visibleBeh: Behaviour[Boolean]) extends Canvas {
 }
 
 object Frame {
-  /** Creates a new Frame with the specified width, height, components
-    * and visibility.
+  /**Creates a new Frame with the specified width, height, components
+   * and visibility.
    */
   def apply(width: Behaviour[Int], height: Behaviour[Int], components: List[Canvas] = List(),
             visible: Behaviour[Boolean] = true): Frame = {

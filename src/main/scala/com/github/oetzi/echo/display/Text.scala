@@ -4,7 +4,7 @@ import javax.swing.JLabel
 import java.awt.Component
 import com.github.oetzi.echo.core.Behaviour
 
-/** Allows for simply text blocks in UIs. Utilises a JLabel internally.
+/**Allows for simply text blocks in UIs. Utilises a JLabel internally.
  */
 class Text private(private val textBeh: Behaviour[String]) extends Canvas {
   protected[echo] val internal: JLabel = new JLabel() {
@@ -26,9 +26,9 @@ class Text private(private val textBeh: Behaviour[String]) extends Canvas {
 }
 
 object Text {
-  
-  /** Creates a Text object displaying the specified
-    * text.
+
+  /**Creates a Text object displaying the specified
+   * text.
    */
   def apply(text: Behaviour[String]): Text = {
     new Text(text)

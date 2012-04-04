@@ -5,8 +5,8 @@ import com.github.oetzi.echo.core._
 import com.github.oetzi.echo.Control._
 import java.io.{InputStreamReader, BufferedReader, PrintWriter}
 
-/** Represents an output network connection. Sends each occurrence value from the specified
-  * Event and occurs when messages are replies to.
+/**Represents an output network connection. Sends each occurrence value from the specified
+ * Event and occurs when messages are replies to.
  */
 class Sender private(val ip: String, val port: Int, val messages: Event[String]) extends EventSource[String]
 with Breakable {
@@ -17,11 +17,11 @@ with Breakable {
 
   private object SenderActor extends Actor {
     def act {
-			loop {
-				receive {
-	        case message: String => sendToSocket(message)
-	      }
-			}
+      loop {
+        receive {
+          case message: String => sendToSocket(message)
+        }
+      }
     }
 
     def sendToSocket(message: String) {
@@ -44,8 +44,8 @@ with Breakable {
 }
 
 object Sender {
-  /** Create a new Sender that sends messages to the given IP and port
-    * whenever the given Event occurs.
+  /**Create a new Sender that sends messages to the given IP and port
+   * whenever the given Event occurs.
    */
   def apply(ip: String, port: Int, messages: Event[String]): Sender = {
     frp {
