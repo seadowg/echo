@@ -347,6 +347,7 @@ at(beh1.toggle(ev, beh2), t) = if (finite(ev, t).length % 2 == 0)
     to switch from one Behaviour to another when an Event occurs (but not back again). Again, this
     function is defined as a member of Behaviour[T]:
 
+\newpage
 \begin{verbatim}
 def until(ev : Event[T], beh1 : Behaviour[T]) : Behaviour[T]
 at(beh.until(ev, beh1), t) = at(new Switcher(beh, 
