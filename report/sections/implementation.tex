@@ -166,7 +166,8 @@ val switcher = Switcher(false, eventBeh)
 def map[U](func : T => U) : Behaviour[U]
 at(beh.map(func), t) = func(at(beh, t))
 
-def map2[U, V](beh1 : Behaviour[U])(func : (T, U) => V) : Behaviour[V]
+def map2[U, V](beh1 : Behaviour[U])
+  (func : (T, U) => V) : Behaviour[V]
 at(beh.map2(beh1)(func), t) = func(at(beh, t), at(beh1, t))
 \end{verbatim}        
 

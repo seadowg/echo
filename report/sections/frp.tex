@@ -81,10 +81,11 @@ def occs[T](ev : Event[T]) : Stream[(Time, T)]
 def lift0[T](t : T) : Behaviour[T]
 at(lift0(v), t) = v  
   
-def lift1[T, U](func : T => U, beh) : Behaviour[U]
+def lift1[T, U](func : T => U, beh : Behaviour[T]) : Behaviour[U]
 at(lift1(func, beh), t) = func(at(beh))
 
-def lift2[T, U, V](func : (T, U) => V, beh1 : T, beh2 : U) : Behaviour[V]
+def lift2[T, U, V](func : (T, U) => V, beh1 : Behaviour[T], 
+  beh2 : Behaviour[U]) : Behaviour[V]
 at(lift2(func, beh1, beh2), t) = func(at(beh1, t), at(beh2, t))
 \end{verbatim}
 
@@ -103,7 +104,8 @@ at(timeTransform(beh, timeBeh), t) = at(beh, at(timeBeh, t))
 
 \begin{verbatim}
 def merge[T](ev1 : Event[T], ev2 : Event[T]) : Event[T]
-def mergeStr[T](str1 : Stream[Time, T], str1 : Stream[Time, T]) = {
+def mergeStr[T](str1 : Stream[Time, T], 
+  str1 : Stream[Time, T]) = {
   if (str1.first.time <= str2.first.time) {
     new Stream(str1.first, mergeStr(str1.drop(1), str2))
   } else {
@@ -170,7 +172,8 @@ stepper(ini, ev) = switcher(lift0(0), map(ev, (t, v) => lift0(v)))
         form of the \emph{snapshot} operation:
 
 \begin{verbatim}
-def snapshot[T, U](beh : Behaviour[T], ev : Event[U]) : Event[(U, T)]
+def snapshot[T, U](beh : Behaviour[T], 
+  ev : Event[U]) : Event[(U, T)]
 occs(snapshot(beh, ev)) = occs(ev).map((t, v) => (v, at(beh, t)))
 \end{verbatim} 
 
