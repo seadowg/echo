@@ -31,8 +31,11 @@ val predicate = beh.sample(someEvent).filter(v => v == 5)
     no overhead associated with throwing out old occurrences (the last occurrence is simply replaced with the new 
     one whenever the Event occurs).
     
-    Also mentioned in section~\ref{sec:caching} Behaviour value caching is also used to prevent redundant reevaluation of Behaviours
-    and this further leads to a more optimised implementation of FRP.
+    Also mentioned in section~\ref{sec:caching} Behaviour value caching is also used to prevent redundant reevaluation of 
+    Behaviours
+    and this further leads to a more optimised implementation of FRP. In a similar vein Echo does redundantly recompute
+    values for Behaviours lifted from constants. This allows for an efficient implementation of \emph{stepper} that
+    doesn't evaluate its current phase on each phase (it simply returns the phase's value).
     
     There is a minor inefficiency due to the choice to make the \emph{occur} and \emph{eval} objects atomic
     with respect to all the FRP objects for an application. This means that even if two Behaviours or Events are in no way

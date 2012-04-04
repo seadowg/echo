@@ -69,6 +69,10 @@ type Event[T] = Stream[(Time, T)]
 \begin{verbatim}
 def occs[T](ev : Event[T]) : Stream[(Time, T)]
 \end{verbatim}
+
+        As this stream is seen as a list of occurrences in Time it is monotonically
+        increasing with respect to time: the time of each occurrence is greater than
+        or equal to the occurrence's before it.
        
     \subsection{Operations}
       Elliott and Hudak additionally define a set of actions on Behaviours and Events.
@@ -148,6 +152,15 @@ occs(join(ev)) = occs(map(ev,
 
       One caveat to this function is that any occurrences of Events that occur in \emph{ev} are delayed
       so their occurrence times are at least that of the time that their parent Event occurred.
+      
+      It should be noted that as the times in Event occurrences are monotonically increasing
+      we are able to express the occurrences before some specified time as a finite set. We will
+      define a notation for this here:
+
+\begin{verbatim}
+def finite[T](ev : Event[T], t : Time) : Stream[(Time, T)]
+finite(ev, t) = occs(ev).takeWhile((te, v) => te <= t)
+\end{verbatim}
         
       \subsubsection{Reactivity}
         One of the most powerful aspects of FRP is the ability to use Events to punctuate or `switch' Behaviours.
@@ -156,8 +169,7 @@ occs(join(ev)) = occs(map(ev,
 
 \begin{verbatim}
 def switcher[T](ini : Behaviour[T], ev : Event[Behaviour[T]])
-at(switcher(ini, ev), t) = at(occs(ev).filter(
-                              (ti, v) => ti <= t).last._2), t)
+at(switcher(ini, ev), t) = at(finite(ev, t).last._2.at(t))
 \end{verbatim}
 
         We can also extend this concept to static values which is very useful in practice:
@@ -198,9 +210,8 @@ occs(predicate(beh, t)).first = (lowestAfter(beh, t), ())
     \subsection{Events as Monotonic Streams}
       As stated earlier, we think of Events as streams of Time-value pairs. What isn't immediately
       obvious is that we think of this stream as real-time data: each occurrence is a value that
-      `occurs' at the time stated. This rationale also means that an Event is a `monotonic' stream in terms of
-      occurrence times as the time of each occurrence will be greater than or equal to the last occurrence
-      time.
+      `occurs' at the time stated. As stated earlier, this means that the stream is monotonic in
+      respect to occurrence times.
       
       With the previous observations in mind it it can be seen that Events should not be treated as a
       standard data structure. Its noticeable that the earlier definition of the \emph{map} operation for
@@ -231,17 +242,6 @@ val event2 = dangerMap(event1, (t, v) => (t - 1, v))
       that they must be evaluated lazily: we can't merge two infinite streams when we actually
       call \emph{merge} as it would never finish! This also means that there are some things we
       can't express for an Event such as its `length' or its `last' element.
-      
-      It should be noted however that as the times in Event occurrences are monotonically increasing
-      we are able to express the occurrences before some specified time as a finite set. We will
-      define a notation for this here:
-
-\begin{verbatim}
-def finite[T](ev : Event[T], t : Time) : Stream[(Time, T)]
-finite(ev, t) = occs(ev).takeWhile((te, v) => te <= t)
-\end{verbatim}
-
-      We will use this function in later definitions.
     
     \subsection{Interactive Behaviour}
       FRP runs into some of its most significant problems when it is combined with any

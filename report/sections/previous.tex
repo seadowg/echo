@@ -19,21 +19,16 @@
       
 \begin{verbatim}
 def stepper[T](ini : T, ev : Event[T]) : Reactive[T]
+at(stepper(ini, ev), t) = finite(ev, t).last._2
 \end{verbatim}
 
       Like with a Behaviour a Reactive's value changes over time but it does so discretely. 
-      Elliott goes on to observe that 
-      a Behaviour's internal representation can be modelled as a Reactive[Time =$>$ T]. In other words a 
-      Behaviour can be seen as a stream of `phases' \footnote{Even a Behaviour with only one phase could be composed using the \emph{switcher} and a never occurring Event.} that exist between discrete
-      points in time (think of the \emph{switcher} operation in section~\ref{sec:semantics}). Of course, we
-      still think of a Behaviour's value at a sample time as the result of evaluating a
-      Time =$>$ T function (the current phase) but using the Reactive type
-      does provide a clearer definition of how Behaviours are `punctuated' by Events. Elliott believed
+      Elliott believed
       that using this model could lead to greater efficiency in FRP implementations as Reactive values
       expose their changes via Events (so only need reevaluated on occurrences). This is
       in contrast to Behaviours as due to their continuous nature we must constantly reevaluate them
       as we can't detect `changes'. Continuous Behaviours still exist in Reactive however, Elliott only replaces     
-      non-continuous instances with the Reactive type.
+      non-continuous instances with the Reactive type. 
       
       As one might expect from a framework created by Elliott, Reactive has all the other major features
       of Fran: Events and \emph{switcher} etc. However, Reactive was mainly intended as an experiment
