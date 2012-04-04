@@ -50,7 +50,7 @@ val predicate = beh.sample(someEvent).filter(v => v == 5)
     So as to gain experience with using Echo and also for the purposes of evaluation, demonstration
     applications were developed. 
     
-    The first of these was a small music player application. The application
+    The first of these was a small music player application \ref{music-player}. The application
     can load in a `.wav' audio file and then play it back to the user. Pause and volume changing functionality
     is also available and the user is presented with a simple animation of the current volume level. One of the
     first points to cover is that an abstraction had to be built to enable the audio playback. This was in the form
@@ -72,3 +72,9 @@ val predicate = beh.sample(someEvent).filter(v => v == 5)
     and intuitive to both create and read.
     
     Code excerpts from both demo applications can be seen in Appendix A and B. 
+    
+    \begin{figure}
+      \includegraphics[width=\linewidth]{images/music-player.png}
+      \caption{Music Player}
+      \label{music_player}
+    \end{figure}
