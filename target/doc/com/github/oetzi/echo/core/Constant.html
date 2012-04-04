@@ -28,7 +28,7 @@
       </span>
       </h4>
       
-          <div class="fullcommenttop" id="comment"><div class="comment cmt"><p>Constant is a Behaviour that's value never changes. It is omptimised so
+          <div class="fullcommenttop" id="comment"><div class="comment cmt"><p>Constant is a Behaviour that's value never changes. It is optimised so
 so it only returns the value rather than evaluating it needlessly with respect
 to time.
 </p></div><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a name="com.github.oetzi.echo" class="extype" href="../package.html">echo</a>] </dd></dl><div class="toggleContainer block">
@@ -320,13 +320,13 @@ and passed Behaviors' value with the passed function.
       </h4>
       <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>final </dd><dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
     </li><li visbl="pub" name="com.github.oetzi.echo.core.Behaviour#sample" data-isabs="false">
-      <a id="sample[A](Event[A]):Event[(A, T)]"></a>
+      <a id="sample[U](Event[U]):Event[(U, T)]"></a>
       <h4 class="signature">
       <span class="kind">def</span>
       <span class="symbol"> 
         <span class="name">sample</span>
-        <span class="tparams">[<span name="A">A</span>]</span>
-        <span class="params">(<span name="sourceEvent">sourceEvent: <a name="com.github.oetzi.echo.core.Event" class="extype" href="Event.html">Event</a>[A]</span>)</span><span class="result">: <a name="com.github.oetzi.echo.core.Event" class="extype" href="Event.html">Event</a>[(A, T)]</span>
+        <span class="tparams">[<span name="U">U</span>]</span>
+        <span class="params">(<span name="sourceEvent">sourceEvent: <a name="com.github.oetzi.echo.core.Event" class="extype" href="Event.html">Event</a>[U]</span>)</span><span class="result">: <a name="com.github.oetzi.echo.core.Event" class="extype" href="Event.html">Event</a>[(U, T)]</span>
       </span>
       </h4>
       <p class="shortcomment cmt">Returns a Event[T] that occurs every time the given
@@ -370,29 +370,13 @@ and the passed Behaviour whenever the passed Event occurs.</p><div class="fullco
 and the passed Behaviour whenever the passed Event occurs.
 </p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a name="com.github.oetzi.echo.core.Behaviour" class="extype" href="Behaviour.html">Behaviour</a></dd></dl></div>
     </li><li visbl="pub" name="com.github.oetzi.echo.core.Behaviour#until" data-isabs="false">
-      <a id="until[A](Time,Event[A],Behaviour[T]):Behaviour[T]"></a>
+      <a id="until[U](Event[U],Behaviour[T]):Behaviour[T]"></a>
       <h4 class="signature">
       <span class="kind">def</span>
       <span class="symbol"> 
         <span class="name">until</span>
-        <span class="tparams">[<span name="A">A</span>]</span>
-        <span class="params">(<span name="after">after: Time</span>, <span name="event">event: <a name="com.github.oetzi.echo.core.Event" class="extype" href="Event.html">Event</a>[A]</span>, <span name="behaviour">behaviour: <a name="com.github.oetzi.echo.core.Behaviour" class="extype" href="Behaviour.html">Behaviour</a>[T]</span>)</span><span class="result">: <a name="com.github.oetzi.echo.core.Behaviour" class="extype" href="Behaviour.html">Behaviour</a>[T]</span>
-      </span>
-      </h4>
-      <p class="shortcomment cmt">Similar to the previous until function except for the Event must
-have occurred on or after the specified time for the Behaviour to
-switch.</p><div class="fullcomment"><div class="comment cmt"><p>Similar to the previous until function except for the Event must
-have occurred on or after the specified time for the Behaviour to
-switch.
-</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a name="com.github.oetzi.echo.core.Behaviour" class="extype" href="Behaviour.html">Behaviour</a></dd></dl></div>
-    </li><li visbl="pub" name="com.github.oetzi.echo.core.Behaviour#until" data-isabs="false">
-      <a id="until[A](Event[A],Behaviour[T]):Behaviour[T]"></a>
-      <h4 class="signature">
-      <span class="kind">def</span>
-      <span class="symbol"> 
-        <span class="name">until</span>
-        <span class="tparams">[<span name="A">A</span>]</span>
-        <span class="params">(<span name="event">event: <a name="com.github.oetzi.echo.core.Event" class="extype" href="Event.html">Event</a>[A]</span>, <span name="behaviour">behaviour: <a name="com.github.oetzi.echo.core.Behaviour" class="extype" href="Behaviour.html">Behaviour</a>[T]</span>)</span><span class="result">: <a name="com.github.oetzi.echo.core.Behaviour" class="extype" href="Behaviour.html">Behaviour</a>[T]</span>
+        <span class="tparams">[<span name="U">U</span>]</span>
+        <span class="params">(<span name="event">event: <a name="com.github.oetzi.echo.core.Event" class="extype" href="Event.html">Event</a>[U]</span>, <span name="behaviour">behaviour: <a name="com.github.oetzi.echo.core.Behaviour" class="extype" href="Behaviour.html">Behaviour</a>[T]</span>)</span><span class="result">: <a name="com.github.oetzi.echo.core.Behaviour" class="extype" href="Behaviour.html">Behaviour</a>[T]</span>
       </span>
       </h4>
       <p class="shortcomment cmt">Returns a Behaviour that behaves as the callee until the
