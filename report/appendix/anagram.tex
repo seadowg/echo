@@ -47,7 +47,7 @@ object Anagram extends EchoApp {
 		  val winTime = Stepper(-1.toDouble, 
 		    correct.map((t, v) => (t / 1000000000)))
 
-		  val timer = Behavior(t => t / 1000000000)
+		  val timer = Behaviour(t => t / 1000000000)
 
 		  val frame = Frame(200, 200, List(
 		    Text(Stepper("Loading...", 
