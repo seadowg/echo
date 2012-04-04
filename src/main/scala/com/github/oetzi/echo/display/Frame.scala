@@ -75,6 +75,9 @@ class Frame private(private val visibleBeh: Behaviour[Boolean]) extends Canvas {
     internal
   }
 
+  /** Starts a thread that draws this Frame and its component
+    * Canvases every 20ms (with respect to new atrribute values).
+   */
   private def startClock() {
     new Timer().schedule(new TimerTask() {
       override def run() {
