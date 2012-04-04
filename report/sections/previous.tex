@@ -28,7 +28,12 @@ def stepper[T](ini : T, ev : Event[T]) : Reactive[T]
       points in time (think of the \emph{switcher} operation in section~\ref{sec:semantics}). Of course, we
       still think of a Behaviour's value at a sample time as the result of evaluating a
       Time =$>$ T function (the current phase) but using the Reactive type
-      does provide a clearer definition of how Behaviours are `punctuated' by Events. 
+      does provide a clearer definition of how Behaviours are `punctuated' by Events. Elliott believed
+      that using this model could lead to greater efficiency in FRP implementations as Reactive values
+      expose their changes via Events (so only need reevaluated on occurrences so to speak). This is
+      in contrast to Behaviours as due to their continuous nature we must constantly reevaluate them
+      as we can't detect `changes'. Continuous Behaviours still exist in Reactive however, Elliott only replaces     
+      non-continuous instances with the Reactive type.
       
       As one might expect from a framework created by Elliott, Reactive has all the other major features
       of Fran: Events and \emph{switcher} etc. However, Reactive was mainly intended as an experiment
@@ -44,7 +49,7 @@ def stepper[T](ini : T, ev : Event[T]) : Reactive[T]
       Apfelmus to use a push
       based implementation where Behaviours don't need polling to keep output components (UI etc) up to date as changes in 
       their values are exposed
-      by Events occurring. While this may be more efficient \footnote{The fact that Behaviours must polled is not really an 
+      by Events occurring. While this may be more `efficient' \footnote{The fact that Behaviours must polled is not really an 
       inefficiency as it is required due to their continuous nature. } it excludes the ability to create truly 
       continuous Behaviours and therefore Reactive-Banana does not really provide a true implementation
       of FRP. This seems like a strange decision. Optimising `constant' Behaviours is sensible
