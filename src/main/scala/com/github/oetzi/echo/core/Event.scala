@@ -179,11 +179,13 @@ trait EventSource[T] extends Event[T] {
     while (!createLock.available) {}
 
     groupLock synchronized {
-      length += 1
-      val occ = new Occurrence(now(), value, length)
-      present = occ
+      freezeTime(now()) {
+        length += 1
+        val occ = new Occurrence(now(), value, length)
+        present = occ
 
-      echo(occ)
+        echo(occ)
+      }
     }
   }
 

@@ -44,6 +44,32 @@ object EventSpec extends Specification {
       event.pubOccur(5)
       passed.value mustEqual 5
     }
+    
+    "has hook functionality" in {
+      "that executes hooked functions on occur" in {
+        val event = new TestEvent[Int]
+        var ran = false
+        event.hook(occ => ran = true)
+        
+        event.pubOccur(5)
+        
+        ran mustEqual true
+      }
+      
+      "that executes hooked functions in frozen time" in {
+        val event = new TestEvent[Int]
+        var time = 0D
+        event.hook {
+          occ =>
+            Thread.sleep(1)
+            time = now()
+        }
+        
+        event.pubOccur(5)
+        
+        time mustEqual event.top().get.time
+      }
+    }
 
     "have a map function" >> {
       "returning a mapped version of the Event" in {
