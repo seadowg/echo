@@ -18,7 +18,7 @@ with Breakable {
   private object SenderActor extends Actor {
     def act {
       loop {
-        receive {
+        react {
           case message: String => sendToSocket(message)
         }
       }
