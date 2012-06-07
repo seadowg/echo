@@ -122,6 +122,24 @@ trait Event[T] {
       }
     }
   }
+  
+  def foldLeft[U](ini: U)(func: (U, T) => U): Behaviour[U] = {
+    frp {
+      val source = this
+      var last = ini
+      
+      val folded = new EventSource[U] {
+        source.hook {
+          occ =>
+            val current = func(last, occ.value)
+            occur(current)
+            last = current
+        }
+      }
+      
+      Stepper(ini, folded)
+    }
+  }
 
   /**Returns the result of calling occs wrapped
    * in an Option[Occurrence[T]] instance.
