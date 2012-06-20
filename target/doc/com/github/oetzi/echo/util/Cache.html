@@ -2,7 +2,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html>
         <head>
-          <title>com.github.oetzi.echo.core.Behaviour</title>
+          <title>com.github.oetzi.echo.util.Cache</title>
           <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
           
       <link type="text/css" media="screen" rel="stylesheet" href="../../../../../lib/template.css" />
@@ -14,28 +14,26 @@
         </head>
         <body onload="sh_highlightDocument('../lib/', '.min.js');" class="type">
       <div id="definition">
-        <a title="Go to companion" href="Behaviour$.html"><img src="../../../../../lib/class_to_object_big.png" /></a>
-        <p id="owner"><a name="com" class="extype" href="../../../../package.html">com</a>.<a name="com.github" class="extype" href="../../../package.html">github</a>.<a name="com.github.oetzi" class="extype" href="../../package.html">oetzi</a>.<a name="com.github.oetzi.echo" class="extype" href="../package.html">echo</a>.<a name="com.github.oetzi.echo.core" class="extype" href="package.html">core</a></p>
-        <h1><a title="Go to companion" href="Behaviour$.html">Behaviour</a></h1>
+        <img src="../../../../../lib/class_big.png" />
+        <p id="owner"><a name="com" class="extype" href="../../../../package.html">com</a>.<a name="com.github" class="extype" href="../../../package.html">github</a>.<a name="com.github.oetzi" class="extype" href="../../package.html">oetzi</a>.<a name="com.github.oetzi.echo" class="extype" href="../package.html">echo</a>.<a name="com.github.oetzi.echo.util" class="extype" href="package.html">util</a></p>
+        <h1>Cache</h1>
       </div>
 
       <h4 class="signature" id="signature">
       <span class="modifier_kind">
-        <span class="modifier">sealed </span>
+        <span class="modifier"></span>
         <span class="kind">class</span>
       </span>
       <span class="symbol">
-        <span class="name">Behaviour</span><span class="tparams">[<span name="T">T</span>]</span><span class="result"> extends AnyRef</span>
+        <span class="name">Cache</span><span class="tparams">[<span name="T">T</span>, <span name="U">U</span>]</span><span class="result"> extends AnyRef</span>
       </span>
       </h4>
       
-      <div class="fullcommenttop" id="comment"><div class="comment cmt"><p>Behaviour provides an implementation of FRP Behaviours.
+      <div class="fullcommenttop" id="comment"><div class="comment cmt"><p>A proxy for non wasteful evaluation of a pure function
+ that is evaluated monotonically.
 </p></div><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
           <div class="superTypes hiddenContent">AnyRef, <span name="scala.Any" class="extype">Any</span></div>
-        </div><div class="toggleContainer block">
-          <span class="toggle">Known Subclasses</span>
-          <div class="subClasses hiddenContent"><a name="com.github.oetzi.echo.core.Constant" class="extype" href="Constant.html">Constant</a>, <a name="com.github.oetzi.echo.core.Stepper" class="extype" href="Stepper.html">Stepper</a>, <a name="com.github.oetzi.echo.core.Switcher" class="extype" href="Switcher.html">Switcher</a></div>
         </div></div>
     
 
@@ -49,7 +47,7 @@
               <span class="filtertype">Inherited</span>
               <ol><li class="hideall out"><span>Hide All</span></li>
               <li class="showall in"><span>Show all</span></li></ol>
-              <ol id="linearization"><li name="com.github.oetzi.echo.core.Behaviour" class="in"><span>Behaviour</span></li><li name="scala.AnyRef" class="in"><span>AnyRef</span></li><li name="scala.Any" class="in"><span>Any</span></li></ol>
+              <ol id="linearization"><li name="com.github.oetzi.echo.util.Cache" class="in"><span>Cache</span></li><li name="scala.AnyRef" class="in"><span>AnyRef</span></li><li name="scala.Any" class="in"><span>Any</span></li></ol>
             </div>
         <div id="visbl">
             <span class="filtertype">Visibility</span>
@@ -61,15 +59,15 @@
         <div id="allMembers">
         <div class="members" id="constructors">
               <h3>Instance Constructors</h3>
-              <ol><li visbl="pub" name="com.github.oetzi.echo.core.Behaviour#this" data-isabs="false">
-      <a id="this:Behaviour[T]"></a>
+              <ol><li visbl="pub" name="com.github.oetzi.echo.util.Cache#this" data-isabs="false">
+      <a id="this:Cache[T, U]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">Behaviour</span><span class="params">(<span name="rule">rule: (Time) ⇒ T</span>)</span>
+        <span class="name">Cache</span><span class="params">(<span name="work">work: (T) ⇒ U</span>)</span>
       </span>
       </h4>
       
@@ -193,23 +191,6 @@
       </span>
       </h4>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
-    </li><li visbl="pub" name="com.github.oetzi.echo.core.Behaviour#eval" data-isabs="false">
-      <a id="eval():T"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">eval</span><span class="params">()</span><span class="result">: T</span>
-      </span>
-      </h4>
-      <p class="shortcomment cmt">Evaluates the Behaviour at the current time.</p><div class="fullcomment"><div class="comment cmt"><p>Evaluates the Behaviour at the current time. The function is atomic
-with respect to the run-time group of FRP objects so evaluation times
-are guaranteed to be monotonically increasing (even for Behaviours part
-of more than one composite Behaviour and for concurrently evaluated
-Behaviours.)
-</p></div></div>
     </li><li visbl="prt" name="scala.AnyRef#finalize" data-isabs="false">
       <a id="finalize():Unit"></a>
       <h4 class="signature">
@@ -225,6 +206,19 @@ Behaviours.)
                 <span class="name">@throws</span><span class="args">()</span>
               
         </dd></dl></div>
+    </li><li visbl="pub" name="com.github.oetzi.echo.util.Cache#get" data-isabs="false">
+      <a id="get(T):U"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">get</span><span class="params">(<span name="check">check: T</span>)</span><span class="result">: U</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Evaluates and returns work with respect to check or returns the cached
+value if check is the same as used in the last evaluation.</p>
     </li><li visbl="pub" name="scala.AnyRef#getClass" data-isabs="false">
       <a id="getClass():java.lang.Class[_]"></a>
       <h4 class="signature">
@@ -261,45 +255,6 @@ Behaviours.)
       </span>
       </h4>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
-    </li><li visbl="pub" name="com.github.oetzi.echo.core.Behaviour#map" data-isabs="false">
-      <a id="map[B]((T) ⇒ B):Behaviour[B]"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">map</span><span class="tparams">[<span name="B">B</span>]</span><span class="params">(<span name="func">func: (T) ⇒ B</span>)</span><span class="result">: <a name="com.github.oetzi.echo.core.Behaviour" class="extype" href="">Behaviour</a>[B]</span>
-      </span>
-      </h4>
-      <p class="shortcomment cmt">Returns a Behaviour that transforms the callee's
-value with the passed function.</p>
-    </li><li visbl="pub" name="com.github.oetzi.echo.core.Behaviour#map2" data-isabs="false">
-      <a id="map2[U, V](Behaviour[U])((T, U) ⇒ V):Behaviour[V]"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">map2</span><span class="tparams">[<span name="U">U</span>, <span name="V">V</span>]</span><span class="params">(<span name="behaviour">behaviour: <a name="com.github.oetzi.echo.core.Behaviour" class="extype" href="">Behaviour</a>[U]</span>)</span><span class="params">(<span name="func">func: (T, U) ⇒ V</span>)</span><span class="result">: <a name="com.github.oetzi.echo.core.Behaviour" class="extype" href="">Behaviour</a>[V]</span>
-      </span>
-      </h4>
-      <p class="shortcomment cmt">Returns a Behaviour that transforms the callee's
-and passed Behavior's value with the passed function.</p>
-    </li><li visbl="pub" name="com.github.oetzi.echo.core.Behaviour#map3" data-isabs="false">
-      <a id="map3[U, V, W](Behaviour[U],Behaviour[V])((T, U, V) ⇒ W):Behaviour[W]"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">map3</span><span class="tparams">[<span name="U">U</span>, <span name="V">V</span>, <span name="W">W</span>]</span><span class="params">(<span name="beh1">beh1: <a name="com.github.oetzi.echo.core.Behaviour" class="extype" href="">Behaviour</a>[U]</span>, <span name="beh2">beh2: <a name="com.github.oetzi.echo.core.Behaviour" class="extype" href="">Behaviour</a>[V]</span>)</span><span class="params">(<span name="func">func: (T, U, V) ⇒ W</span>)</span><span class="result">: <a name="com.github.oetzi.echo.core.Behaviour" class="extype" href="">Behaviour</a>[W]</span>
-      </span>
-      </h4>
-      <p class="shortcomment cmt">Returns a Behaviour that transforms the callee's
-and passed Behaviors' value with the passed function.</p>
     </li><li visbl="pub" name="scala.AnyRef#ne" data-isabs="false">
       <a id="ne(AnyRef):Boolean"></a>
       <h4 class="signature">
@@ -336,19 +291,6 @@ and passed Behaviors' value with the passed function.</p>
       </span>
       </h4>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
-    </li><li visbl="pub" name="com.github.oetzi.echo.core.Behaviour#sample" data-isabs="false">
-      <a id="sample[U](Event[U]):Event[(U, T)]"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">sample</span><span class="tparams">[<span name="U">U</span>]</span><span class="params">(<span name="sourceEvent">sourceEvent: <a name="com.github.oetzi.echo.core.Event" class="extype" href="Event.html">Event</a>[U]</span>)</span><span class="result">: <a name="com.github.oetzi.echo.core.Event" class="extype" href="Event.html">Event</a>[(U, T)]</span>
-      </span>
-      </h4>
-      <p class="shortcomment cmt">Returns a Event[T] that occurs every time the given
-Event occurs with the value of the Behaviour at that time.</p>
     </li><li visbl="pub" name="scala.AnyRef#synchronized" data-isabs="false">
       <a id="synchronized[T0](⇒ T0):T0"></a>
       <h4 class="signature">
@@ -373,35 +315,6 @@ Event occurs with the value of the Behaviour at that time.</p>
       </span>
       </h4>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
-    </li><li visbl="pub" name="com.github.oetzi.echo.core.Behaviour#toggle" data-isabs="false">
-      <a id="toggle[A](Event[A],Behaviour[T]):Behaviour[T]"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">toggle</span><span class="tparams">[<span name="A">A</span>]</span><span class="params">(<span name="event">event: <a name="com.github.oetzi.echo.core.Event" class="extype" href="Event.html">Event</a>[A]</span>, <span name="behaviour">behaviour: <a name="com.github.oetzi.echo.core.Behaviour" class="extype" href="">Behaviour</a>[T]</span>)</span><span class="result">: <a name="com.github.oetzi.echo.core.Behaviour" class="extype" href="">Behaviour</a>[T]</span>
-      </span>
-      </h4>
-      <p class="shortcomment cmt">Returns a Behaviour that toggles between behaving as the callee
-and the passed Behaviour whenever the passed Event occurs.</p>
-    </li><li visbl="pub" name="com.github.oetzi.echo.core.Behaviour#until" data-isabs="false">
-      <a id="until[U](Event[U],Behaviour[T]):Behaviour[T]"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">until</span><span class="tparams">[<span name="U">U</span>]</span><span class="params">(<span name="event">event: <a name="com.github.oetzi.echo.core.Event" class="extype" href="Event.html">Event</a>[U]</span>, <span name="behaviour">behaviour: <a name="com.github.oetzi.echo.core.Behaviour" class="extype" href="">Behaviour</a>[T]</span>)</span><span class="result">: <a name="com.github.oetzi.echo.core.Behaviour" class="extype" href="">Behaviour</a>[T]</span>
-      </span>
-      </h4>
-      <p class="shortcomment cmt">Returns a Behaviour that behaves as the callee until the
-Event occurs.</p><div class="fullcomment"><div class="comment cmt"><p>Returns a Behaviour that behaves as the callee until the
-Event occurs. It then switches to behaving as the passed
-Behaviour.
-</p></div></div>
     </li><li visbl="pub" name="scala.AnyRef#wait" data-isabs="false">
       <a id="wait():Unit"></a>
       <h4 class="signature">
