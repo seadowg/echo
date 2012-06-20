@@ -288,5 +288,28 @@ object EventSpec extends Specification {
         event.top().get.num mustEqual 3
       }
     }
+    
+    "have a foldLeft function that" >> {
+      "returns a Behaviour that has the initial value for an empty Event" in {
+        val event = new TestEvent[Int]
+        
+        event.foldLeft(0) {
+          (l, r) => l
+        }.eval() mustEqual 0
+      }
+      
+      "returns a Behaviour that applies the function across Event occurrences" in {
+        val event = new TestEvent[Int]
+        val folded = event.foldLeft(1) {
+          (l, r) =>
+            l + r
+        }
+        
+        event.pubOccur(2)
+        event.pubOccur(3)
+        
+        folded.eval() mustEqual 6
+      }
+    }
   }
 }

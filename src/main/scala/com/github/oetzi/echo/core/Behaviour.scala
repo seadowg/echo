@@ -2,6 +2,7 @@ package com.github.oetzi.echo.core
 
 import com.github.oetzi.echo.Echo._
 import com.github.oetzi.echo.Control._
+import com.github.oetzi.echo.util.Cache
 
 /**Behaviour provides an implementation of FRP Behaviours.
  */
@@ -10,7 +11,7 @@ sealed class Behaviour[T](private val rule: Time => T) {
   /**Holds last computed value and time it was computed at
    * to prevent redundant evaluation.
    */
-  private var last: (Time, T) = null
+  private var cache = new Cache[Time, T](time => rule(time))
 
   /**Evaluates the Behaviour at the current time. The function is atomic
    * with respect to the run-time group of FRP objects so evaluation times
@@ -114,11 +115,7 @@ sealed class Behaviour[T](private val rule: Time => T) {
   /**Evaluates the Behaviour at the specified time.
    */
   private[core] def at(time: Time): T = {
-    if (last == null || time != last._1) {
-      last = (time, rule(time))
-    }
-
-    last._2
+    cache.get(time)
   }
 }
 

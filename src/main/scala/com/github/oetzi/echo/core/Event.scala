@@ -3,6 +3,7 @@ package com.github.oetzi.echo.core
 import com.github.oetzi.echo.Echo._
 import com.github.oetzi.echo.Control._
 import com.github.oetzi.echo.EchoApp
+import com.github.oetzi.echo.util.Cache
 import collection.mutable.ArrayBuffer
 
 /**Event provides an implementation of FRP Events.
@@ -25,6 +26,8 @@ trait Event[T] {
    */
   def map[U](func: (Time, T) => U): Event[U] = {
     frp {
+      val cache = new Cache[Occurrence[T], Occurrence[U]](occ => occ.map(func))
+      
       val mapFun: () => Occurrence[U] = {
         () =>
           val occ = occs()
@@ -34,7 +37,7 @@ trait Event[T] {
           }
 
           else {
-            occ.map(func)
+            cache.get(occ)
           }
       }
 
@@ -82,11 +85,13 @@ trait Event[T] {
    */
   def merge(event: Event[T]): Event[T] = {
     frp {
-      val func: () => Occurrence[T] = {
-        () =>
-          val left = this.occs()
-          val right = event.top().getOrElse(null)
-
+      type occPair = (Occurrence[T], Occurrence[T])
+      
+      val func: occPair => Occurrence[T] = {
+        (leftAndRight) =>
+          val left = leftAndRight._1
+          val right = leftAndRight._2
+          
           if (left == null && right == null) {
             null
           }
@@ -107,12 +112,13 @@ trait Event[T] {
             new Occurrence(left.time, left.value, left.num + right.num)
           }
       }
-
+      
+      val cache = new Cache[occPair, Occurrence[T]](func)
       val source = this
 
       new Event[T] {
         protected def occs(): Occurrence[T] = {
-          func()
+          cache.get((source.occs(), event.top().getOrElse(null)))
         }
 
         protected[echo] def hook(block: Occurrence[T] => Unit) {
@@ -120,6 +126,28 @@ trait Event[T] {
           event.hook(block)
         }
       }
+    }
+  }
+  
+  /** Returns a Behaviour that's value is either ini or func applied to
+   *  to every occurrence in time order (using the last application and the
+   *  occurrence value as arguments).
+   */
+  def foldLeft[U](ini: U)(func: (U, T) => U): Behaviour[U] = {
+    frp {
+      val source = this
+      var last = ini
+      
+      val folded = new EventSource[U] {
+        source.hook {
+          occ =>
+            val current = func(last, occ.value)
+            occur(current)
+            last = current
+        }
+      }
+      
+      Stepper(ini, folded)
     }
   }
 
