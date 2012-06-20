@@ -129,6 +129,10 @@ trait Event[T] {
     }
   }
   
+  /** Returns a Behaviour that's value is either ini or func applied to
+   *  to every occurrence in time order (using the last application and the
+   *  occurrence value as arguments).
+   */
   def foldLeft[U](ini: U)(func: (U, T) => U): Behaviour[U] = {
     frp {
       val source = this
