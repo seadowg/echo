@@ -8,21 +8,7 @@ with working on the echo source code.
 
 ## Building
 
-The framework uses [buildr](http://buildr.apache.org/) for building. If you haven't used this before it is a ruby tool for 
-building JVM languages. To build the project simply do:
-
-    buildr
-    
-This will compile the project into `target/classes` and run all tests. You can also package echo as a jar by doing:
-
-    buildr package
-    
-There are a few other tasks added to buildfile:
-
-* `docs` - builds the documentation for the source code.
-* `console` - this builds everything then fires up a scala console with the built classes included in the classpath.
-
-You can also use standard buildr commands to work with echo in various IDEs. These are documented [here](http://buildr.apache.org/more_stuff.html#eclipse).
+Coming soon...
 
 ## Hacking
 
