@@ -13,7 +13,7 @@ the echo directory you can simply run the following command to fire it up:
 
     sbt
    
-Information and tutorials on using sbt can be found [here](http://code.google.com/p/simple-build-tool/wiki/RunningSbt).
+Information and tutorials on using sbt can be found [here](http://github.com/harrah/xsbt/wiki/Getting-Started-Running).
 
 ## Hacking
 
