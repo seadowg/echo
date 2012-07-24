@@ -11,7 +11,7 @@ with working on the echo source code.
 The echo source can be built, tested etc using the standard Scala tool [sbt](http://www.scala-sbt.org/). Once in 
 the echo directory you can simply run the following command to fire it up:
 
-   sbt
+    sbt
    
 Information and tutorials on using sbt can be found [here](http://code.google.com/p/simple-build-tool/wiki/RunningSbt).
 
