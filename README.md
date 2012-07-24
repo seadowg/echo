@@ -8,7 +8,12 @@ with working on the echo source code.
 
 ## Building
 
-Coming soon...
+The echo source can be built, tested etc using the standard Scala tool [sbt](http://www.scala-sbt.org/). Once in 
+the echo directory you can simply run the following command to fire it up:
+
+   sbt
+   
+Information and tutorials on using sbt can be found [here](http://code.google.com/p/simple-build-tool/wiki/RunningSbt).
 
 ## Hacking
 
@@ -16,19 +21,19 @@ Please feel free to hack on the echo source: [Fork](http://help.github.com/fork-
 
 ### Packages
 
-The echo framework currently has four packages:
+The echo framework currently has five packages:
 
 * root - contains EchoApp and Echo class.
 * core - contains implementation of core FRP types and operations
 * ui - simple UI framework classes
 * io - currently contains network classes and code to deal with exceptions
+* util - package for any extra code used mainly for DRYness internally
 
 ### Testing
 
-Testing for echo is written using Specs. The tests are contained in src/spec/scala and are part of the
-`core.test` package so they can access package level function of FRP types. To run the tests you can simply do:
-
-    buildr test
+Testing for echo is written using Specs. The tests are contained in src/test/scala and are part of the
+`core.test` package so they can access package level functions of FRP types. Tests can be run using the sbt command
+`test`.
     
 Remember: tests are good. You should write them.
 
