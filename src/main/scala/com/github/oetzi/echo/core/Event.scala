@@ -282,24 +282,22 @@ object Event {
         }
 
         private def joinOccur(occurrence: Occurrence[T], priority: BigInt) {
-          this synchronized {
-            val lastOcc = this.top()
+          val lastOcc = this.top()
 
-            if (lastOcc != None && occurrence.time == lastOcc.get.time) {
-              if (priority >= lastPriority) {
-                occur(occurrence.value)
-                lastPriority = priority
-              }
-
-              else {
-                echo(occurrence)
-              }
-            }
-
-            else {
+          if (lastOcc != None && occurrence.time == lastOcc.get.time) {
+            if (priority >= lastPriority) {
               occur(occurrence.value)
               lastPriority = priority
             }
+
+            else {
+              echo(occurrence)
+            }
+          }
+
+          else {
+            occur(occurrence.value)
+            lastPriority = priority
           }
         }
       }.event()
