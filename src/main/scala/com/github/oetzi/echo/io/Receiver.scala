@@ -4,6 +4,7 @@ import java.lang.Thread
 import java.net.ServerSocket
 import com.github.oetzi.echo.core.{Behaviour, EventSource}
 import java.io.{PrintWriter, InputStreamReader, BufferedReader}
+import actors.Actor._
 
 /**Represents a network input. Network requests received occur
  * as part of this Event.
@@ -17,16 +18,19 @@ with Breakable {
 
         while (true) {
           val request = socket.accept()
-          val in = new BufferedReader(new InputStreamReader(request.getInputStream))
-          val out = new PrintWriter(request.getOutputStream, true)
+          
+          actor {
+            val in = new BufferedReader(new InputStreamReader(request.getInputStream))
+            val out = new PrintWriter(request.getOutputStream, true)
 
-          val message = in.readLine()
-          Receiver.this.occur(message)
-          out.println(reply(message).eval())
+            val message = in.readLine()
+            Receiver.this.occur(message)
+            out.println(reply(message).eval())
 
-          out.close()
-          in.close()
-          request.close()
+            out.close()
+            in.close()
+            request.close()
+          }
         }
 
         socket.close()
