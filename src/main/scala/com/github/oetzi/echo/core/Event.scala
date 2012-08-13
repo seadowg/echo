@@ -74,7 +74,7 @@ trait Event[T] {
               occur(occ.value)
             }
         }
-      }
+      }.event()
     }
   }
 
