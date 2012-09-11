@@ -10,14 +10,12 @@ import java.io.{PrintWriter, InputStreamReader, BufferedReader}
  */
 class Receiver private(val port: Int, val reply: String => Behaviour[String]) extends EventSource[String]
 with Breakable {
-  private var running = true
-
   private val thread = new Thread(new Runnable() {
     def run() {
       dangerous {
         val socket = new ServerSocket(port)
 
-        while (Receiver.this.running) {
+        while (true) {
           val request = socket.accept()
           val in = new BufferedReader(new InputStreamReader(request.getInputStream))
           val out = new PrintWriter(request.getOutputStream, true)
@@ -36,12 +34,6 @@ with Breakable {
     }
   })
   thread.start()
-
-  /**Stop this Receiver listening for connections.
-   */
-  protected[echo] def die() {
-    this.running = false
-  }
 }
 
 object Receiver {
