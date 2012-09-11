@@ -1,7 +1,7 @@
 package com.github.oetzi.echo.core.test
 
 import com.github.oetzi.echo.core.test.help.TestEvent
-import org.specs._
+import org.specs2.mutable._
 import com.github.oetzi.echo.Echo._
 import com.github.oetzi.echo.Control._
 import com.github.oetzi.echo.core.Stepper
@@ -15,7 +15,7 @@ object StepperSpec extends Specification {
       "returning 'initial' if event hasn't occured" in {
         val stepper = new Stepper(0, new TestEvent[Int])
 
-        stepper.eval() mustBe 0
+        stepper.eval() mustEqual 0
       }
 
       "returning the newest event if time is >= last event occurrence" in {
@@ -23,7 +23,7 @@ object StepperSpec extends Specification {
         event.pubOccur(5)
         val stepper = new Stepper(0, event)
 
-        stepper.eval mustBe 5
+        stepper.eval mustEqual 5
       }
 
       "returning an event's value if the time is equal to it" in {
@@ -33,7 +33,7 @@ object StepperSpec extends Specification {
           event.pubOccur(10)
           val stepper = new Stepper(0, event)
           stepper.eval()
-        }.mustBe(10)
+        }.mustEqual(10)
       }
 
       "returning an events value if it has the max before time" in {
@@ -46,7 +46,7 @@ object StepperSpec extends Specification {
         freezeTime(6) {
           val stepper = new Stepper(0, event)
           stepper.eval()
-        }.mustBe(10)
+        }.mustEqual(10)
       }
     }
   }

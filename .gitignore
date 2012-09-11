@@ -1,5 +1,5 @@
 reports/*
-target/*
+target/
 examples/*/target
 examples/example_lib/*
 echo.iml
@@ -9,4 +9,3 @@ echo.iws
 *.log
 .DS_Store
 *.pdf
-project/*

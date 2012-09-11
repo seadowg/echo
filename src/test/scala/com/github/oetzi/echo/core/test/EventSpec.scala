@@ -5,7 +5,7 @@ import com.github.oetzi.echo.Echo._
 import com.github.oetzi.echo.Control._
 import com.github.oetzi.echo.core._
 
-import org.specs._
+import org.specs2.mutable._
 
 object EventSpec extends Specification {
 
