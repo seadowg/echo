@@ -1,6 +1,6 @@
 package com.github.oetzi.echo.core.test
 
-import org.specs._
+import org.specs2.mutable._
 import com.github.oetzi.echo.Echo._
 import com.github.oetzi.echo.Control._
 import com.github.oetzi.echo.core.test.help.TestEvent
@@ -16,7 +16,7 @@ object SwitcherSpec extends Specification {
       "returning 'initial' if event hasn't occured" in {
         val switcher = new Switcher(0, new TestEvent[Behaviour[Int]])
 
-        switcher.eval() mustBe 0
+        switcher.eval() mustEqual 0
       }
 
       "returning the newest event if time is >= last event occurrence" in {
@@ -24,7 +24,7 @@ object SwitcherSpec extends Specification {
         event.pubOccur(5)
         val switcher = new Switcher(0, event)
 
-        switcher.eval mustBe 5
+        switcher.eval mustEqual 5
       }
 
       "returning an event's value if the time is equal to it" in {
@@ -34,7 +34,7 @@ object SwitcherSpec extends Specification {
           event.pubOccur(10)
           val switcher = new Switcher(0, event)
           switcher.eval()
-        }.mustBe(10)
+        }.mustEqual(10)
       }
 
       "returning an events value if it has the max before time" in {
@@ -47,7 +47,7 @@ object SwitcherSpec extends Specification {
         freezeTime(6) {
           val switcher = new Switcher(0, event)
           switcher.eval()
-        }.mustBe(10)
+        }.mustEqual(10)
       }
     }
   }

@@ -1,6 +1,6 @@
 package com.github.oetzi.echo.util.test
 
-import org.specs._
+import org.specs2.mutable._
 import com.github.oetzi.echo.util.Cache
 
 object CacheSpec extends Specification {

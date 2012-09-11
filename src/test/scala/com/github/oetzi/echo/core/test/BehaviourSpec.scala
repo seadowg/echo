@@ -1,7 +1,7 @@
 package com.github.oetzi.echo.core.test
 
 import help.TestEvent
-import org.specs._
+import org.specs2.mutable._
 import com.github.oetzi.echo.Echo._
 import com.github.oetzi.echo.Control._
 import com.github.oetzi.echo.core.Behaviour
@@ -18,7 +18,7 @@ object BehaviourSpec extends Specification {
 
     "be created from from Behaviour.apply" in {
       val behaviour = Behaviour(time => 5)
-      behaviour.isInstanceOf[Behaviour[Int]] mustBe true
+      behaviour.isInstanceOf[Behaviour[Int]] mustEqual true
     }
 
     "provide an until(non-relative) function" >> {
@@ -31,7 +31,7 @@ object BehaviourSpec extends Specification {
       "returning a new Behaviour with the current rule when the Event hasn't occured" in {
         val beh = new Behaviour(time => 5)
 
-        beh.until(new TestEvent[Int], new Behaviour(time => 10)).eval() mustBe 5
+        beh.until(new TestEvent[Int], new Behaviour(time => 10)).eval() mustEqual 5
       }
 
       "returning a new Behaviour with the new rule after the Event occurs" in {
@@ -92,7 +92,7 @@ object BehaviourSpec extends Specification {
 
         freezeTime(0) {
           beh.toggle(new TestEvent[Unit], new Behaviour(time => 10)).eval()
-        }.mustBe(5)
+        }.mustEqual(5)
       }
 
       "returning a new Behaviour that uses the next rule when time >= only occurrence" in {
@@ -104,7 +104,7 @@ object BehaviourSpec extends Specification {
           beh.toggle(event, new Behaviour(time => 10)).eval()
         }
 
-        value mustBe 10
+        value mustEqual 10
       }
 
       "returning a new Behaviour that uses the first rule when time >= second (only two)" in {
@@ -115,7 +115,7 @@ object BehaviourSpec extends Specification {
           event.pubOccur(())
           event.pubOccur(())
           beh.toggle(event, new Behaviour(time => 10)).eval()
-        }.mustBe(5)
+        }.mustEqual(5)
       }
     }
 
@@ -124,7 +124,7 @@ object BehaviourSpec extends Specification {
         val event = new TestEvent[Unit]
         val beh = new Behaviour(time => time)
 
-        beh.sample(event).top() mustBe None
+        beh.sample(event).top() mustEqual None
       }
 
       "returning an event that samples the Behaviour on occurrences" in {

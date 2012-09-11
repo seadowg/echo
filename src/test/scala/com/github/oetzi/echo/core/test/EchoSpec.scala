@@ -1,6 +1,6 @@
 package com.github.oetzi.echo.core.test
 
-import org.specs._
+import org.specs2.mutable._
 import com.github.oetzi.echo.Echo._
 import com.github.oetzi.echo.Control._
 import com.github.oetzi.echo.core._
@@ -23,7 +23,7 @@ object EchoSpec extends Specification {
           done = true
         }
 
-        done mustBe true
+        done mustEqual true
       }
 
       "that freezes time during execution of its block" in {
