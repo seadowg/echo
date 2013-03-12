@@ -11,18 +11,18 @@
           <h1>echo</h1>
             <h6>A Functional Reactive Programming framework for Scala</h6>
         </div>
-      
+
         <div class="step">
           <h3>1. Get It</h3>
           <p>
-            You can download the latest jar of the framework 
+            You can download the latest jar of the framework
             <a href="https://github.com/downloads/oetzi/echo/echo-1.1.0.jar">here</a>. Just
-            stick it in your project folder. I'd personally recommend <a href="http://buildr.apache.org/">buildr</a> 
+            stick it in your project folder. I'd personally recommend <a href="http://buildr.apache.org/">buildr</a>
             for building and compiling Scala projects. If you're wanting to hack on the source you can get that
             <a href="http://github.com/oetzi/echo">here</a>.
           </p>
         </div>
-      
+
         <div class="step">
           <h3>2. FRP</h3>
           <p>
@@ -31,72 +31,72 @@
             streams of values that 'occur' at a discrete point in time - we can think of them as
             as a stream of time and value pairs. Mental eh?
           </p>
-        
+
           <p>
             Lets see some examples. Here we're going to make a simple Behaviour:
           </p>
           <pre>
   val beh = Behaviour(time => time * 2)</pre>
-        
+
           <p>
             This Behaviour will, at a given time <code>t</code> have the value <code>t * 2</code>. So how do we actually
             get at that value? We use the <code>eval</code> function:
           </p>
-          
+
           <pre>
   val value = beh.eval()
   println(value)</pre>
-  
+
           <p>
             The above code would evaluate the Behaviour at the current time and then print the calculated
             value out.
           </p>
-          
+
           <p>
             So what about Events? Well here's something. Imagine we have an Event <code>mouseEv</code>
             that occurs every time the left mouse button is pressed. We could construct a Behaviour like this:
           </p>
-          
+
           <pre>
   val false = Behaviour(time => false)
   val true = Behaviour(time => true)
   val beh = false.until(mouseEv, true)</pre>
-  
+
           <p>
             This creates a Behaviour that has the value <code>false</code> until the left mouse button is
             pressed, at which point its value is <code>true</code>. Cool? How about this:
           </p>
-          
+
           <pre>
-  val beh = false.toggle(mouseEv, true)</pre>  
-  
+  val beh = false.toggle(mouseEv, true)</pre>
+
          <p>
            Guess what this does? Thats right. It produced a Behaviour that toggles between <code>false</code>
            and <code>true</code> whenever that crazy left mouse button is pressed.
-         </p> 
-         
+         </p>
+
          <p>
            Getting the hang of this? Lets jump in at the deep end:
           </p>
-         
+
           <pre>
    val mouseTimes = mouseEv.map((t, v) => t)
    val lastTime = Stepper(-1, mouseTimes)</pre>
-   
+
           <p>
             Ok. Here we map the mouse button Event to return a new Event who's values are that of the times
             of each occurrence. We then use a Stepper. A Stepper is a Behaviour that has an initial value
             and an Event: at any point in time its value will be the Event's last occurrence's value (or the initial
             value if the Event hasn't occurred). With all that put together you will see that we've created a Behaviour
-            that's value will always be the last time the mouse button was pressed (or <code>-1</code> to specify it 
+            that's value will always be the last time the mouse button was pressed (or <code>-1</code> to specify it
             was never pressed).
           </p>
-          
+
           <p>
             That should all have hopefully got you into the right frame of mind. Lets move on to writing
             some code in echo...
           </p>
-    
+
         </div>
         <div class="step">
           <h3>3. Writing Echo Code</h3>
@@ -106,7 +106,7 @@
             that takes care of some stuff for you so all you need to do is write
             your code in the <code>setup</code> function like so:
           </p>
-          
+
           <pre>
   object App extends EchoApp {
      def setup(args : Array[String]) {
@@ -115,38 +115,38 @@
        println(value)
      }
    }</pre>
-   
+
           <p>
             Unfortunately in order to avoid the FRP semantics going bonkers you can only write echo code
             inside this <code>setup</code> function. This may seem restrictive but you'll find in FRP
             you generally write a small amount of code in an upfront declarative manner to define
             an entire applications run-time behaviour.
           </p>
-          
+
           <p>
             You might notice that a lot of the time
             the Behaviours we create are 'constant' (always have the same value).
-            So we can express these easily we can just write constant 
+            So we can express these easily we can just write constant
             Behaviours as their constant values:
           </p>
           <pre>
- val beh = 5.until(event, 5)</pre>     
+ val beh = 5.until(event, 5)</pre>
         </div>
-        
+
         <div class="step">
-          <h3>4. Custom Events</h3> 
-          
+          <h3>4. Custom Events</h3>
+
           <p>
             You are not restricted to only using the Events provided
             in echo. You can simply extend the EventSource class
             to create your own:
           </p>
-          
+
           <pre>
   class CustomEvent extends EventSource[Int] {
     occur(5)
-  }</pre>   
-  
+  }</pre>
+
           <p>
             This creates an Event that when instantiated occurs
             with a value of <code>5</code>. The <code>occur</code>
@@ -154,7 +154,7 @@
             extends EventSource.
           </p>
         </div>
-      
+
         <div class="step">
           <h3>5. Adding Graphics</h3>
           <p>
@@ -163,39 +163,39 @@
             Before we launch into all that though lets make a small little app with a button and
             some text:
           </p>
-            
+
             <pre>
   val frame = Frame(200, 200, List(
     Text("Hello you!"),
     Button("Click Me!")
   ))</pre>
           </p>
-          
+
           <p>
             This creates a Frame with a size of 200 x 200. It should be noted that these
             dimensions are Behaviours so if we set them to change over time the window
             size would stay up to date with the Behaviour's value. So lets do something with FRP:
           </p>
-          
+
           <pre>
   val button = Button("Click Me!")
   val text = "Hello".until(button.click, "Goodbye")
-  
+
   val frame = Frame(200, 200, List(
     text,
     button
   ))</pre>
-  
+
           <p>
             When this app runs the text component will say <code>"Hello"</code> but when a user hits the button
             it will change to saying <code>"Goodbye"</code>. You can see pretty immediately that this allows us
             to build our GUI's in a much nicer way. No ActionEventListener here. Its hard to cover
-            all the different components and attributes for the UI framework here but the 
+            all the different components and attributes for the UI framework here but the
             <a href="target/doc/index.html">docs</a>
             should provide a good starting point.
           </p>
         </div>
-      
+
         <div class="step">
           <h3>6. Over the Interwebs...</h3>
           <p>
@@ -204,36 +204,36 @@
             way inclined. These are Sender and Receiver. A Sender sends messages whenever a given
             Event occurs and a Receiver occurs whenever it receives a message. Lets build an example:
           </p>
-          
+
           <pre>
   val button = Button("Ping")
   val pinger = button.click.map((t, v) => "Ping")
   val sender = Sender("localhost", 1997, pinger)
   val receiver = Receiver(1997)</pre>
-  
+
           <p>
             Here we create a Sender that will send the message <code>"Ping"</code> out to the specified
             IP and port number. You can see the Receiver uses the same port and as we are on
             the same computer the messages the messages will be received by the Receiver we created.
           </p>
-          
+
           <p>
-            Of course now we are communicating over a network we've started writing FRP code that
+            Of course we are now communicating over a network we've started writing FRP code that
             might fail due to something out of our control. Luckily we can deal with this. Remember Exceptions?
             Well we can the Sender and Receiver types have an <code>errors</code> Event that will occur whenever an Exception
             is thrown within their operation. So, if want a Behaviour that shows the last error message from our
             Sender:
           </p>
-          
+
           <pre>
   val error = Stepper("No errors!", sender.errors.map((t, e) => e.toString))</pre>
-  
+
           <p>
             Using Events to deal with Exceptions should allow you to declaratively define how your
             code is going to deal with errors.
           </p>
         </div>
-        
+
         <div class="step">
           <h3>7. Going Deeper</h3>
           <p>
